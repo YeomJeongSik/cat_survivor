@@ -1,0 +1,7 @@
+[
+  {"skin_id":"magpie_tuxedo","name":"새들의 집회","description":"살아 있는 새 12마리를 동시에 모으기","species":"magpie","count":12},
+  {"skin_id":"squirrel_brown","name":"도토리 모임","description":"살아 있는 다람쥐 8마리를 동시에 모으기","species":"squirrel","count":8},
+  {"skin_id":"bee_golden","name":"윙윙 합창단","description":"살아 있는 벌 3마리를 동시에 모으기","species":"bee","count":3},
+  {"skin_id":"snake_silver","name":"땅속의 이웃들","description":"살아 있는 뱀 5마리를 동시에 모으기","species":"snake","count":5},
+  {"skin_id":"rainbow_clear","name":"캠퍼스의 수호냥","description":"200웨이브를 살아남아 클리어하기","count":200}
+]
