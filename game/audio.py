@@ -5,8 +5,9 @@ import pico2d.pico2d as native
 
 ROOT=Path(__file__).resolve().parents[1]/'assets/audio'
 TRACKS={'TITLE':'campus_stroll','RANKING':'campus_stroll','PLAY':'jelly_rush','RESULT':'sunset_record'}
+COMBAT_SOUNDS=('shot','hurt','jump','enemy_hit','magpie_attack','squirrel_attack','bee_attack','snake_attack')
 CHANNELS={'shot':0,'dash':1,'jump':2,'land':2,'enemy_death':3,'magpie_attack':4,'bee_attack':11,
-          'squirrel_attack':12,'snake_attack':13,'siren':5,'click':6,'countdown':6,
+          'squirrel_attack':12,'snake_attack':13,'enemy_hit':14,'siren':5,'click':6,'countdown':6,
           'hurt':7,'cat_death':7,'pickup':8,'heal':8,'unlock':9,'clear':9,'empty':10,'no_target':10}
 
 
@@ -21,7 +22,7 @@ class Audio:
         for name in set(TRACKS.values()):
             self.music[name]=p.load_music(str(ROOT/'bgm'/f'{name}.wav'))
         for name in CHANNELS:
-            folder=ROOT/'sfx'
+            folder=ROOT/'v2/sfx' if name in COMBAT_SOUNDS else ROOT/'sfx'
             self.sounds[name]=p.load_wav(str(folder/f'{name}.wav'))
         self.volumes(profile)
 
@@ -37,7 +38,7 @@ class Audio:
             self.current=name
 
     def play(self,name):
-        if name in ('footstep','enemy_hit'):
+        if name=='footstep':
             name='land'
         if self.available and name in self.sounds:
             p.Mix_PlayChannel(CHANNELS[name],self.sounds[name].wav,0)

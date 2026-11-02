@@ -1,0 +1,62 @@
+{
+  "author": "Project original local procedural SFX",
+  "license": "Original synthesis; no recordings, third-party samples, API or cloud",
+  "files": [
+    {
+      "file": "sfx/shot.wav",
+      "seconds": 0.28,
+      "sample_rate": 22050,
+      "peak": 0.3495,
+      "description": "Short bright synthetic meow on projectile launch"
+    },
+    {
+      "file": "sfx/hurt.wav",
+      "seconds": 0.36,
+      "sample_rate": 22050,
+      "peak": 0.4137,
+      "description": "Higher rough startled synthetic cat yelp on damage"
+    },
+    {
+      "file": "sfx/jump.wav",
+      "seconds": 0.2,
+      "sample_rate": 22050,
+      "peak": 0.2474,
+      "description": "Soft rising cartoon spring for both jumps"
+    },
+    {
+      "file": "sfx/enemy_hit.wav",
+      "seconds": 0.13,
+      "sample_rate": 22050,
+      "peak": 0.3885,
+      "description": "Crisp paw impact on every projectile hit, including lethal hits"
+    },
+    {
+      "file": "sfx/magpie_attack.wav",
+      "seconds": 0.32,
+      "sample_rate": 22050,
+      "peak": 0.286,
+      "description": "Two coarse bird calls with a wing rush at attack start"
+    },
+    {
+      "file": "sfx/squirrel_attack.wav",
+      "seconds": 0.27,
+      "sample_rate": 22050,
+      "peak": 0.2237,
+      "description": "Three quick squirrel chirps and a light launch rustle"
+    },
+    {
+      "file": "sfx/bee_attack.wav",
+      "seconds": 0.3,
+      "sample_rate": 22050,
+      "peak": 0.2622,
+      "description": "Accelerating raspy wing buzz on the bee dash"
+    },
+    {
+      "file": "sfx/snake_attack.wav",
+      "seconds": 0.34,
+      "sample_rate": 22050,
+      "peak": 0.3771,
+      "description": "Airy snake hiss with a low dirt pop on emergence"
+    }
+  ]
+}
