@@ -270,6 +270,30 @@ class World:
         self.events.append('dash')
 
 
+    def nearest_enemy(self, x, y):
+        return min((e for e in self.enemies if e.targetable),
+                   key=lambda e:(e.x-x)**2+(e.y-y)**2,default=None)
+
+
+    def shoot(self):
+        c = self.cat
+        if self.mode != 'PLAYING' or c.shot_cd > 0:
+            return
+        c.shot_cd = BALANCE['shot_cooldown']
+        if not c.ammo:
+            self.events.append('empty')
+            return
+        target = self.nearest_enemy(c.x,c.y+26)
+        if target is None:
+            self.events.append('no_target')
+            return
+        dx,dy = direction_to(c.x,c.y+26,target)
+        self.projectiles.append(Projectile(c.x+dx*25,c.y+26+dy*18,dx=dx,dy=dy,target=target))
+        c.ammo -= 1
+        c.attack_left = .2
+        self.events.append('shot')
+
+
     def spawn_enemy(self, kind):
         self.spawn_stats['attempted'] += 1
         living = [e for e in self.enemies if e.alive]
@@ -501,12 +525,46 @@ class World:
             self.siren_due.pop(0)
             self.events.append('siren')
         self.update_cat(dt,keys)
+        if 'shoot' in keys:
+            self.shoot()
         while self.spawn_queue and self.spawn_queue[0][0] <= self.wave_time:
             _, kind = self.spawn_queue.pop(0)
             self.spawn_enemy(kind)
         for e in self.enemies:
             self.update_enemy(e,dt)
+        for p in self.projectiles:
+            p.clock += dt
+            old_x,old_y = p.x,p.y
+            if p.target is None or not p.target.targetable or not any(e is p.target for e in self.enemies):
+                p.target = self.nearest_enemy(p.x,p.y)
+            if p.target is not None:
+                p.dx,p.dy = direction_to(p.x,p.y,p.target)
+            p.x += p.dx*BALANCE['projectile_speed']*dt
+            p.y += p.dy*BALANCE['projectile_speed']*dt
+            p.enter('FLY',reset_clock=False)
+            hits = [(t,e) for e in self.enemies if e.exposed and (t:=segment_hit(old_x,old_y,p.x,p.y,e.box(5))) is not None]
+            if hits:
+                _, e = min(hits,key=lambda pair:pair[0])
+                killed = e.damage()
+                p.enter('HIT')
+                self.events.append('enemy_hit')
+                if killed:
+                    self.kill_score += (10,15,25)[e.grade]
+                    self.events.append('enemy_death')
+            elif not 0 <= p.x <= 960 or not BALANCE['ground'] <= p.y <= 560 or p.clock > 2:
+                p.enter('DESPAWN')
+        self.projectiles = [p for p in self.projectiles if p.state not in ('HIT','DESPAWN')]
         self.enemies = [e for e in self.enemies if not(e.state == 'DEAD' and e.clock > .45)]
+        c = self.cat
+        if not c.invincible and c.dash_left <= 0:
+            for e in self.enemies:
+                if e.exposed and not e.spawn_grace and segment_hit(c.x,c.y+24,c.x,c.y+24,e.box(13)) is not None:
+                    c.hp -= 1
+                    c.invincible = BALANCE['invincible_seconds']
+                    self.events.append('hurt')
+                    if c.hp <= 0:
+                        self.begin_death()
+                    break
         self.trails = [t for t in self.trails if self.time-t[3] < .23]
         cleared_early = not self.spawn_queue and not any(e.alive for e in self.enemies)
         if self.mode == 'PLAYING' and (cleared_early or self.wave_time+1e-8 >= self.spec['duration']):
