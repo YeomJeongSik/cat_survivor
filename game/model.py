@@ -200,7 +200,7 @@ class World:
         self.notices, self.events = [], []
         self.spawn_stats = dict(attempted=0, success=0, skipped=0)
         self.bandage_due = None
-        self.spawn_queue,self.siren_due = [],[]
+        self.start_wave()
 
 
     @property
@@ -211,6 +211,23 @@ class World:
     @property
     def score(self):
         return self.completed * 100 + int(self.time * 2) + self.kill_score + (50000 if self.mode == 'CLEAR' else 0)
+
+
+    def start_wave(self):
+        self.wave_time = 0.
+        self.wave_rng = random.Random(self.seed ^ (self.wave * 2654435761))
+        kinds = list(self.spec['species'])
+        offset = self.wave % len(kinds)
+        kinds = kinds[offset:] + kinds[:offset]
+        self.spawn_queue = []
+        due = BALANCE['spawn_first_delay']
+        for i in range(wave_quota(self.spec)):
+            self.spawn_queue.append((due,kinds[i%len(kinds)]))
+            due += BALANCE['spawn_fast_gap'] if i<2 else BALANCE['spawn_slow_gap']
+        if self.wave % BALANCE['heal_wave_interval'] == 0:
+            self.bandage_due = self.time + .4
+        self.events.append('wave')
+        self.siren_due = [0.,.32,.64]
 
 
     def pause(self):
@@ -253,6 +270,33 @@ class World:
         self.events.append('dash')
 
 
+    def spawn_enemy(self, kind):
+        self.spawn_stats['attempted'] += 1
+        living = [e for e in self.enemies if e.alive]
+        if len(living) >= self.spec['cap'] or (kind == 'bee' and sum(e.species == 'bee' for e in living) >= 3):
+            self.spawn_stats['skipped'] += 1
+            return
+        for _ in range(24):
+            x = self.wave_rng.uniform(45, 915)
+            y = self.wave_rng.uniform(310, 480) if kind in ('magpie', 'bee') else BALANCE['ground']+22
+            if kind == 'magpie':
+                y = BALANCE['magpie_y']
+            if kind == 'squirrel':
+                left, right, floor = self.wave_rng.choice(BALANCE['surfaces'])
+                x, y = self.wave_rng.uniform(left+25, right-25), floor+22
+            if math.hypot(x-self.cat.x, y-self.cat.y-22) < 145:
+                continue
+            if any(math.hypot(x-e.x, y-e.y) < 65 for e in living):
+                continue
+            grade = self.spec['grade']
+            self.enemies.append(Enemy(x, y, species=kind, grade=grade, max_grade=1 if grade == 0 else 2,
+                                      vx=self.wave_rng.choice((-1, 1))*70, origin_y=y,
+                                      behavior=self.wave_rng.randrange(3), speed_scale=1.1 if self.spec['stage'] >= 3 else 1.))
+            self.spawn_stats['success'] += 1
+            return
+        self.spawn_stats['skipped'] += 1
+
+
     def update_cat(self, dt, keys):
         c = self.cat
         was_grounded = c.grounded
@@ -291,6 +335,143 @@ class World:
         c.clock += dt
 
 
+    def update_enemy(self, e, dt):
+        e.clock += dt
+        e.hit_flash = max(0.,e.hit_flash-dt)
+        if not e.alive:
+            if e.state == 'HIT' and e.clock > .1:
+                e.enter('DEAD')
+            return
+        e.spawn_grace = max(0., e.spawn_grace-dt)
+        e.evolution += dt
+        if e.grade < e.max_grade and e.evolution >= BALANCE['evolution_seconds']:
+            e.grade += 1
+            e.evolution = 0.
+        g, c = e.grade, self.cat
+        warning = (.6, .45, .34)[g]
+        if e.species == 'snake':
+            if e.state in ('IDLE', 'BURROW_MOVE'):
+                e.y = BALANCE['ground']+22
+                dx = c.x-e.x
+                e.x += max(-1, min(1, dx))*(55, 62, 70)[g]*dt
+                if abs(dx) < 42 and e.clock > .8:
+                    e.enter('CHARGE')
+                elif abs(dx) >= 42:
+                    e.enter('BURROW_MOVE',reset_clock=False)
+            elif e.state == 'CHARGE':
+                e.y = BALANCE['ground']+22
+                if e.clock >= warning:
+                    e.enter('POP_UP')
+                    self.events.append('snake_attack')
+            elif e.state == 'POP_UP':
+                e.y = BALANCE['ground']+22+45*min(1, e.clock/.18)
+                if e.clock >= .3:
+                    e.enter('RETURN_UNDERGROUND')
+            elif e.state == 'RETURN_UNDERGROUND':
+                e.y = BALANCE['ground']+22+45*max(0, 1-e.clock/.24)
+                if e.clock >= .24:
+                    e.enter('IDLE')
+        elif e.species == 'squirrel':
+            if e.state in ('IDLE', 'PATROL', 'LAND'):
+                e.x += e.vx*dt*e.speed_scale
+                surface = next((s for s in BALANCE['surfaces'][1:] if abs(e.y-s[2]-22) < 2 and s[0]-2 <= e.x <= s[1]+2), BALANCE['surfaces'][0])
+                if e.x < surface[0]+25 or e.x > surface[1]-25:
+                    e.vx *= -1
+                    e.x = max(surface[0]+25,min(surface[1]-25,e.x))
+                e.enter('PATROL',reset_clock=False)
+                if e.clock > 1.7:
+                    e.enter('CROUCH_CHARGE')
+            elif e.state == 'CROUCH_CHARGE' and e.clock > (.8, .6, .48)[g]:
+                e.vy = (520, 600, 660)[g]
+                e.vx = (1 if c.x > e.x else -1)*150
+                e.enter('JUMP')
+                self.events.append('squirrel_attack')
+            elif e.state == 'JUMP':
+                old_y = e.y
+                e.vy -= BALANCE['gravity']*dt
+                e.x += e.vx*dt
+                e.y += e.vy*dt
+                if e.x < 25 or e.x > 935:
+                    e.x = max(25, min(935, e.x))
+                    e.vx *= -1
+                for left, right, floor in sorted(BALANCE['surfaces'], key=lambda s: -s[2]):
+                    if left <= e.x <= right and e.vy <= 0 and old_y-22 >= floor and e.y-22 <= floor:
+                        e.y, e.vy = floor+22, 0
+                        e.enter('LAND')
+                        break
+        elif e.species == 'magpie':
+            self.update_magpie(e,dt,warning)
+        else:
+            if e.state in ('IDLE', 'WAIT'):
+                wait = (1.9, 1.45, 1.05)[g]
+                if e.clock > wait:
+                    dx,dy = c.x-e.x,c.y+24-e.y
+                    length = max(1,math.hypot(dx,dy))
+                    e.attack_dx, e.attack_dy = dx/length, dy/length
+                    e.enter('TARGET_LOCK')
+            elif e.state == 'TARGET_LOCK' and e.clock >= warning:
+                e.distance = 0.
+                e.enter('DASH')
+                self.events.append('bee_attack')
+            elif e.state == 'DASH':
+                speed = 250
+                e.x += e.attack_dx*speed*dt
+                e.y += e.attack_dy*speed*dt
+                e.distance += speed*dt
+                e.x, e.y = max(25,min(935,e.x)), max(BALANCE['ground']+20,min(510,e.y))
+                if e.distance >= 140:
+                    e.enter('WAIT')
+
+
+    def update_magpie(self,e,dt,warning):
+        home = BALANCE['magpie_y']
+        if e.state in ('IDLE','FLY','WARNING'):
+            e.y = home
+        if e.state in ('IDLE','FLY'):
+            if e.behavior == 2:
+                speed = (150,175,190)[e.grade]
+                e.vx = max(-speed,min(speed,(self.cat.x-e.x)*1.5))
+            elif e.behavior == 0 and self.rng.random() < dt*.6:
+                e.vx *= -1
+            e.x += e.vx*dt*e.speed_scale
+            if e.x < 30 or e.x > 930:
+                e.x = max(30,min(930,e.x))
+                e.vx *= -1
+            e.enter('FLY',reset_clock=False)
+            if e.clock > 1.8:
+                dx,dy = self.cat.x-e.x,self.cat.y+24-e.y
+                length = max(1.,math.hypot(dx,dy))
+                e.attack_dx,e.attack_dy = dx/length,dy/length
+                e.attack_length = min(700.,max(260.,length+40))
+                e.arc_start_x = e.x
+                e.arc_end_x = max(30,min(930,2*self.cat.x-e.x))
+                e.arc_depth = max(60,min(home-BALANCE['ground']-22,home-self.cat.y-24))
+                e.enter('WARNING')
+        elif e.state == 'WARNING' and e.clock >= warning:
+            e.distance = 0.
+            e.enter('DIVE' if e.behavior == 0 else 'RUSH')
+            self.events.append('magpie_attack')
+        elif e.state == 'DIVE':
+            t = min(1.,e.clock/BALANCE['magpie_arc_seconds'])
+            e.x = e.arc_start_x+(e.arc_end_x-e.arc_start_x)*t
+            e.y = home-4*e.arc_depth*t*(1-t)
+            if t >= 1:
+                e.enter('IDLE')
+        elif e.state == 'RUSH':
+            speed = (360,400,450)[e.grade]
+            e.x = max(25,min(935,e.x+e.attack_dx*speed*dt))
+            e.y = max(BALANCE['ground']+22,min(520,e.y+e.attack_dy*speed*dt))
+            e.distance += speed*dt
+            if e.distance >= e.attack_length:
+                e.enter('RECOVER')
+        elif e.state == 'RECOVER':
+            delta = home-e.y
+            step = BALANCE['magpie_return_speed']*dt
+            e.y += max(-step,min(step,delta))
+            if abs(e.y-home) < .001:
+                e.enter('IDLE')
+
+
     def update(self, dt, keys=frozenset()):
         if dt < 0 or not math.isfinite(dt):
             raise ValueError('dt must be finite and nonnegative')
@@ -313,9 +494,29 @@ class World:
             dt -= step
 
 
-    def tick(self,dt,keys):
+    def tick(self, dt, keys):
         self.time += dt
         self.wave_time += dt
+        while self.siren_due and self.siren_due[0] <= self.wave_time:
+            self.siren_due.pop(0)
+            self.events.append('siren')
         self.update_cat(dt,keys)
+        while self.spawn_queue and self.spawn_queue[0][0] <= self.wave_time:
+            _, kind = self.spawn_queue.pop(0)
+            self.spawn_enemy(kind)
+        for e in self.enemies:
+            self.update_enemy(e,dt)
+        self.enemies = [e for e in self.enemies if not(e.state == 'DEAD' and e.clock > .45)]
+        self.trails = [t for t in self.trails if self.time-t[3] < .23]
+        cleared_early = not self.spawn_queue and not any(e.alive for e in self.enemies)
+        if self.mode == 'PLAYING' and (cleared_early or self.wave_time+1e-8 >= self.spec['duration']):
+            self.completed += 1
+            if self.wave == len(WAVES):
+                self.clear_run()
+                self.unlocked.add('rainbow_clear')
+                self.events.append('clear')
+            else:
+                self.wave += 1
+                self.start_wave()
 
 
