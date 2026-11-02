@@ -371,6 +371,17 @@ class App:
                 self.buttons.append(((x-20,y-18,x+20,y+18),('skin',skin),owned))
             self.button('장착',(751,332,891,366),'equip')
 
+    def controls_panel(self):
+        self.panel(*CONTROLS_PANEL)
+        self.art.text('조작 방법',480,399,24,INK,True)
+        rows=(('← / →','좌우 이동'),('SPACE','점프 / 공중에서 한 번 더'),
+              ('SHIFT','대시 · 사용 중 무적'),('왼쪽 CTRL','가까운 적에게 유도탄'),
+              ('ESC','일시정지 / 계속하기'),('F11','전체 화면'))
+        for i,(key,description) in enumerate(rows):
+            y=359-i*25
+            self.art.text(key,296,y,16)
+            self.art.text(description,420,y,16)
+
     def draw(self):
         p.clear_canvas()
         self.buttons = []
@@ -383,6 +394,9 @@ class App:
             self.art.draw('ui/title_logo.png',480,477,420,280)
             self.cat(480,255,'groom' if self.ui_clock%8>4 else 'idle',self.ui_clock)
             self.button('시작하기',(335,182,625,230),'start')
+            self.button('키 설명',CONTROLS_BUTTON,'controls')
+            if self.controls_popup:
+                self.controls_panel()
         if self.error:
             self.panel(30,10,930,42)
             self.art.text(self.error[:80],45,26,13,(151,44,44))
