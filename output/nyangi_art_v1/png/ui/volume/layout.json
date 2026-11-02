@@ -1,0 +1,27 @@
+{
+  "track_start_x": 8,
+  "axis_y": 16,
+  "tick_count": 21,
+  "layers": [
+    "track_base.png",
+    "track_fill.png",
+    "ticks.png",
+    "knob.png"
+  ],
+  "canvas": [
+    256,
+    32
+  ],
+  "knob_canvas": [
+    24,
+    24
+  ],
+  "minor_tick_step": 5,
+  "composition": "Overlay base/fill/ticks at the same origin. Clip the fill at the current knob X. Position the knob independently; never stretch the complete assembled UI.",
+  "volume_step": 10,
+  "knob_pivot": [
+    12,
+    12
+  ],
+  "track_end_x": 248
+}

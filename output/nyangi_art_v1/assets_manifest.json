@@ -1,0 +1,3337 @@
+{
+  "game": "냥이 서바이버",
+  "version": "art_v1",
+  "logical_canvas": [
+    960,
+    640
+  ],
+  "format": "PNG RGBA",
+  "interpolation": "nearest-neighbor",
+  "generator": "Built-in ImageGen for original art; native PNG export for frame registration, palette variants and independent volume layers.",
+  "coordinate_origin": "top-left image coordinates; convert Y for pico2d clip_draw",
+  "sprite_layout": "Each animation is a horizontal strip. Use the actual frames count; cat atlases have 8 columns and 9 rows with transparent unused cells.",
+  "cat_atlas_rows": [
+    "idle",
+    "walk",
+    "jump",
+    "fall",
+    "dash",
+    "attack",
+    "hit",
+    "dead",
+    "groom"
+  ],
+  "skins": [
+    "tobi_default",
+    "magpie_tuxedo",
+    "squirrel_brown",
+    "bee_golden",
+    "snake_silver",
+    "rainbow_clear"
+  ],
+  "cat_palette": [
+    2367271,
+    7158308,
+    10311724,
+    14256963,
+    15906153,
+    16247507,
+    16774629,
+    13154203,
+    15240854,
+    11122792,
+    15579206,
+    1316125
+  ],
+  "volume_layout": "png/ui/volume/layout.json",
+  "entries": [
+    {
+      "file": "sprites/enemies/magpie/idle.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/magpie/fly.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/magpie/warning.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/magpie/dive.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/magpie/rush.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/magpie/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/magpie/dead.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/squirrel/idle.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/squirrel/patrol.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/squirrel/crouch_charge.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/squirrel/jump.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/squirrel/land.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/squirrel/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/squirrel/dead.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/bee/idle.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/bee/target_lock.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/bee/dash.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/bee/wait.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/bee/hit.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/bee/dead.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/snake/idle.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/snake/burrow_move.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/snake/charge.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/snake/pop_up.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/snake/return_underground.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/snake/hit.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/enemies/snake/dead.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/snake_dig.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/cat/tobi_default/idle.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "ui/portraits/tobi_default.png",
+      "width": 64,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "sprites/cat/tobi_default/walk.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/tobi_default/jump.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/tobi_default/fall.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/tobi_default/dash.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/tobi_default/attack.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/tobi_default/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/cat/tobi_default/dead.png",
+      "width": 448,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 7,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 7
+    },
+    {
+      "file": "sprites/cat/tobi_default/groom.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/magpie_tuxedo/idle.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "ui/portraits/magpie_tuxedo.png",
+      "width": 64,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "sprites/cat/magpie_tuxedo/walk.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/magpie_tuxedo/jump.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/magpie_tuxedo/fall.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/magpie_tuxedo/dash.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/magpie_tuxedo/attack.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/magpie_tuxedo/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/cat/magpie_tuxedo/dead.png",
+      "width": 448,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 7,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 7
+    },
+    {
+      "file": "sprites/cat/magpie_tuxedo/groom.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/squirrel_brown/idle.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "ui/portraits/squirrel_brown.png",
+      "width": 64,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "sprites/cat/squirrel_brown/walk.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/squirrel_brown/jump.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/squirrel_brown/fall.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/squirrel_brown/dash.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/squirrel_brown/attack.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/squirrel_brown/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/cat/squirrel_brown/dead.png",
+      "width": 448,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 7,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 7
+    },
+    {
+      "file": "sprites/cat/squirrel_brown/groom.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/bee_golden/idle.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "ui/portraits/bee_golden.png",
+      "width": 64,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "sprites/cat/bee_golden/walk.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/bee_golden/jump.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/bee_golden/fall.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/bee_golden/dash.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/bee_golden/attack.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/bee_golden/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/cat/bee_golden/dead.png",
+      "width": 448,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 7,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 7
+    },
+    {
+      "file": "sprites/cat/bee_golden/groom.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/snake_silver/idle.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "ui/portraits/snake_silver.png",
+      "width": 64,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "sprites/cat/snake_silver/walk.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/snake_silver/jump.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/snake_silver/fall.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/snake_silver/dash.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/snake_silver/attack.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/snake_silver/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/cat/snake_silver/dead.png",
+      "width": 448,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 7,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 7
+    },
+    {
+      "file": "sprites/cat/snake_silver/groom.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/rainbow_clear/idle.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "ui/portraits/rainbow_clear.png",
+      "width": 64,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "sprites/cat/rainbow_clear/walk.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/rainbow_clear/jump.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/rainbow_clear/fall.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/rainbow_clear/dash.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/rainbow_clear/attack.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/cat/rainbow_clear/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/cat/rainbow_clear/dead.png",
+      "width": 448,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 7,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 7
+    },
+    {
+      "file": "sprites/cat/rainbow_clear/groom.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8
+    },
+    {
+      "file": "sprites/items/churu.png",
+      "width": 128,
+      "height": 48,
+      "frame_width": 32,
+      "frame_height": 48,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        16,
+        24
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/items/bandage.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/projectiles/paw_000.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/projectiles/paw_045.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/projectiles/paw_090.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/projectiles/paw_135.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/projectiles/paw_180.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/projectiles/paw_225.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/projectiles/paw_270.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "sprites/projectiles/paw_315.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/pickup.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 12,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/jump_dust.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/paw_hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/heal.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/bandage_spawn_warning.png",
+      "width": 384,
+      "height": 48,
+      "frame_width": 96,
+      "frame_height": 48,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        48,
+        24
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/awakened_aura.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/super_awakened_aura.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/attack_warning.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/despawn.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4
+    },
+    {
+      "file": "effects/dash_afterimage_01.png",
+      "width": 64,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "effects/dash_afterimage_02.png",
+      "width": 64,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "effects/dash_afterimage_03.png",
+      "width": 64,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "effects/dash_afterimage_04.png",
+      "width": 64,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/grass_top.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/grass_left_edge.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/grass_right_edge.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/soil_fill.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/platform_left.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/platform_center.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/platform_right.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/stone_path.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/lawn.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/weed_decor.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/tiny_flower.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/bush.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/stone_small.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/stone_large.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/moss_path.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "tiles/deep_soil.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/button_normal.png",
+      "width": 192,
+      "height": 64,
+      "frame_width": 192,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        96,
+        32
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/button_hover.png",
+      "width": 192,
+      "height": 64,
+      "frame_width": 192,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        96,
+        32
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/button_pressed.png",
+      "width": 192,
+      "height": 64,
+      "frame_width": 192,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        96,
+        32
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/button_disabled.png",
+      "width": 192,
+      "height": 64,
+      "frame_width": 192,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        96,
+        32
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/rank_row.png",
+      "width": 320,
+      "height": 80,
+      "frame_width": 320,
+      "frame_height": 80,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        160,
+        40
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/costume_panel.png",
+      "width": 160,
+      "height": 240,
+      "frame_width": 160,
+      "frame_height": 240,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        80,
+        120
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/pause_panel.png",
+      "width": 192,
+      "height": 256,
+      "frame_width": 192,
+      "frame_height": 256,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        96,
+        128
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/portrait_frame.png",
+      "width": 64,
+      "height": 80,
+      "frame_width": 64,
+      "frame_height": 80,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        32,
+        40
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/heart_full.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/heart_empty.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/ammo_full.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/ammo_empty.png",
+      "width": 32,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/play.png",
+      "width": 48,
+      "height": 48,
+      "frame_width": 48,
+      "frame_height": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        24,
+        24
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/pause.png",
+      "width": 48,
+      "height": 48,
+      "frame_width": 48,
+      "frame_height": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        24,
+        24
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/restart.png",
+      "width": 48,
+      "height": 48,
+      "frame_width": 48,
+      "frame_height": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        24,
+        24
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/settings.png",
+      "width": 48,
+      "height": 48,
+      "frame_width": 48,
+      "frame_height": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        24,
+        24
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/lock.png",
+      "width": 48,
+      "height": 48,
+      "frame_width": 48,
+      "frame_height": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        24,
+        24
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/bgm.png",
+      "width": 48,
+      "height": 48,
+      "frame_width": 48,
+      "frame_height": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        24,
+        24
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/sfx.png",
+      "width": 48,
+      "height": 48,
+      "frame_width": 48,
+      "frame_height": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        24,
+        24
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/close.png",
+      "width": 48,
+      "height": 48,
+      "frame_width": 48,
+      "frame_height": 48,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        24,
+        24
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/wave_banner.png",
+      "width": 320,
+      "height": 64,
+      "frame_width": 320,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        160,
+        32
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/wave_banner_heal.png",
+      "width": 320,
+      "height": 64,
+      "frame_width": 320,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        160,
+        32
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/new_record.png",
+      "width": 192,
+      "height": 224,
+      "frame_width": 192,
+      "frame_height": 224,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        96,
+        112
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "backgrounds/campus_title.png",
+      "width": 960,
+      "height": 640,
+      "frame_width": 960,
+      "frame_height": 640,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        480,
+        320
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "backgrounds/campus_gameplay.png",
+      "width": 960,
+      "height": 640,
+      "frame_width": 960,
+      "frame_height": 640,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        480,
+        320
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "ui/title_logo.png",
+      "width": 768,
+      "height": 512,
+      "frame_width": 768,
+      "frame_height": 512,
+      "frames": 1,
+      "fps": 0,
+      "loop": false,
+      "pivot": [
+        384,
+        256
+      ],
+      "unique_frames": 1
+    },
+    {
+      "file": "effects/outlines/magpie/idle_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/idle.png"
+    },
+    {
+      "file": "effects/outlines/magpie/idle_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/idle.png"
+    },
+    {
+      "file": "effects/outlines/magpie/fly_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/fly.png"
+    },
+    {
+      "file": "effects/outlines/magpie/fly_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/fly.png"
+    },
+    {
+      "file": "effects/outlines/magpie/warning_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/warning.png"
+    },
+    {
+      "file": "effects/outlines/magpie/warning_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/warning.png"
+    },
+    {
+      "file": "effects/outlines/magpie/warning_warning.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/warning.png"
+    },
+    {
+      "file": "effects/outlines/magpie/dive_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/dive.png"
+    },
+    {
+      "file": "effects/outlines/magpie/dive_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/dive.png"
+    },
+    {
+      "file": "effects/outlines/magpie/rush_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/rush.png"
+    },
+    {
+      "file": "effects/outlines/magpie/rush_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/rush.png"
+    },
+    {
+      "file": "effects/outlines/magpie/hit_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/hit.png"
+    },
+    {
+      "file": "effects/outlines/magpie/hit_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/hit.png"
+    },
+    {
+      "file": "effects/outlines/magpie/dead_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/dead.png"
+    },
+    {
+      "file": "effects/outlines/magpie/dead_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/magpie/dead.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/idle_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/idle.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/idle_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/idle.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/patrol_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/patrol.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/patrol_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/patrol.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/crouch_charge_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/crouch_charge.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/crouch_charge_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/crouch_charge.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/crouch_charge_warning.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/crouch_charge.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/jump_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/jump.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/jump_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/jump.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/land_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/land.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/land_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/land.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/hit_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/hit.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/hit_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/hit.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/dead_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/dead.png"
+    },
+    {
+      "file": "effects/outlines/squirrel/dead_super_awakened.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/squirrel/dead.png"
+    },
+    {
+      "file": "effects/outlines/bee/idle_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/idle.png"
+    },
+    {
+      "file": "effects/outlines/bee/idle_super_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/idle.png"
+    },
+    {
+      "file": "effects/outlines/bee/target_lock_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/target_lock.png"
+    },
+    {
+      "file": "effects/outlines/bee/target_lock_super_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/target_lock.png"
+    },
+    {
+      "file": "effects/outlines/bee/target_lock_warning.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/target_lock.png"
+    },
+    {
+      "file": "effects/outlines/bee/dash_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/dash.png"
+    },
+    {
+      "file": "effects/outlines/bee/dash_super_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/dash.png"
+    },
+    {
+      "file": "effects/outlines/bee/wait_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/wait.png"
+    },
+    {
+      "file": "effects/outlines/bee/wait_super_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/wait.png"
+    },
+    {
+      "file": "effects/outlines/bee/hit_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/hit.png"
+    },
+    {
+      "file": "effects/outlines/bee/hit_super_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/hit.png"
+    },
+    {
+      "file": "effects/outlines/bee/dead_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/dead.png"
+    },
+    {
+      "file": "effects/outlines/bee/dead_super_awakened.png",
+      "width": 128,
+      "height": 32,
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/bee/dead.png"
+    },
+    {
+      "file": "effects/outlines/snake/idle_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/idle.png"
+    },
+    {
+      "file": "effects/outlines/snake/idle_super_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/idle.png"
+    },
+    {
+      "file": "effects/outlines/snake/burrow_move_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/burrow_move.png"
+    },
+    {
+      "file": "effects/outlines/snake/burrow_move_super_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/burrow_move.png"
+    },
+    {
+      "file": "effects/outlines/snake/charge_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/charge.png"
+    },
+    {
+      "file": "effects/outlines/snake/charge_super_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/charge.png"
+    },
+    {
+      "file": "effects/outlines/snake/charge_warning.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/charge.png"
+    },
+    {
+      "file": "effects/outlines/snake/pop_up_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/pop_up.png"
+    },
+    {
+      "file": "effects/outlines/snake/pop_up_super_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/pop_up.png"
+    },
+    {
+      "file": "effects/outlines/snake/return_underground_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/return_underground.png"
+    },
+    {
+      "file": "effects/outlines/snake/return_underground_super_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/return_underground.png"
+    },
+    {
+      "file": "effects/outlines/snake/hit_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/hit.png"
+    },
+    {
+      "file": "effects/outlines/snake/hit_super_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/hit.png"
+    },
+    {
+      "file": "effects/outlines/snake/dead_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/dead.png"
+    },
+    {
+      "file": "effects/outlines/snake/dead_super_awakened.png",
+      "width": 256,
+      "height": 96,
+      "frame_width": 64,
+      "frame_height": 96,
+      "frames": 4,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        90
+      ],
+      "unique_frames": 4,
+      "role": "overlay",
+      "base_file": "sprites/enemies/snake/dead.png"
+    }
+  ],
+  "warnings": [],
+  "limits": [
+    "Static PNG validation only; game-engine playback and full animation transitions were not tested.",
+    "Rainbow fur uses fixed palette bands; other five skins share exactly the same alpha geometry.",
+    "Ground and platform edge matching requires verification in the final game map.",
+    "Generated source sheets are preserved separately; use normalized png/ files, not raw sources."
+  ]
+}
