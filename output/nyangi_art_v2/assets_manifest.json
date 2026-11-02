@@ -1,0 +1,538 @@
+{
+  "entries": [
+    {
+      "loop": false,
+      "frame_width": 32,
+      "fps": 0,
+      "pivot": [
+        16,
+        16
+      ],
+      "frame_height": 32,
+      "height": 32,
+      "white_pixels": 97,
+      "frames": 1,
+      "width": 32,
+      "file": "tiles/ground_left.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 32,
+      "fps": 0,
+      "pivot": [
+        16,
+        16
+      ],
+      "frame_height": 32,
+      "height": 32,
+      "white_pixels": 89,
+      "frames": 1,
+      "width": 32,
+      "file": "tiles/ground_center.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 32,
+      "fps": 0,
+      "pivot": [
+        16,
+        16
+      ],
+      "frame_height": 32,
+      "height": 32,
+      "white_pixels": 94,
+      "frames": 1,
+      "width": 32,
+      "file": "tiles/ground_right.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 32,
+      "fps": 0,
+      "pivot": [
+        16,
+        16
+      ],
+      "frame_height": 32,
+      "height": 32,
+      "white_pixels": 89,
+      "frames": 1,
+      "width": 32,
+      "file": "tiles/platform_left.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 32,
+      "fps": 0,
+      "pivot": [
+        16,
+        16
+      ],
+      "frame_height": 32,
+      "height": 32,
+      "white_pixels": 66,
+      "frames": 1,
+      "width": 32,
+      "file": "tiles/platform_center.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 32,
+      "fps": 0,
+      "pivot": [
+        16,
+        16
+      ],
+      "frame_height": 32,
+      "height": 32,
+      "white_pixels": 89,
+      "frames": 1,
+      "width": 32,
+      "file": "tiles/platform_right.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        24
+      ],
+      "frame_height": 48,
+      "height": 48,
+      "white_pixels": 902,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/normal_290x48.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        23
+      ],
+      "frame_height": 46,
+      "height": 46,
+      "white_pixels": 895,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/normal_290x46.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 879,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/normal_290x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 285,
+      "fps": 0,
+      "pivot": [
+        142,
+        24
+      ],
+      "frame_height": 49,
+      "height": 49,
+      "white_pixels": 902,
+      "frames": 1,
+      "width": 285,
+      "file": "ui/buttons/normal_285x49.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 285,
+      "fps": 0,
+      "pivot": [
+        142,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 864,
+      "frames": 1,
+      "width": 285,
+      "file": "ui/buttons/normal_285x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 135,
+      "fps": 0,
+      "pivot": [
+        68,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 414,
+      "frames": 1,
+      "width": 135,
+      "file": "ui/buttons/normal_135x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 140,
+      "fps": 0,
+      "pivot": [
+        70,
+        17
+      ],
+      "frame_height": 34,
+      "height": 34,
+      "white_pixels": 294,
+      "frames": 1,
+      "width": 140,
+      "file": "ui/buttons/normal_140x34.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        24
+      ],
+      "frame_height": 48,
+      "height": 48,
+      "white_pixels": 31,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/hover_290x48.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        23
+      ],
+      "frame_height": 46,
+      "height": 46,
+      "white_pixels": 17,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/hover_290x46.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 25,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/hover_290x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 285,
+      "fps": 0,
+      "pivot": [
+        142,
+        24
+      ],
+      "frame_height": 49,
+      "height": 49,
+      "white_pixels": 27,
+      "frames": 1,
+      "width": 285,
+      "file": "ui/buttons/hover_285x49.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 285,
+      "fps": 0,
+      "pivot": [
+        142,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 25,
+      "frames": 1,
+      "width": 285,
+      "file": "ui/buttons/hover_285x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 135,
+      "fps": 0,
+      "pivot": [
+        68,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 25,
+      "frames": 1,
+      "width": 135,
+      "file": "ui/buttons/hover_135x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 140,
+      "fps": 0,
+      "pivot": [
+        70,
+        17
+      ],
+      "frame_height": 34,
+      "height": 34,
+      "white_pixels": 16,
+      "frames": 1,
+      "width": 140,
+      "file": "ui/buttons/hover_140x34.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        24
+      ],
+      "frame_height": 48,
+      "height": 48,
+      "white_pixels": 0,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/pressed_290x48.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        23
+      ],
+      "frame_height": 46,
+      "height": 46,
+      "white_pixels": 0,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/pressed_290x46.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 0,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/pressed_290x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 285,
+      "fps": 0,
+      "pivot": [
+        142,
+        24
+      ],
+      "frame_height": 49,
+      "height": 49,
+      "white_pixels": 0,
+      "frames": 1,
+      "width": 285,
+      "file": "ui/buttons/pressed_285x49.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 285,
+      "fps": 0,
+      "pivot": [
+        142,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 0,
+      "frames": 1,
+      "width": 285,
+      "file": "ui/buttons/pressed_285x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 135,
+      "fps": 0,
+      "pivot": [
+        68,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 0,
+      "frames": 1,
+      "width": 135,
+      "file": "ui/buttons/pressed_135x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 140,
+      "fps": 0,
+      "pivot": [
+        70,
+        17
+      ],
+      "frame_height": 34,
+      "height": 34,
+      "white_pixels": 0,
+      "frames": 1,
+      "width": 140,
+      "file": "ui/buttons/pressed_140x34.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        24
+      ],
+      "frame_height": 48,
+      "height": 48,
+      "white_pixels": 6,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/disabled_290x48.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        23
+      ],
+      "frame_height": 46,
+      "height": 46,
+      "white_pixels": 0,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/disabled_290x46.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 290,
+      "fps": 0,
+      "pivot": [
+        145,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 6,
+      "frames": 1,
+      "width": 290,
+      "file": "ui/buttons/disabled_290x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 285,
+      "fps": 0,
+      "pivot": [
+        142,
+        24
+      ],
+      "frame_height": 49,
+      "height": 49,
+      "white_pixels": 0,
+      "frames": 1,
+      "width": 285,
+      "file": "ui/buttons/disabled_285x49.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 285,
+      "fps": 0,
+      "pivot": [
+        142,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 6,
+      "frames": 1,
+      "width": 285,
+      "file": "ui/buttons/disabled_285x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 135,
+      "fps": 0,
+      "pivot": [
+        68,
+        21
+      ],
+      "frame_height": 42,
+      "height": 42,
+      "white_pixels": 6,
+      "frames": 1,
+      "width": 135,
+      "file": "ui/buttons/disabled_135x42.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 140,
+      "fps": 0,
+      "pivot": [
+        70,
+        17
+      ],
+      "frame_height": 34,
+      "height": 34,
+      "white_pixels": 0,
+      "frames": 1,
+      "width": 140,
+      "file": "ui/buttons/disabled_140x34.png"
+    },
+    {
+      "loop": false,
+      "frame_width": 490,
+      "fps": 0,
+      "pivot": [
+        245,
+        15
+      ],
+      "frame_height": 30,
+      "height": 30,
+      "white_pixels": 89,
+      "frames": 1,
+      "width": 490,
+      "file": "ui/rank_row.png"
+    }
+  ],
+  "version": "art_v2",
+  "overrides": {
+    "tiles/platform_right.png": "tiles/platform_right.png",
+    "tiles/platform_center.png": "tiles/platform_center.png",
+    "ui/rank_row.png": "ui/rank_row.png",
+    "tiles/platform_left.png": "tiles/platform_left.png",
+    "tiles/grass_top.png": "tiles/ground_center.png"
+  },
+  "generator": "Built-in ImageGen; alpha cleanup, uniform nearest-neighbor scale and plain-center repeat export"
+}
