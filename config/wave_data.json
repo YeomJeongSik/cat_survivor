@@ -1,0 +1,2352 @@
+[
+  {
+    "index": 1,
+    "stage": 1,
+    "species": [
+      "magpie"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 2,
+    "stage": 1,
+    "species": [
+      "magpie"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 3,
+    "stage": 1,
+    "species": [
+      "magpie"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 4,
+    "stage": 1,
+    "species": [
+      "magpie"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 5,
+    "stage": 1,
+    "species": [
+      "magpie"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 6,
+    "stage": 1,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 7,
+    "stage": 1,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 8,
+    "stage": 1,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 9,
+    "stage": 1,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 10,
+    "stage": 1,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 11,
+    "stage": 1,
+    "species": [
+      "bee"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 12,
+    "stage": 1,
+    "species": [
+      "bee"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 13,
+    "stage": 1,
+    "species": [
+      "bee"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 14,
+    "stage": 1,
+    "species": [
+      "bee"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 15,
+    "stage": 1,
+    "species": [
+      "bee"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 16,
+    "stage": 1,
+    "species": [
+      "snake"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 17,
+    "stage": 1,
+    "species": [
+      "snake"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 18,
+    "stage": 1,
+    "species": [
+      "snake"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 19,
+    "stage": 1,
+    "species": [
+      "snake"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 20,
+    "stage": 1,
+    "species": [
+      "snake"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 21,
+    "stage": 1,
+    "species": [
+      "magpie"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 22,
+    "stage": 1,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 23,
+    "stage": 1,
+    "species": [
+      "bee"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 24,
+    "stage": 1,
+    "species": [
+      "snake"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 25,
+    "stage": 1,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 26,
+    "stage": 1,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 27,
+    "stage": 1,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 28,
+    "stage": 1,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 29,
+    "stage": 1,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 30,
+    "stage": 1,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 31,
+    "stage": 1,
+    "species": [
+      "magpie"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 32,
+    "stage": 1,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 33,
+    "stage": 1,
+    "species": [
+      "bee"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 34,
+    "stage": 1,
+    "species": [
+      "snake"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 35,
+    "stage": 1,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 3,
+    "grade": 0,
+    "cap": 10,
+    "duration": 8.0
+  },
+  {
+    "index": 36,
+    "stage": 2,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 37,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 38,
+    "stage": 2,
+    "species": [
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 39,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "squirrel",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 40,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 41,
+    "stage": 2,
+    "species": [
+      "magpie"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 42,
+    "stage": 2,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 43,
+    "stage": 2,
+    "species": [
+      "bee"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 44,
+    "stage": 2,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 45,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 46,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 47,
+    "stage": 2,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 48,
+    "stage": 2,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 49,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 50,
+    "stage": 2,
+    "species": [
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 51,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "squirrel",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 52,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 53,
+    "stage": 2,
+    "species": [
+      "magpie"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 54,
+    "stage": 2,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 55,
+    "stage": 2,
+    "species": [
+      "bee"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 56,
+    "stage": 2,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 57,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 58,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 59,
+    "stage": 2,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 60,
+    "stage": 2,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 61,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 62,
+    "stage": 2,
+    "species": [
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 63,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "squirrel",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 64,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 65,
+    "stage": 2,
+    "species": [
+      "magpie"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 66,
+    "stage": 2,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 67,
+    "stage": 2,
+    "species": [
+      "bee"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 68,
+    "stage": 2,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 69,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 70,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 71,
+    "stage": 2,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 72,
+    "stage": 2,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 73,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 74,
+    "stage": 2,
+    "species": [
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 75,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "squirrel",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 76,
+    "stage": 2,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 77,
+    "stage": 2,
+    "species": [
+      "magpie"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 78,
+    "stage": 2,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 4,
+    "grade": 0,
+    "cap": 16,
+    "duration": 6.5
+  },
+  {
+    "index": 79,
+    "stage": 3,
+    "species": [
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 80,
+    "stage": 3,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 81,
+    "stage": 3,
+    "species": [
+      "magpie"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 82,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 83,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 84,
+    "stage": 3,
+    "species": [
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 85,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 86,
+    "stage": 3,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 87,
+    "stage": 3,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 88,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 89,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 90,
+    "stage": 3,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 91,
+    "stage": 3,
+    "species": [
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 92,
+    "stage": 3,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 93,
+    "stage": 3,
+    "species": [
+      "magpie"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 94,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 95,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 96,
+    "stage": 3,
+    "species": [
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 97,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 98,
+    "stage": 3,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 99,
+    "stage": 3,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 100,
+    "stage": 3,
+    "species": [
+      "magpie"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 101,
+    "stage": 3,
+    "species": [
+      "magpie"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 102,
+    "stage": 3,
+    "species": [
+      "magpie"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 103,
+    "stage": 3,
+    "species": [
+      "magpie"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 104,
+    "stage": 3,
+    "species": [
+      "magpie"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 105,
+    "stage": 3,
+    "species": [
+      "magpie"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 106,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 107,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 108,
+    "stage": 3,
+    "species": [
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 109,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 110,
+    "stage": 3,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 111,
+    "stage": 3,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 112,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 113,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 114,
+    "stage": 3,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 115,
+    "stage": 3,
+    "species": [
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 116,
+    "stage": 3,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 117,
+    "stage": 3,
+    "species": [
+      "magpie"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 118,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 119,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 120,
+    "stage": 3,
+    "species": [
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 121,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 122,
+    "stage": 3,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 123,
+    "stage": 3,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 124,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 125,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 126,
+    "stage": 3,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 127,
+    "stage": 3,
+    "species": [
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 128,
+    "stage": 3,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 129,
+    "stage": 3,
+    "species": [
+      "magpie"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 130,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 131,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "squirrel",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 132,
+    "stage": 3,
+    "species": [
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 133,
+    "stage": 3,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 134,
+    "stage": 3,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 5,
+    "grade": 1,
+    "cap": 24,
+    "duration": 5.0
+  },
+  {
+    "index": 135,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 136,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 137,
+    "stage": 4,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 138,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 139,
+    "stage": 4,
+    "species": [
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 140,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 141,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 142,
+    "stage": 4,
+    "species": [
+      "magpie"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 143,
+    "stage": 4,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 144,
+    "stage": 4,
+    "species": [
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 145,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 146,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 147,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 148,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 149,
+    "stage": 4,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 150,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 151,
+    "stage": 4,
+    "species": [
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 152,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 153,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 154,
+    "stage": 4,
+    "species": [
+      "magpie"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 155,
+    "stage": 4,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 156,
+    "stage": 4,
+    "species": [
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 157,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 158,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 159,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 160,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 161,
+    "stage": 4,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 162,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 163,
+    "stage": 4,
+    "species": [
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 164,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 165,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 166,
+    "stage": 4,
+    "species": [
+      "magpie"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 167,
+    "stage": 4,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 168,
+    "stage": 4,
+    "species": [
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 169,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 170,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 171,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 172,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 173,
+    "stage": 4,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 174,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 175,
+    "stage": 4,
+    "species": [
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 176,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 177,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 178,
+    "stage": 4,
+    "species": [
+      "magpie"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 179,
+    "stage": 4,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 180,
+    "stage": 4,
+    "species": [
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 181,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 182,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 183,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 184,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 185,
+    "stage": 4,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 186,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 187,
+    "stage": 4,
+    "species": [
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 188,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 189,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 190,
+    "stage": 4,
+    "species": [
+      "magpie"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 191,
+    "stage": 4,
+    "species": [
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 192,
+    "stage": 4,
+    "species": [
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 193,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 194,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 195,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 196,
+    "stage": 4,
+    "species": [
+      "squirrel",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 197,
+    "stage": 4,
+    "species": [
+      "squirrel"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 198,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 199,
+    "stage": 4,
+    "species": [
+      "snake"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  },
+  {
+    "index": 200,
+    "stage": 4,
+    "species": [
+      "magpie",
+      "squirrel",
+      "bee"
+    ],
+    "quota": 6,
+    "grade": 2,
+    "cap": 30,
+    "duration": 4.2
+  }
+]
