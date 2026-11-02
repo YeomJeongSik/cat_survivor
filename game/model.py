@@ -203,16 +203,13 @@ class World:
         self.start_wave()
         self.spawn_food(4)
 
-
     @property
     def spec(self):
         return WAVES[self.wave-1]
 
-
     @property
     def score(self):
         return self.completed * 100 + int(self.time * 2) + self.kill_score + (50000 if self.mode == 'CLEAR' else 0)
-
 
     def start_wave(self):
         self.wave_time = 0.
@@ -230,24 +227,20 @@ class World:
         self.events.append('wave')
         self.siren_due = [0.,.32,.64]
 
-
     def pause(self):
         if self.mode == 'PLAYING':
             self.pause_play()
         elif self.mode == 'PAUSED':
             self.resume_play()
 
-
     def _prepare_countdown(self):
         self.countdown = 3.
-
 
     def _start_death(self):
         self.cat.enter('DEAD')
         self.cat.vx = self.cat.vy = 0.
         self.cat.attack_left = 0.
         self.events.append('cat_death')
-
 
     def jump(self,keys=frozenset()):
         if self.mode != 'PLAYING':
@@ -259,7 +252,6 @@ class World:
             self.cat.enter('JUMP')
             self.events.append('jump')
 
-
     def dash(self, keys):
         c = self.cat
         if self.mode != 'PLAYING' or c.dash_cd > 0:
@@ -270,11 +262,9 @@ class World:
         c.enter('DASH')
         self.events.append('dash')
 
-
     def nearest_enemy(self, x, y):
         return min((e for e in self.enemies if e.targetable),
                    key=lambda e:(e.x-x)**2+(e.y-y)**2,default=None)
-
 
     def shoot(self):
         c = self.cat
@@ -294,7 +284,6 @@ class World:
         c.attack_left = .2
         self.events.append('shot')
 
-
     def spawn_food(self, count):
         count = min(count, BALANCE['food_cap'] - sum(i.kind == 'churu' for i in self.items))
         for _ in range(count):
@@ -313,7 +302,6 @@ class World:
                     continue
                 self.items.append(Item(x, y, state='SPAWN'))
                 break
-
 
     def spawn_enemy(self, kind):
         self.spawn_stats['attempted'] += 1
@@ -340,7 +328,6 @@ class World:
             self.spawn_stats['success'] += 1
             return
         self.spawn_stats['skipped'] += 1
-
 
     def update_cat(self, dt, keys):
         c = self.cat
@@ -378,7 +365,6 @@ class World:
         if state != c.state:
             c.enter(state)
         c.clock += dt
-
 
     def update_enemy(self, e, dt):
         e.clock += dt
@@ -467,7 +453,6 @@ class World:
                 if e.distance >= 140:
                     e.enter('WAIT')
 
-
     def update_magpie(self,e,dt,warning):
         home = BALANCE['magpie_y']
         if e.state in ('IDLE','FLY','WARNING'):
@@ -516,7 +501,6 @@ class World:
             if abs(e.y-home) < .001:
                 e.enter('IDLE')
 
-
     def update(self, dt, keys=frozenset()):
         if dt < 0 or not math.isfinite(dt):
             raise ValueError('dt must be finite and nonnegative')
@@ -537,7 +521,6 @@ class World:
             step = min(dt, 1/120)
             self.tick(step, keys)
             dt -= step
-
 
     def tick(self, dt, keys):
         self.time += dt
@@ -610,6 +593,14 @@ class World:
                         self.begin_death()
                     break
         self.trails = [t for t in self.trails if self.time-t[3] < .23]
+        for achievement in ACHIEVEMENTS:
+            if 'species' not in achievement:
+                continue
+            species,needed,skin = achievement['species'],achievement['count'],achievement['skin_id']
+            if skin not in self.unlocked and sum(e.species == species and e.alive and 0 <= e.x <= 960 and 0 <= e.y <= 560 for e in self.enemies) >= needed:
+                self.unlocked.add(skin)
+                self.notices.append((skin,self.time))
+                self.events.append('unlock')
         cleared_early = not self.spawn_queue and not any(e.alive for e in self.enemies)
         if self.mode == 'PLAYING' and (cleared_early or self.wave_time+1e-8 >= self.spec['duration']):
             self.completed += 1
@@ -620,5 +611,3 @@ class World:
             else:
                 self.wave += 1
                 self.start_wave()
-
-
