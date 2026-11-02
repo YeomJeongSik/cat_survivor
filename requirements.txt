@@ -1,0 +1,2 @@
+pico2d==1.5.1
+transitions==0.9.3
