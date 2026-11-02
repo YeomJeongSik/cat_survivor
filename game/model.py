@@ -177,3 +177,145 @@ class Item(Actor):
         return graph
 
 
+class World:
+    def __init__(self, seed=1):
+        self.seed = seed
+        self.rng = random.Random(seed)
+        self.cat = Cat(480, BALANCE['ground'])
+        self.enemies, self.projectiles, self.items, self.trails = [], [], [], []
+        self.time, self.wave_time, self.food_time = 0., 0., 0.
+        self.wave, self.completed, self.kill_score = 1, 0, 0
+        self.countdown = 0.
+        self.machine = Machine(model=self,model_attribute='mode',initial='PLAYING',
+                               states=['PLAYING','PAUSED','COUNTDOWN','DYING','GAME_OVER','CLEAR'],
+                               auto_transitions=False,transitions=[
+                                   ['pause_play','PLAYING','PAUSED'],
+                                   dict(trigger='resume_play',source='PAUSED',dest='COUNTDOWN',before='_prepare_countdown'),
+                                   ['finish_resume','COUNTDOWN','PLAYING'],
+                                   dict(trigger='begin_death',source='PLAYING',dest='DYING',before='_start_death'),
+                                   ['finish_death','DYING','GAME_OVER'],
+                                   ['finish_run',['PLAYING','PAUSED','COUNTDOWN'],'GAME_OVER'],
+                                   ['clear_run','PLAYING','CLEAR']])
+        self.unlocked = {'tobi_default'}
+        self.notices, self.events = [], []
+        self.spawn_stats = dict(attempted=0, success=0, skipped=0)
+        self.bandage_due = None
+        self.spawn_queue,self.siren_due = [],[]
+
+
+    @property
+    def spec(self):
+        return WAVES[self.wave-1]
+
+
+    @property
+    def score(self):
+        return self.completed * 100 + int(self.time * 2) + self.kill_score + (50000 if self.mode == 'CLEAR' else 0)
+
+
+    def pause(self):
+        if self.mode == 'PLAYING':
+            self.pause_play()
+        elif self.mode == 'PAUSED':
+            self.resume_play()
+
+
+    def _prepare_countdown(self):
+        self.countdown = 3.
+
+
+    def _start_death(self):
+        self.cat.enter('DEAD')
+        self.cat.vx = self.cat.vy = 0.
+        self.cat.attack_left = 0.
+        self.events.append('cat_death')
+
+
+    def jump(self,keys=frozenset()):
+        if self.mode != 'PLAYING':
+            return
+        c = self.cat
+        if self.cat.jumps_used < BALANCE['max_jumps']:
+            self.cat.vy, self.cat.grounded = BALANCE['jump_speed'], False
+            self.cat.jumps_used += 1
+            self.cat.enter('JUMP')
+            self.events.append('jump')
+
+
+    def dash(self, keys):
+        c = self.cat
+        if self.mode != 'PLAYING' or c.dash_cd > 0:
+            return
+        move = int('right' in keys) - int('left' in keys)
+        c.facing = move or c.facing
+        c.dash_left, c.dash_cd = BALANCE['dash_duration'], BALANCE['dash_cooldown']
+        c.enter('DASH')
+        self.events.append('dash')
+
+
+    def update_cat(self, dt, keys):
+        c = self.cat
+        was_grounded = c.grounded
+        for name in ('dash_cd', 'shot_cd', 'invincible', 'attack_left', 'heal_left'):
+            setattr(c, name, max(0., getattr(c, name)-dt))
+        move = int('right' in keys)-int('left' in keys)
+        if move and c.dash_left <= 0:
+            c.facing = move
+        c.vx = move * BALANCE['move_speed']
+        if c.dash_left > 0:
+            c.vx = c.facing * BALANCE['dash_speed']
+            c.dash_left = max(0., c.dash_left-dt)
+            if not self.trails or self.time-self.trails[-1][3] > .025:
+                self.trails.append((c.x, c.y, c.facing, self.time))
+        previous = c.y
+        c.x = max(26, min(934, c.x+c.vx*dt))
+        c.vy -= BALANCE['gravity'] * dt
+        c.y += c.vy * dt
+        c.grounded = False
+        for left, right, floor in sorted(BALANCE['surfaces'], key=lambda v: -v[2]):
+            if left-15 <= c.x <= right+15 and c.vy <= 0 and previous >= floor-.01 and c.y <= floor:
+                c.y, c.vy, c.grounded = floor, 0., True
+                c.jumps_used = 0
+                if not was_grounded:
+                    self.events.append('land')
+                break
+        c.idle_time = c.idle_time+dt if c.grounded and not move else 0.
+        c.step_clock = c.step_clock+dt if c.grounded and move and c.dash_left<=0 else 0.
+        if c.step_clock >= .22:
+            c.step_clock -= .22
+            self.events.append('footstep')
+        state = ('DASH' if c.dash_left > 0 else 'JUMP' if c.vy > 0 else 'FALL' if not c.grounded
+                 else 'MOVE' if move else 'GROOM' if c.idle_time > 4 else 'IDLE')
+        if state != c.state:
+            c.enter(state)
+        c.clock += dt
+
+
+    def update(self, dt, keys=frozenset()):
+        if dt < 0 or not math.isfinite(dt):
+            raise ValueError('dt must be finite and nonnegative')
+        if self.mode == 'DYING':
+            self.cat.clock += dt
+            if self.cat.clock >= DEATH_SECONDS:
+                self.finish_death()
+            return
+        if self.mode == 'COUNTDOWN':
+            self.countdown -= dt
+            if self.countdown <= 0:
+                self.finish_resume()
+            return
+        if self.mode != 'PLAYING':
+            return
+        # Fixed substeps preserve collision and due events after a slow frame.
+        while dt > 1e-9 and self.mode == 'PLAYING':
+            step = min(dt, 1/120)
+            self.tick(step, keys)
+            dt -= step
+
+
+    def tick(self,dt,keys):
+        self.time += dt
+        self.wave_time += dt
+        self.update_cat(dt,keys)
+
+
