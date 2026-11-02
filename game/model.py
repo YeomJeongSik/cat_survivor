@@ -201,6 +201,7 @@ class World:
         self.spawn_stats = dict(attempted=0, success=0, skipped=0)
         self.bandage_due = None
         self.start_wave()
+        self.spawn_food(4)
 
 
     @property
@@ -292,6 +293,26 @@ class World:
         c.ammo -= 1
         c.attack_left = .2
         self.events.append('shot')
+
+
+    def spawn_food(self, count):
+        count = min(count, BALANCE['food_cap'] - sum(i.kind == 'churu' for i in self.items))
+        for _ in range(count):
+            for _ in range(24):
+                if self.rng.random() < .35:
+                    x = self.cat.x + self.rng.choice((-1, 1))*self.rng.uniform(80, 260)
+                    y = BALANCE['ground']+18
+                else:
+                    left, right, floor = self.rng.choice(BALANCE['surfaces'])
+                    x, y = self.rng.uniform(left+22, right-22), floor+18
+                if not 35 < x < 925 or abs(x-self.cat.x) < 35:
+                    continue
+                if any(math.hypot(x-i.x, y-i.y) < 55 for i in self.items):
+                    continue
+                if any(e.exposed and math.hypot(x-e.x, y-e.y) < 75 for e in self.enemies):
+                    continue
+                self.items.append(Item(x, y, state='SPAWN'))
+                break
 
 
     def spawn_enemy(self, kind):
@@ -524,12 +545,19 @@ class World:
         while self.siren_due and self.siren_due[0] <= self.wave_time:
             self.siren_due.pop(0)
             self.events.append('siren')
+        self.food_time += dt
         self.update_cat(dt,keys)
         if 'shoot' in keys:
             self.shoot()
         while self.spawn_queue and self.spawn_queue[0][0] <= self.wave_time:
             _, kind = self.spawn_queue.pop(0)
             self.spawn_enemy(kind)
+        if self.food_time >= self.spec['duration']/2:
+            self.food_time -= self.spec['duration']/2
+            self.spawn_food(4)
+        if self.bandage_due is not None and self.time >= self.bandage_due:
+            self.items.append(Item(480,BALANCE['ground']+18,kind='bandage',state='SPAWN'))
+            self.bandage_due = None
         for e in self.enemies:
             self.update_enemy(e,dt)
         for p in self.projectiles:
@@ -556,6 +584,22 @@ class World:
         self.projectiles = [p for p in self.projectiles if p.state not in ('HIT','DESPAWN')]
         self.enemies = [e for e in self.enemies if not(e.state == 'DEAD' and e.clock > .45)]
         c = self.cat
+        for i in self.items:
+            i.clock += dt
+            if i.state == 'SPAWN' and i.clock > .15:
+                i.enter('IDLE')
+            if math.hypot(i.x-c.x,i.y-c.y-18) < 35:
+                if i.kind == 'churu':
+                    c.ammo = min(BALANCE['ammo_max'],c.ammo+1)
+                    self.events.append('pickup')
+                else:
+                    c.hp = min(3,c.hp+1)
+                    c.heal_left = .6
+                    self.events.append('heal')
+                i.enter('COLLECTED')
+            elif i.kind == 'churu' and i.clock > BALANCE['food_lifetime']:
+                i.enter('DESPAWN')
+        self.items = [i for i in self.items if i.state not in ('COLLECTED','DESPAWN')]
         if not c.invincible and c.dash_left <= 0:
             for e in self.enemies:
                 if e.exposed and not e.spawn_grace and segment_hit(c.x,c.y+24,c.x,c.y+24,e.box(13)) is not None:
