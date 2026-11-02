@@ -187,7 +187,7 @@ class App:
                 if self.world.mode in ('GAME_OVER','CLEAR') and not self.saved_result:
                     self.new_record = self.store.record(self.world)
                     self.saved_result = True
-                    self.achievement_queue = []
+                    self.achievement_queue = [s for s in SKINS[1:] if s in self.world.unlocked and s not in self.run_owned]
                     self.show_result()
             except OSError as exc:
                 self.error = f'기록 저장 실패: {exc}'
@@ -370,6 +370,20 @@ class App:
                     p.draw_rectangle(x-18,y-18,x+18,y+18,232,142,50)
                 self.buttons.append(((x-20,y-18,x+20,y+18),('skin',skin),owned))
             self.button('장착',(751,332,891,366),'equip')
+        if self.achievement_queue and self.scene=='RESULT':
+            self.achievement_popup()
+
+    def achievement_popup(self):
+        skin=self.achievement_queue[0]
+        info=ACHIEVEMENT_INFO[skin]
+        self.panel(275,160,685,510)
+        self.art.text('업적 달성!',480,478,26,INK,True)
+        self.art.text(info['name'],480,437,22,INK,True)
+        self.art.text(info['description'],480,401,16,INK,True)
+        self.cat(480,300,'groom',self.ui_clock,skin,scale=2.)
+        self.art.text(f'{SKIN_NAMES[SKINS.index(skin)]} 해금!',480,269,20,INK,True)
+        self.buttons.append(((0,0,960,640),None,True))
+        self.button('X',ACHIEVEMENT_CLOSE,'achievement_close')
 
     def controls_panel(self):
         self.panel(*CONTROLS_PANEL)
