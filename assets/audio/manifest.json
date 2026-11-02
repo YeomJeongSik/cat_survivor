@@ -1,0 +1,145 @@
+{
+  "author": "Original local procedural composition",
+  "license": "Project original audio; no third-party samples",
+  "bgm_style": "Bright campus chiptune; C-Am-F-G; original melodies",
+  "files": [
+    {
+      "file": "bgm/campus_stroll.wav",
+      "seconds": 16.271,
+      "sample_rate": 22050,
+      "peak": 0.2197
+    },
+    {
+      "file": "bgm/jelly_rush.wav",
+      "seconds": 30.0,
+      "sample_rate": 22050,
+      "peak": 0.4349
+    },
+    {
+      "file": "bgm/sunset_record.wav",
+      "seconds": 17.455,
+      "sample_rate": 22050,
+      "peak": 0.2199
+    },
+    {
+      "file": "sfx/jump.wav",
+      "seconds": 0.17,
+      "sample_rate": 22050,
+      "peak": 0.211
+    },
+    {
+      "file": "sfx/dash.wav",
+      "seconds": 0.18,
+      "sample_rate": 22050,
+      "peak": 0.3108
+    },
+    {
+      "file": "sfx/empty.wav",
+      "seconds": 0.09,
+      "sample_rate": 22050,
+      "peak": 0.086
+    },
+    {
+      "file": "sfx/no_target.wav",
+      "seconds": 0.08,
+      "sample_rate": 22050,
+      "peak": 0.0747
+    },
+    {
+      "file": "sfx/enemy_death.wav",
+      "seconds": 0.25,
+      "sample_rate": 22050,
+      "peak": 0.1957
+    },
+    {
+      "file": "sfx/hurt.wav",
+      "seconds": 0.2,
+      "sample_rate": 22050,
+      "peak": 0.1669
+    },
+    {
+      "file": "sfx/cat_death.wav",
+      "seconds": 0.75,
+      "sample_rate": 22050,
+      "peak": 0.1984
+    },
+    {
+      "file": "sfx/magpie_attack.wav",
+      "seconds": 0.24,
+      "sample_rate": 22050,
+      "peak": 0.2539
+    },
+    {
+      "file": "sfx/bee_attack.wav",
+      "seconds": 0.2,
+      "sample_rate": 22050,
+      "peak": 0.1346
+    },
+    {
+      "file": "sfx/squirrel_attack.wav",
+      "seconds": 0.2,
+      "sample_rate": 22050,
+      "peak": 0.1719
+    },
+    {
+      "file": "sfx/snake_attack.wav",
+      "seconds": 0.28,
+      "sample_rate": 22050,
+      "peak": 0.3359
+    },
+    {
+      "file": "sfx/pickup.wav",
+      "seconds": 0.21,
+      "sample_rate": 22050,
+      "peak": 0.1579
+    },
+    {
+      "file": "sfx/heal.wav",
+      "seconds": 0.45,
+      "sample_rate": 22050,
+      "peak": 0.1807
+    },
+    {
+      "file": "sfx/unlock.wav",
+      "seconds": 0.6,
+      "sample_rate": 22050,
+      "peak": 0.177
+    },
+    {
+      "file": "sfx/click.wav",
+      "seconds": 0.065,
+      "sample_rate": 22050,
+      "peak": 0.0901
+    },
+    {
+      "file": "sfx/land.wav",
+      "seconds": 0.07,
+      "sample_rate": 22050,
+      "peak": 0.127
+    },
+    {
+      "file": "sfx/countdown.wav",
+      "seconds": 0.09,
+      "sample_rate": 22050,
+      "peak": 0.0987
+    },
+    {
+      "file": "sfx/clear.wav",
+      "seconds": 0.9,
+      "sample_rate": 22050,
+      "peak": 0.221
+    },
+    {
+      "file": "sfx/shot.wav",
+      "seconds": 0.28,
+      "sample_rate": 22050,
+      "peak": 0.2376
+    },
+    {
+      "file": "sfx/siren.wav",
+      "seconds": 0.24,
+      "sample_rate": 22050,
+      "peak": 0.15
+    }
+  ]
+}
