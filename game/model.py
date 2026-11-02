@@ -246,6 +246,12 @@ class World:
         if self.mode != 'PLAYING':
             return
         c = self.cat
+        if 'down' in keys and c.grounded and c.y > BALANCE['ground']:
+            # Start below the one-way surface so lower platforms still catch the fall.
+            c.y -= 2
+            c.vy,c.grounded,c.jumps_used = -80.,False,1
+            c.enter('FALL')
+            return
         if self.cat.jumps_used < BALANCE['max_jumps']:
             self.cat.vy, self.cat.grounded = BALANCE['jump_speed'], False
             self.cat.jumps_used += 1

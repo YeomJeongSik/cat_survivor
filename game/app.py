@@ -18,7 +18,7 @@ ART_V3 = ROOT/'output/nyangi_art_v3'
 INK = (48,45,52)
 CREAM = (255,247,224)
 SKIN_NAMES = ('토비냥','까치냥','청설모냥','벌냥','뱀냥','무지개냥')
-KEY_BINDINGS = {p.SDLK_LEFT:'left',p.SDLK_RIGHT:'right',p.SDLK_LCTRL:'shoot'}
+KEY_BINDINGS = {p.SDLK_LEFT:'left',p.SDLK_RIGHT:'right',p.SDLK_DOWN:'down',p.SDLK_LCTRL:'shoot'}
 CONTROLS_BUTTON = (335,132,625,178)
 CONTROLS_PANEL = (275,190,685,430)
 ACHIEVEMENT_CLOSE = (410,187,550,221)
@@ -388,7 +388,7 @@ class App:
     def controls_panel(self):
         self.panel(*CONTROLS_PANEL)
         self.art.text('조작 방법',480,399,24,INK,True)
-        rows=(('← / →','좌우 이동'),('SPACE','점프 / 공중에서 한 번 더'),
+        rows=(('← / →','좌우 이동'),('SPACE','점프 / 공중에서 한 번 더'),('↓ + SPACE','발판 아래로 내려가기'),
               ('SHIFT','대시 · 사용 중 무적'),('왼쪽 CTRL','가까운 적에게 유도탄'),
               ('ESC','일시정지 / 계속하기'),('F11','전체 화면'))
         for i,(key,description) in enumerate(rows):
