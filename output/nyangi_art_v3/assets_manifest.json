@@ -1,0 +1,19 @@
+{
+  "entries": [
+    {
+      "fps": 0,
+      "frames": 1,
+      "height": 96,
+      "file": "ui/new_record.png",
+      "loop": false,
+      "frame_width": 240,
+      "frame_height": 96,
+      "pivot": [
+        120,
+        48
+      ],
+      "width": 240
+    }
+  ],
+  "version": "art_v3"
+}
