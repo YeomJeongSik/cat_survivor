@@ -40,14 +40,14 @@ def main():
             app.show_title()  # Repeated menu clicks must remain harmless.
             app.start()
             app.world.cat.x,app.world.cat.y=200,195
-            for event_type,key in ((p.SDL_KEYDOWN,p.SDLK_DOWN),(p.SDL_KEYDOWN,p.SDLK_SPACE)):
+            for event_type,key in ((p.SDL_KEYDOWN,p.SDLK_s),(p.SDL_KEYDOWN,p.SDLK_SPACE)):
                 event=p.SDL_Event()
                 event.type=event_type
                 event.key.keysym.sym=key
                 p.SDL_PushEvent(ctypes.byref(event))
             app.events()
             assert app.world.cat.state=='FALL' and app.world.cat.y<195
-            for key in (p.SDLK_DOWN,p.SDLK_SPACE):
+            for key in (p.SDLK_s,p.SDLK_SPACE):
                 event=p.SDL_Event()
                 event.type=p.SDL_KEYUP
                 event.key.keysym.sym=key
@@ -55,6 +55,41 @@ def main():
             app.events()
             assert 'down' not in app.keys
             app.start()
+            def mouse(event_type,x,y,button=p.SDL_BUTTON_LEFT):
+                event=p.SDL_Event()
+                event.type=event_type
+                data=event.motion if event_type==p.SDL_MOUSEMOTION else event.button
+                data.x,data.y=int(x),640-int(y)
+                if event_type!=p.SDL_MOUSEMOTION:
+                    event.button.button=button
+                p.SDL_PushEvent(ctypes.byref(event))
+                app.events()
+            mouse(p.SDL_MOUSEBUTTONDOWN,850,350)
+            assert app.world.cat.ammo==3 and 'shoot' in app.keys
+            bullet=app.world.projectiles[0]
+            direction=(bullet.dx,bullet.dy)
+            mouse(p.SDL_MOUSEMOTION,50,250)
+            app.update(.26)
+            assert (bullet.dx,bullet.dy)==direction
+            assert app.world.cat.ammo==2
+            mouse(p.SDL_MOUSEBUTTONUP,50,250)
+            assert 'shoot' not in app.keys
+            app.world.cat.pierce_charges=1
+            app.world.cat.ammo=0
+            mouse(p.SDL_MOUSEBUTTONDOWN,800,400,p.SDL_BUTTON_RIGHT)
+            assert app.world.cat.pierce_charges==0 and app.world.cat.ammo==0
+            assert app.world.projectiles[-1].piercing
+            mouse(p.SDL_MOUSEBUTTONUP,800,400,p.SDL_BUTTON_RIGHT)
+            app.world.cat.pierce_charges=3
+            app.world.cat.ammo=4
+            app.world.cat.churu_collected=9
+            app.world.cat.dash_charges=1
+            app.world.cat.dash_cd=.7
+            app.draw()
+            capture(ROOT/'output/combat_charges_current.png')
+            app.ui_clock+=.2
+            app.draw()
+            capture(ROOT/'output/combat_charges_ripple.png')
             app.draw()
             assert not any(isinstance(action,tuple) and action[0]=='volume' for _,action,_ in app.buttons)
             app.world.enemies=[Enemy(200,480,species='magpie'),Enemy(350,250,species='squirrel'),
@@ -103,7 +138,7 @@ def main():
             app.world.update(.05)
             assert app.world.projectiles
             app.draw()
-            capture(ROOT/'output/homing_first_run.png')
+            capture(ROOT/'output/mouse_aim_current.png')
             for species in ('magpie','squirrel','bee','snake'):
                 prefix=f'sprites/enemies/{species}/'
                 for file in app.art.specs:

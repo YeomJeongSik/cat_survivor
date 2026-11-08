@@ -82,61 +82,130 @@ class RulesTest(unittest.TestCase):
         self.assertAlmostEqual(sum(w['duration'] for w in WAVES),1116.7)
         self.assertEqual([WAVES[i-1]['stage'] for i in (35,36,78,79,134,135,200)],[1,2,2,3,3,4,4])
 
-    def test_left_ctrl_replaces_manual_aim_and_z(self):
-        self.assertEqual(KEY_BINDINGS[p.SDLK_LCTRL],'shoot')
-        self.assertEqual(KEY_BINDINGS[p.SDLK_DOWN],'down')
-        for key in (p.SDLK_z,p.SDLK_RCTRL,p.SDLK_UP):
+    def test_wasd_mapping_replaces_arrows_and_keyboard_fire(self):
+        self.assertEqual(KEY_BINDINGS,{p.SDLK_a:'left',p.SDLK_d:'right',p.SDLK_w:'up',p.SDLK_s:'down'})
+        for key in (p.SDLK_LEFT,p.SDLK_RIGHT,p.SDLK_DOWN,p.SDLK_UP,p.SDLK_z,p.SDLK_LCTRL):
             self.assertNotIn(key,KEY_BINDINGS)
 
-    def test_homing_selects_nearest_visible_damageable_enemy(self):
+    def test_mouse_vector_is_normalized_and_fixed_after_firing(self):
         w=World()
-        underground=Enemy(w.cat.x+10,105,species='snake')
-        dead=Enemy(w.cat.x+5,105,species='bee',state='DEAD')
-        near=Enemy(w.cat.x-70,160,species='bee',state='TARGET_LOCK')
-        far=Enemy(w.cat.x+180,180,species='bee')
-        w.enemies=[underground,dead,far,near]
-        w.cat.facing=1
+        w.spawn_queue=[]
+        w.aim=(w.cat.x+300,w.cat.y+26+400)
         w.shoot()
-        self.assertEqual(len(w.projectiles),1)
         bullet=w.projectiles[0]
-        self.assertIs(bullet.target,near)
-        self.assertLess(bullet.dx,0)
+        self.assertAlmostEqual(bullet.dx,.6)
+        self.assertAlmostEqual(bullet.dy,.8)
         self.assertEqual(w.cat.ammo,3)
+        start=(bullet.x,bullet.y)
+        w.aim=(0,0)
+        w.tick(.05,set())
+        self.assertAlmostEqual(bullet.x-start[0],BALANCE['projectile_speed']*.05*.6)
+        self.assertAlmostEqual(bullet.y-start[1],BALANCE['projectile_speed']*.05*.8)
         self.assertAlmostEqual(math.hypot(bullet.dx,bullet.dy),1)
 
-    def test_homing_tracks_motion_and_retargets_dead_or_hidden_enemy(self):
+    def test_mouse_on_player_has_safe_facing_fallback(self):
         w=World()
-        w.spawn_queue=[]
-        w.cat.invincible=999
-        target=Enemy(600,200,species='bee',state='TARGET_LOCK')
-        other=Enemy(700,300,species='bee',state='TARGET_LOCK')
-        w.enemies=[target,other]
+        w.aim=(w.cat.x,w.cat.y+26)
+        w.cat.facing=-1
         w.shoot()
-        bullet=w.projectiles[0]
-        self.assertIs(bullet.target,target)
-        target.x=400
-        w.tick(.01,set())
-        self.assertLess(bullet.dx,0)
-        target.enter('HIT')
-        w.tick(.01,set())
-        self.assertIs(bullet.target,other)
-        snake=Enemy(600,200,species='snake',state='POP_UP')
-        w.enemies=[snake,other]
-        bullet.target=snake
-        snake.enter('RETURN_UNDERGROUND')
-        snake.enter('IDLE')
-        w.tick(.01,set())
-        self.assertIs(bullet.target,other)
+        self.assertEqual((w.projectiles[0].dx,w.projectiles[0].dy),(-1.,0.))
 
-    def test_no_target_keeps_ammo_and_no_target_in_flight_is_safe(self):
+    def test_no_enemy_still_fires_and_projectiles_expire_at_map_edges(self):
         w=World()
         w.spawn_queue=[]
         w.shoot()
-        self.assertEqual((w.cat.ammo,len(w.projectiles)),(4,0))
-        w.projectiles=[Projectile(100,300)]
+        self.assertEqual((w.cat.ammo,len(w.projectiles)),(3,1))
+        for x,y,dx,dy in ((959,300,1,0),(1,300,-1,0),(400,559,0,1),(400,81,0,-1)):
+            for piercing in (False,True):
+                w.projectiles=[Projectile(x,y,dx=dx,dy=dy,piercing=piercing)]
+                w.tick(.01,set())
+                self.assertFalse(w.projectiles)
+
+    def test_piercing_hits_all_crossed_enemies_once_and_is_125_percent(self):
+        w=World()
+        w.spawn_queue=[]
+        w.enemies=[Enemy(180,180,species='squirrel',state='CROUCH_CHARGE'),
+                   Enemy(240,180,species='squirrel',state='CROUCH_CHARGE')]
+        bullet=Projectile(100,180,piercing=True)
+        self.assertEqual(bullet.scale,1.25)
+        w.projectiles=[bullet]
+        w.tick(.25,set())
+        self.assertEqual([e.hp for e in w.enemies],[1,1])
+        self.assertEqual(len(bullet.hit_enemies),2)
+        self.assertIn(bullet,w.projectiles)
+
+    def test_piercing_overlap_and_reentry_cannot_repeat_damage(self):
+        w=World()
+        w.spawn_queue=[]
+        w.update_enemy=lambda enemy,dt:None
+        enemy=Enemy(200,180,species='squirrel',state='CROUCH_CHARGE')
+        w.enemies=[enemy]
+        bullet=Projectile(200,180,dx=0,dy=0,piercing=True)
+        w.projectiles=[bullet]
+        for _ in range(9):
+            w.tick(.25,set())
+        self.assertEqual(enemy.hp,1)
+        self.assertIn(bullet,w.projectiles)  # No time-to-live while inside the map.
+        bullet.x=500
         w.tick(.01,set())
-        self.assertEqual(len(w.projectiles),1)
-        self.assertIsNone(w.projectiles[0].target)
+        bullet.x=200
+        w.tick(.01,set())
+        self.assertEqual(enemy.hp,1)
+        replacement=Enemy(200,180,species='squirrel',state='CROUCH_CHARGE')
+        w.enemies=[replacement]
+        w.tick(.01,set())
+        self.assertEqual(replacement.hp,1)
+
+    def test_pickup_ten_counter_and_three_special_charges_are_independent(self):
+        w=World()
+        w.spawn_queue=[]
+        for count in range(1,41):
+            w.items=[Item(w.cat.x,w.cat.y+18)]
+            w.tick(.001,set())
+            self.assertEqual(w.cat.churu_collected,count%10)
+            self.assertEqual(w.cat.pierce_charges,min(3,count//10))
+        self.assertEqual(w.cat.ammo,4)
+        w.shoot()
+        self.assertEqual((w.cat.ammo,w.cat.pierce_charges,w.cat.churu_collected),(3,3,0))
+        w.cat.ammo=0
+        for _ in range(3):
+            w.shoot(piercing=True)
+        self.assertEqual((w.cat.ammo,w.cat.pierce_charges),(0,0))
+        count=len(w.projectiles)
+        w.shoot(piercing=True)
+        self.assertEqual(len(w.projectiles),count)
+
+    def test_dash_two_charges_share_sequential_nonresetting_recharge(self):
+        w=World()
+        w.spawn_queue=[]
+        self.assertEqual(w.cat.dash_charges,2)
+        w.dash({'right'})
+        self.assertEqual(w.cat.dash_charges,1)
+        w.update(.2)
+        remaining=w.cat.dash_cd
+        w.dash({'left'})
+        self.assertEqual(w.cat.dash_charges,0)
+        self.assertAlmostEqual(w.cat.dash_cd,remaining)
+        w.dash({'right'})
+        self.assertEqual(w.cat.dash_charges,0)
+        w.update(remaining-.01)
+        self.assertEqual(w.cat.dash_charges,0)
+        w.update(.02)
+        self.assertEqual(w.cat.dash_charges,1)
+        w.update(BALANCE['dash_cooldown'])
+        self.assertEqual((w.cat.dash_charges,w.cat.dash_cd),(2,0.))
+
+    def test_pause_freezes_charge_recovery_and_blocks_both_fire_modes(self):
+        w=World()
+        w.cat.pierce_charges=1
+        w.dash({'right'})
+        w.pause()
+        snapshot=(w.cat.dash_charges,w.cat.dash_cd,w.cat.ammo,w.cat.pierce_charges)
+        w.update(5)
+        w.shoot()
+        w.shoot(piercing=True)
+        self.assertEqual(snapshot,(w.cat.dash_charges,w.cat.dash_cd,w.cat.ammo,w.cat.pierce_charges))
+        self.assertFalse(w.projectiles)
 
     def test_ammo_cap_is_four_including_pickups(self):
         w=World()
@@ -168,7 +237,7 @@ class RulesTest(unittest.TestCase):
         w.enemies=[e]
         for expected_hp in (1,0):
             w.events.clear()
-            w.projectiles=[Projectile(170,180,target=e)]
+            w.projectiles=[Projectile(170,180)]
             w.tick(.04,set())
             self.assertEqual(e.hp,expected_hp)
             self.assertFalse(w.projectiles)

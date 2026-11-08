@@ -17,12 +17,6 @@ SPECIES = ('magpie', 'squirrel', 'bee', 'snake')
 SKINS = ('tobi_default', 'magpie_tuxedo', 'squirrel_brown', 'bee_golden', 'snake_silver', 'rainbow_clear')
 
 
-def direction_to(x, y, target):
-    dx,dy = target.x-x,target.y-y
-    length = math.hypot(dx,dy)
-    return (dx/length,dy/length) if length else (1.,0.)
-
-
 def wave_quota(spec):
     return math.ceil(spec['quota']*BALANCE['spawn_multiplier'])
 
@@ -77,6 +71,9 @@ class Cat(Actor):
     ammo: int = BALANCE['ammo_max']
     dash_left: float = 0.
     dash_cd: float = 0.
+    dash_charges: int = BALANCE['dash_max_charges']
+    churu_collected: int = 0
+    pierce_charges: int = 0
     shot_cd: float = 0.
     invincible: float = 0.
     attack_left: float = 0.
@@ -154,7 +151,12 @@ class Enemy(Actor):
 class Projectile(Actor):
     dx: float = 1.
     dy: float = 0.
-    target: Enemy | None = field(default=None,repr=False,compare=False)
+    piercing: bool = False
+    hit_enemies: list = field(default_factory=list,repr=False,compare=False)
+
+    @property
+    def scale(self):
+        return BALANCE['pierce_scale'] if self.piercing else 1.
 
     def state_graph(self):
         return {'IDLE':('FLY',),'FLY':('HIT','DESPAWN'),'HIT':(),'DESPAWN':()}
@@ -182,6 +184,7 @@ class World:
         self.seed = seed
         self.rng = random.Random(seed)
         self.cat = Cat(480, BALANCE['ground'])
+        self.aim = (960.,BALANCE['ground']+26.)
         self.enemies, self.projectiles, self.items, self.trails = [], [], [], []
         self.time, self.wave_time, self.food_time = 0., 0., 0.
         self.wave, self.completed, self.kill_score = 1, 0, 0
@@ -260,33 +263,37 @@ class World:
 
     def dash(self, keys):
         c = self.cat
-        if self.mode != 'PLAYING' or c.dash_cd > 0:
+        if self.mode != 'PLAYING' or c.dash_charges == 0 or c.dash_left > 0:
             return
         move = int('right' in keys) - int('left' in keys)
         c.facing = move or c.facing
-        c.dash_left, c.dash_cd = BALANCE['dash_duration'], BALANCE['dash_cooldown']
+        c.dash_left = BALANCE['dash_duration']
+        if c.dash_charges == BALANCE['dash_max_charges']:
+            c.dash_cd = BALANCE['dash_cooldown']
+        c.dash_charges -= 1
         c.enter('DASH')
         self.events.append('dash')
 
-    def nearest_enemy(self, x, y):
-        return min((e for e in self.enemies if e.targetable),
-                   key=lambda e:(e.x-x)**2+(e.y-y)**2,default=None)
-
-    def shoot(self):
+    def aim_direction(self):
         c = self.cat
-        if self.mode != 'PLAYING' or c.shot_cd > 0:
+        dx,dy = self.aim[0]-c.x,self.aim[1]-c.y-26
+        length = math.hypot(dx,dy)
+        return (dx/length,dy/length) if length > 1e-9 else (float(c.facing),0.)
+
+    def shoot(self,piercing=False):
+        c = self.cat
+        if self.mode != 'PLAYING' or (not piercing and c.shot_cd > 0):
             return
-        c.shot_cd = BALANCE['shot_cooldown']
-        if not c.ammo:
+        if not (c.pierce_charges if piercing else c.ammo):
             self.events.append('empty')
             return
-        target = self.nearest_enemy(c.x,c.y+26)
-        if target is None:
-            self.events.append('no_target')
-            return
-        dx,dy = direction_to(c.x,c.y+26,target)
-        self.projectiles.append(Projectile(c.x+dx*25,c.y+26+dy*18,dx=dx,dy=dy,target=target))
-        c.ammo -= 1
+        dx,dy = self.aim_direction()
+        self.projectiles.append(Projectile(c.x,c.y+26,dx=dx,dy=dy,piercing=piercing))
+        if piercing:
+            c.pierce_charges -= 1
+        else:
+            c.ammo -= 1
+            c.shot_cd = BALANCE['shot_cooldown']
         c.attack_left = .2
         self.events.append('shot')
 
@@ -338,8 +345,15 @@ class World:
     def update_cat(self, dt, keys):
         c = self.cat
         was_grounded = c.grounded
-        for name in ('dash_cd', 'shot_cd', 'invincible', 'attack_left', 'heal_left'):
+        for name in ('shot_cd', 'invincible', 'attack_left', 'heal_left'):
             setattr(c, name, max(0., getattr(c, name)-dt))
+        if c.dash_charges < BALANCE['dash_max_charges']:
+            c.dash_cd -= dt
+            while c.dash_cd <= 1e-9 and c.dash_charges < BALANCE['dash_max_charges']:
+                c.dash_charges += 1
+                c.dash_cd += BALANCE['dash_cooldown']
+            if c.dash_charges == BALANCE['dash_max_charges']:
+                c.dash_cd = 0.
         move = int('right' in keys)-int('left' in keys)
         if move and c.dash_left <= 0:
             c.facing = move
@@ -552,23 +566,21 @@ class World:
         for p in self.projectiles:
             p.clock += dt
             old_x,old_y = p.x,p.y
-            if p.target is None or not p.target.targetable or not any(e is p.target for e in self.enemies):
-                p.target = self.nearest_enemy(p.x,p.y)
-            if p.target is not None:
-                p.dx,p.dy = direction_to(p.x,p.y,p.target)
             p.x += p.dx*BALANCE['projectile_speed']*dt
             p.y += p.dy*BALANCE['projectile_speed']*dt
             p.enter('FLY',reset_clock=False)
-            hits = [(t,e) for e in self.enemies if e.exposed and (t:=segment_hit(old_x,old_y,p.x,p.y,e.box(5))) is not None]
-            if hits:
-                _, e = min(hits,key=lambda pair:pair[0])
+            hits = sorted(((t,e) for e in self.enemies if e.exposed and not any(e is hit for hit in p.hit_enemies)
+                           and (t:=segment_hit(old_x,old_y,p.x,p.y,e.box(5*p.scale))) is not None),key=lambda pair:pair[0])
+            for _,e in hits if p.piercing else hits[:1]:
+                p.hit_enemies.append(e)
                 killed = e.damage()
-                p.enter('HIT')
+                if not p.piercing:
+                    p.enter('HIT')
                 self.events.append('enemy_hit')
                 if killed:
                     self.kill_score += (10,15,25)[e.grade]
                     self.events.append('enemy_death')
-            elif not 0 <= p.x <= 960 or not BALANCE['ground'] <= p.y <= 560 or p.clock > 2:
+            if p.state != 'HIT' and (not 0 <= p.x <= 960 or not BALANCE['ground'] <= p.y <= 560):
                 p.enter('DESPAWN')
         self.projectiles = [p for p in self.projectiles if p.state not in ('HIT','DESPAWN')]
         self.enemies = [e for e in self.enemies if not(e.state == 'DEAD' and e.clock > .45)]
@@ -580,6 +592,10 @@ class World:
             if math.hypot(i.x-c.x,i.y-c.y-18) < 35:
                 if i.kind == 'churu':
                     c.ammo = min(BALANCE['ammo_max'],c.ammo+1)
+                    c.churu_collected += 1
+                    if c.churu_collected >= BALANCE['pierce_pickups']:
+                        c.churu_collected = 0
+                        c.pierce_charges = min(BALANCE['pierce_max_charges'],c.pierce_charges+1)
                     self.events.append('pickup')
                 else:
                     c.hp = min(3,c.hp+1)

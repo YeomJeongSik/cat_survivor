@@ -18,9 +18,9 @@ ART_V3 = ROOT/'output/nyangi_art_v3'
 INK = (48,45,52)
 CREAM = (255,247,224)
 SKIN_NAMES = ('토비냥','까치냥','청설모냥','벌냥','뱀냥','무지개냥')
-KEY_BINDINGS = {p.SDLK_LEFT:'left',p.SDLK_RIGHT:'right',p.SDLK_DOWN:'down',p.SDLK_LCTRL:'shoot'}
+KEY_BINDINGS = {p.SDLK_a:'left',p.SDLK_d:'right',p.SDLK_w:'up',p.SDLK_s:'down'}
 CONTROLS_BUTTON = (335,132,625,178)
-CONTROLS_PANEL = (275,190,685,430)
+CONTROLS_PANEL = (275,190,685,490)
 ACHIEVEMENT_CLOSE = (410,187,550,221)
 ACHIEVEMENT_INFO = {a['skin_id']:a for a in ACHIEVEMENTS}
 # Source rectangles remove transparent UI padding without changing the supplied PNGs.
@@ -181,6 +181,8 @@ class App:
     def update(self,dt):
         self.ui_clock += dt
         if self.scene == 'PLAY':
+            if self.world.mode == 'PLAYING':
+                self.world.aim = self.mouse
             self.world.update(dt,self.keys)
             try:
                 self.store.unlock(self.world.unlocked)
@@ -230,6 +232,7 @@ class App:
             for x,width,part in tile_segments(left,right):
                 image = self.art.image(f'v2/tiles/{kind}_{part}.png')
                 image.clip_draw(0,0,width,32,x+width/2,floor-16,width,32)
+        self.aim_guide()
         for item in w.items:
             self.art.sprite(f'sprites/items/{item.kind}.png',item.x,item.y+math.sin(item.clock*4)*3,item.clock)
         if w.bandage_due is not None:
@@ -271,7 +274,7 @@ class App:
             p.draw_circle(c.x,c.y+26,int(34*(1-c.heal_left/.6)),75,216,151)
         for projectile in w.projectiles:
             self.art.sprite('sprites/projectiles/paw_000.png',projectile.x,projectile.y,projectile.clock,
-                            rotation=math.atan2(projectile.dy,projectile.dx))
+                            scale=projectile.scale,rotation=math.atan2(projectile.dy,projectile.dx))
         p.draw_rectangle(0,562,960,640,43,55,60,filled=True)
         p.draw_rectangle(0,0,960,46,43,55,60,filled=True)
         for i in range(3):
@@ -279,6 +282,7 @@ class App:
         self.art.text('츄르',142,24,17,CREAM)
         for i in range(BALANCE['ammo_max']):
             self.art.draw(f'ui/ammo_{"full" if i<c.ammo else "empty"}.png',208+i*23,24,20,20)
+        self.charge_hud()
         self.art.text(f'WAVE {w.wave:03d} / 200',28,611,22,CREAM)
         self.art.text(f'{w.spec["stage"]}단계   {w.time:05.1f}s',28,581,15,(186,214,210))
         self.art.text(f'{w.score:,}',780,610,26,CREAM)
@@ -387,14 +391,68 @@ class App:
 
     def controls_panel(self):
         self.panel(*CONTROLS_PANEL)
-        self.art.text('조작 방법',480,399,24,INK,True)
-        rows=(('← / →','좌우 이동'),('SPACE','점프 / 공중에서 한 번 더'),('↓ + SPACE','발판 아래로 내려가기'),
-              ('SHIFT','대시 · 사용 중 무적'),('왼쪽 CTRL','가까운 적에게 유도탄'),
+        self.art.text('조작 방법',480,459,24,INK,True)
+        rows=(('A / D','좌우 이동'),('W / SPACE','더블 점프'),('S + SPACE','발판 아래로 내려가기'),
+              ('SHIFT','대시 2회 · 공유 충전'),('마우스 좌','조준 방향 일반탄'),('마우스 우','관통탄 · 츄르 10개 충전'),
               ('ESC','일시정지 / 계속하기'),('F11','전체 화면'))
         for i,(key,description) in enumerate(rows):
-            y=359-i*25
+            y=419-i*27
             self.art.text(key,296,y,16)
             self.art.text(description,420,y,16)
+
+    def aim_guide(self):
+        w,c=self.world,self.world.cat
+        x,y=c.x,c.y+26
+        dx,dy=w.aim_direction()
+        distances=[(bound-origin)/direction for origin,direction,bounds in
+                   ((x,dx,(0,960)),(y,dy,(BALANCE['ground'],560))) if abs(direction)>1e-9
+                   for bound in bounds if (bound-origin)/direction>=0]
+        length=min(distances,default=0.)
+
+        def stroke(ax,ay,bx,by):
+            span=math.hypot(bx-ax,by-ay)
+            if span<1e-9:
+                return
+            nx,ny=-(by-ay)/span,(bx-ax)/span
+            for width,color in ((3,(26,35,43)),(1,(255,226,69))):
+                for offset in range(-width,width+1):
+                    p.draw_line(ax+nx*offset,ay+ny*offset,bx+nx*offset,by+ny*offset,*color)
+
+        for distance in range(28,int(length),24):
+            end=min(distance+15,length)
+            stroke(x+dx*distance,y+dy*distance,x+dx*end,y+dy*end)
+        mx,my=w.aim
+        if 0<=mx<=960 and BALANCE['ground']<=my<=560:
+            for radii,color in ((range(10,15),(26,35,43)),(range(11,14),(255,226,69))):
+                for radius in radii:
+                    p.draw_circle(mx,my,radius,*color)
+            for ax,ay,bx,by in ((mx-21,my,mx-7,my),(mx+7,my,mx+21,my),
+                               (mx,my-21,mx,my-7),(mx,my+7,mx,my+21)):
+                stroke(ax,ay,bx,by)
+
+    def charge_hud(self):
+        c=self.world.cat
+        self.art.text(f'대시 {c.dash_charges}/2',315,24,15,CREAM)
+        progress=1-c.dash_cd/BALANCE['dash_cooldown']
+        for i in range(BALANCE['dash_max_charges']):
+            left=405+i*54
+            p.draw_rectangle(left,16,left+49,31,91,109,112,filled=True)
+            fill=1. if i<c.dash_charges else progress if i==c.dash_charges else 0.
+            if fill>0:
+                p.draw_rectangle(left+1,17,left+1+47*fill,30,131,222,188,filled=True)
+        for i in range(BALANCE['pierce_max_charges']):
+            x=662+i*56
+            ready=i<c.pierce_charges
+            self.art.sprite('sprites/projectiles/paw_000.png',x,24,self.ui_clock,scale=.84,alpha=1. if ready else .22)
+            if ready:
+                points=[]
+                for j in range(40):
+                    angle=j*math.tau/40
+                    radius=19+2*math.sin(angle*5+self.ui_clock*7+i)
+                    points.append((x+math.cos(angle)*radius,24+math.sin(angle)*radius))
+                for a,b in zip(points,points[1:]+points[:1]):
+                    p.draw_line(*a,*b,255,203,107)
+        self.art.text(f'츄르 {c.churu_collected}/10',831,24,14,CREAM)
 
     def draw(self):
         p.clear_canvas()
@@ -518,20 +576,32 @@ class App:
                     elif self.world.mode == 'PAUSED':
                         self.world.pause()
                 elif self.scene == 'PLAY':
-                    if key == p.SDLK_SPACE:
+                    if key in (p.SDLK_SPACE,p.SDLK_w):
                         self.world.jump(self.keys)
                     elif key in (p.SDLK_LSHIFT,p.SDLK_RSHIFT):
                         self.world.dash(self.keys)
             elif event.type in (p.SDL_MOUSEMOTION,p.SDL_MOUSEBUTTONDOWN,p.SDL_MOUSEBUTTONUP):
                 data = event.motion if event.type == p.SDL_MOUSEMOTION else event.button
                 self.mouse = data.x,640-data.y
+                if self.scene=='PLAY' and self.world.mode=='PLAYING':
+                    self.world.aim=self.mouse
                 if event.type == p.SDL_MOUSEMOTION:
                     self.change_volume(self.mouse[0])
-                elif event.type == p.SDL_MOUSEBUTTONDOWN and event.button.button == p.SDL_BUTTON_LEFT:
-                    self.click(*self.mouse)
-                elif event.type == p.SDL_MOUSEBUTTONUP and self.dragging:
-                    self.dragging = None
-                    self.save()
+                elif event.type == p.SDL_MOUSEBUTTONDOWN:
+                    playing=self.scene=='PLAY' and self.world.mode=='PLAYING'
+                    if playing and event.button.button==p.SDL_BUTTON_LEFT:
+                        self.keys.add('shoot')
+                        self.world.shoot()
+                    elif playing and event.button.button==p.SDL_BUTTON_RIGHT:
+                        self.world.shoot(piercing=True)
+                    elif event.button.button==p.SDL_BUTTON_LEFT:
+                        self.click(*self.mouse)
+                elif event.type == p.SDL_MOUSEBUTTONUP:
+                    if event.button.button==p.SDL_BUTTON_LEFT:
+                        self.keys.discard('shoot')
+                    if self.dragging:
+                        self.dragging=None
+                        self.save()
 
 
 def capture(path):
