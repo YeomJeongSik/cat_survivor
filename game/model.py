@@ -4,12 +4,12 @@ from pathlib import Path
 import json
 import math
 import random
+from uuid import uuid4
 from .difficulty import SETTINGS, difficulty_at, monster_stats
 from .states import CAT_ACTIVE, ENEMY_GRAPHS, Machine, actor_machine
 
 ROOT = Path(__file__).resolve().parents[1]
 BALANCE = json.loads((ROOT / 'config/balance.json').read_text(encoding='utf-8'))
-ACHIEVEMENTS = json.loads((ROOT/'config/achievements.json').read_text(encoding='utf-8'))
 _ART = json.loads((ROOT/'output/nyangi_art_v1/assets_manifest.json').read_text(encoding='utf-8-sig'))
 _DEATH = next(e for e in _ART['entries'] if e['file']=='sprites/cat/tobi_default/dead.png')
 DEATH_SECONDS = _DEATH['frames']/_DEATH['fps']
@@ -187,14 +187,17 @@ class Item(Actor):
 
 
 class World:
-    def __init__(self, seed=1):
+    def __init__(self, seed=1, character_id="nabi"):
+        self.run_id = str(uuid4())
+        self.character_id = character_id
+        self.run_exp = self.run_gold = 0
+        self.end_reason = None
         self.seed = seed
         self.rng = random.Random(seed)
         self.cat = Cat(480, BALANCE['ground'])
         self.aim = (960.,BALANCE['ground']+26.)
         self.enemies, self.projectiles, self.items, self.trails = [], [], [], []
         self.time, self.food_time = 0., 0.
-        self.kill_score = 0
         self.spawn_rng = random.Random(seed ^ 2654435761)
         self.next_spawn_at = SETTINGS['initial_spawn_delay']
         self.next_bandage_at = SETTINGS['bandage_interval']
@@ -208,9 +211,8 @@ class World:
                                    ['finish_resume','COUNTDOWN','PLAYING'],
                                    dict(trigger='begin_death',source='PLAYING',dest='DYING',before='_start_death'),
                                    ['finish_death','DYING','GAME_OVER'],
-                                   ['finish_run',['PLAYING','PAUSED','COUNTDOWN'],'GAME_OVER']])
-        self.unlocked = {'tobi_default'}
-        self.notices, self.events = [], []
+                                   dict(trigger='finish_run',source=['PLAYING','PAUSED','COUNTDOWN'],dest='GAME_OVER',before='_abandon')])
+        self.events = []
         self.spawn_stats = dict(attempted=0, success=0, skipped=0)
         self.bandage_due = None
         self.spawn_food(4)
@@ -229,11 +231,6 @@ class World:
         keys = ('spawn_interval','cap','weights','hp_multiplier','attack_rate','reward_multiplier','grade')
         return following['warning'] if any(rules[k]!=following[k] for k in keys) else ''
 
-    @property
-    def score(self):
-        # shortcut: legacy results retain score until the reward/result feature is replaced.
-        return int(self.time*2)+self.kill_score
-
     def pause(self):
         if self.mode == 'PLAYING':
             self.pause_play()
@@ -243,7 +240,12 @@ class World:
     def _prepare_countdown(self):
         self.countdown = 3.
 
+    def _abandon(self):
+        self.end_reason = "abandoned"
+        self.run_exp = self.run_gold = 0
+
     def _start_death(self):
+        self.end_reason = "death"
         self.cat.enter('DEAD')
         self.cat.vx = self.cat.vy = 0.
         self.cat.attack_left = 0.
@@ -586,7 +588,8 @@ class World:
                     p.enter('HIT')
                 self.events.append('enemy_hit')
                 if killed:
-                    self.kill_score += (10,15,25)[e.grade]
+                    self.run_exp += e.exp_reward
+                    self.run_gold += e.gold_reward
                     self.events.append('enemy_death')
             if p.state != 'HIT' and (not 0 <= p.x <= 960 or not BALANCE['ground'] <= p.y <= 560):
                 p.enter('DESPAWN')
@@ -623,11 +626,3 @@ class World:
                         self.begin_death()
                     break
         self.trails = [t for t in self.trails if self.time-t[3] < .23]
-        for achievement in ACHIEVEMENTS:
-            if 'species' not in achievement:
-                continue
-            species,needed,skin = achievement['species'],achievement['count'],achievement['skin_id']
-            if skin not in self.unlocked and sum(e.species == species and e.alive and 0 <= e.x <= 960 and 0 <= e.y <= 560 for e in self.enemies) >= needed:
-                self.unlocked.add(skin)
-                self.notices.append((skin,self.time))
-                self.events.append('unlock')

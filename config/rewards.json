@@ -1,0 +1,58 @@
+{
+  "max_level": 50,
+  "level_exp_base": 100,
+  "level_exp_growth": 25,
+  "exp_to_gold": "0.5",
+  "exp_bonuses": [
+    {
+      "seconds": 600,
+      "percent": 101
+    },
+    {
+      "seconds": 900,
+      "percent": 105
+    },
+    {
+      "seconds": 1200,
+      "percent": 110
+    },
+    {
+      "seconds": 1800,
+      "percent": 120
+    },
+    {
+      "seconds": 2700,
+      "percent": 135
+    },
+    {
+      "seconds": 3600,
+      "percent": 150
+    }
+  ],
+  "gold_bonuses": [
+    {
+      "seconds": 900,
+      "percent": 101
+    },
+    {
+      "seconds": 1200,
+      "percent": 103
+    },
+    {
+      "seconds": 1800,
+      "percent": 108
+    },
+    {
+      "seconds": 2700,
+      "percent": 115
+    },
+    {
+      "seconds": 3600,
+      "percent": 125
+    },
+    {
+      "seconds": 5400,
+      "percent": 150
+    }
+  ]
+}

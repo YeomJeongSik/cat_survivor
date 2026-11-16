@@ -242,7 +242,7 @@ class RulesTest(unittest.TestCase):
         for invalid in (0,-1,math.nan,math.inf):
             with self.assertRaises(ValueError):e.damage(invalid)
 
-    def test_projectile_consumed_on_nonlethal_hit_and_score_on_kill_only(self):
+    def test_projectile_consumed_on_nonlethal_hit_and_rewards_on_kill_only(self):
         w=World()
         w.next_spawn_at=math.inf
         e=Enemy(200,180,species='squirrel',max_hp=2.,state='CROUCH_CHARGE')
@@ -253,7 +253,7 @@ class RulesTest(unittest.TestCase):
             w.tick(.04,set())
             self.assertEqual(e.hp,expected_hp)
             self.assertFalse(w.projectiles)
-            self.assertEqual(w.kill_score,10 if expected_hp==0 else 0)
+            self.assertEqual((w.run_exp,w.run_gold),(e.exp_reward,e.gold_reward) if expected_hp==0 else (0,0))
             self.assertEqual(w.events.count('enemy_hit'),1)
             self.assertEqual(w.events.count('enemy_death'),int(expected_hp==0))
 
@@ -462,7 +462,7 @@ class RulesTest(unittest.TestCase):
         self.assertEqual((w.mode,w.rules['start']),('PLAYING',0))
         self.assertFalse(hasattr(w,'wave'))
         self.assertFalse(hasattr(w,'clear_run'))
-        self.assertNotIn('rainbow_clear',w.unlocked)
+        self.assertFalse(hasattr(w,'score'))
 
     def test_footstep_cadence_stops_while_paused(self):
         w=World()
@@ -621,7 +621,7 @@ class RulesTest(unittest.TestCase):
                 self.assertLessEqual(sum(e.alive and e.species==kind for e in w.enemies),spec['cap'])
         self.assertEqual(w.mode,'PLAYING')
         self.assertAlmostEqual(w.time,1250,places=5)
-        self.assertNotIn('rainbow_clear',w.unlocked)
+        self.assertFalse(hasattr(w,'score'))
 
     def test_bandage_warns_before_time_spawn_and_cannot_collect_early(self):
         w=World()
@@ -646,21 +646,11 @@ class StorageTest(unittest.TestCase):
             s=Store(folder)
             s.save_profile()
             self.assertEqual(len(list(Path(folder).glob('profile.json.damaged-*'))),1)
-            self.assertEqual(json.loads(path.read_text())['version'],1)
+            self.assertEqual(json.loads(path.read_text())['version'],2)
             s.profile['bgm_volume']=float('nan')
             path.write_text(json.dumps(s.profile),encoding='utf-8')
             self.assertEqual(Store(folder).profile['bgm_volume'],70)
 
-    def test_endless_result_legacy_save_does_not_require_wave(self):
-        with tempfile.TemporaryDirectory(dir=ROOT/'tests') as folder:
-            s=Store(folder)
-            world=World();world.time=75;world.finish_run()
-            s.record(world)
-            self.assertEqual(s.records[0]['time_survived'],75)
-            self.assertFalse(s.records[0]['cleared'])
-            self.assertNotIn('wave_reached',s.records[0])
-            s.unlock({'bee_golden'})
-            self.assertIn('bee_golden',Store(folder).profile['unlocked_skin_ids'])
 
 
 if __name__=='__main__':

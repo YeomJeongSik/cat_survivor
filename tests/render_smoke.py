@@ -5,9 +5,11 @@ import sys
 import tempfile
 import time
 import statistics
+from unittest.mock import patch
+import copy
 
 ROOT=Path(__file__).resolve().parents[1]
-OUTPUT=ROOT/'output/preview2_step1'
+OUTPUT=ROOT/'output/preview2_step2'
 OUTPUT.mkdir(parents=True,exist_ok=True)
 sys.path.insert(0,str(ROOT))
 from game.app import App, capture, p, native
@@ -37,10 +39,6 @@ def main():
             app.click(480,155)
             app.click(20,20)
             assert not app.controls_popup and app.scene=='TITLE'
-            app.show_ranking()
-            assert app.scene=='RANKING'
-            app.draw()
-            app.show_title()
             app.show_title()  # Repeated menu clicks must remain harmless.
             app.start()
             app.world.cat.x,app.world.cat.y=200,195
@@ -185,7 +183,8 @@ def main():
             for skin in SKINS:
                 for state in ('idle','walk','jump','fall','dash','attack','hit','dead','groom'):
                     app.cat(480,100,state,.2,skin)
-            app.world.unlocked.update(('bee_golden','snake_silver'))
+            app.world.run_exp=240
+            app.world.run_gold=80
             app.world.cat.hp=0
             app.world.begin_death()
             app.update(DEATH_SECONDS/2)
@@ -194,31 +193,59 @@ def main():
             capture(OUTPUT/'cat_death_current.png')
             app.update(DEATH_SECONDS/2+.01)
             assert app.scene=='RESULT'
-            assert app.achievement_queue==['bee_golden','snake_silver']
+            assert app.saved_result
+            assert app.store.profile['gold']==80
+            assert app.store.profile['characters']['nabi']['level']==3
+            original_id=app.world.run_id
+            app.result_clock=0
             app.draw()
-            capture(OUTPUT/'achievement_current.png')
-            app.click(700,135)  # The underlying restart button must stay blocked.
-            assert app.scene=='RESULT' and len(app.achievement_queue)==2
+            capture(OUTPUT/'result_count_start.png')
+            app.update(.8)
+            app.draw()
+            capture(OUTPUT/'result_count_exp.png')
+            app.update(.9)
+            app.draw()
+            capture(OUTPUT/'result_count_gold.png')
             event=p.SDL_Event()
             event.type=p.SDL_KEYDOWN
             event.key.keysym.sym=p.SDLK_RETURN
             p.SDL_PushEvent(ctypes.byref(event))
             app.events()
-            assert app.scene=='RESULT' and len(app.achievement_queue)==2
-            app.click(480,204)
-            assert app.achievement_queue==['snake_silver']
+            assert app.scene=='RESULT' and app.world.run_id==original_id and app.result_clock==3
             app.draw()
-            app.click(480,204)
-            assert not app.achievement_queue
-            assert {'bee_golden','snake_silver'}<=set(app.store.profile['unlocked_skin_ids'])
-            app.store.profile['unlocked_skin_ids']=list(SKINS)
-            app.skin_popup=True
+            capture(OUTPUT/'result_complete.png')
+            assert [action for _,action,_ in app.buttons]==['start','title']
+            assert not hasattr(app,'show_ranking')
+            # A later, separate Enter restarts.
+            p.SDL_PushEvent(ctypes.byref(event))
+            app.events()
+            assert app.scene=='PLAY' and app.world.run_id!=original_id
+            before=copy.deepcopy(app.store.profile)
+            app.world.run_exp,app.world.run_gold=12,8
+            app.world.begin_death()
+            with patch.object(app.store,'write',side_effect=OSError('test: disk unavailable')):
+                app.update(DEATH_SECONDS+.01)
+            assert app.scene=='RESULT' and not app.saved_result
+            assert app.store.profile==before
             app.draw()
-            capture(OUTPUT/'result_first_run.png')
-            assert app.new_record
-            assert 35 < 180-120 and 180+120 < 330 and 40 < 547-48 < 547+48 < 600
-            # The popup is to the costume button's right and completely inside the main panel.
-            assert 715<725<915<925 and 40<320<555<600
+            capture(OUTPUT/'result_save_failed.png')
+            for key in (p.SDLK_RETURN,p.SDLK_ESCAPE):
+                event.key.keysym.sym=key
+                p.SDL_PushEvent(ctypes.byref(event))
+                app.events()
+                assert app.scene=='RESULT' and not app.saved_result
+            app.click(480,100)
+            assert app.saved_result and app.store.profile['gold']==88
+            app.click(480,320)
+            app.start()
+            app.store.profile['characters']['nabi'].update(level=50,exp=0,skill_points=50)
+            app.world.run_exp,app.world.run_gold=123,9
+            app.world.begin_death()
+            app.update(DEATH_SECONDS+.01)
+            app.result_clock=3
+            app.draw()
+            capture(OUTPUT/'result_max_level.png')
+            assert app.settlement['applied_exp']==0 and app.settlement['converted_gold']==62
             for file in app.art.specs:
                 image=app.art.image(file)
                 assert image.w==app.art.specs[file]['width'] and image.h==app.art.specs[file]['height'],file
@@ -229,9 +256,22 @@ def main():
                 image=app.art.image('v3/'+file)
                 assert (image.w,image.h)==(spec['width'],spec['height']),file
             app.start()
-            app.world.finish_run()
-            app.update(0)
-            assert app.scene=='RESULT' and not app.achievement_queue
+            app.world.run_exp,app.world.run_gold=100,100
+            before=copy.deepcopy(app.store.profile)
+            app.world.pause()
+            app.draw()
+            app.click(480,170)
+            app.draw()
+            capture(OUTPUT/'abandon_confirm.png')
+            assert app.exit_confirm
+            app.click(380,280)
+            assert app.world.mode=='PAUSED' and not app.exit_confirm
+            app.draw()
+            app.click(480,170)
+            app.draw()
+            app.click(580,280)
+            assert app.scene=='TITLE' and app.store.profile==before
+            assert app.world.run_exp==app.world.run_gold==0
             app.start()
             app.world.pause()
             for width,height in ((720,480),(1280,720)):

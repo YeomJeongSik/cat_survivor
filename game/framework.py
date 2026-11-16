@@ -11,11 +11,10 @@ from .states import Machine
 
 def scene_machine(app):
     return Machine(model=app,model_attribute='scene',initial='TITLE',
-                                     states=['TITLE','PLAY','RESULT','RANKING'],auto_transitions=False,
-                                     transitions=[['show_play',['TITLE','RESULT','RANKING','PLAY'],'PLAY'],
-                                                  ['show_result','PLAY','RESULT'],
-                                                  ['show_title',['TITLE','PLAY','RESULT','RANKING'],'TITLE'],
-                                                  ['show_ranking',['TITLE','RANKING'],'RANKING']])
+                   states=['TITLE','PLAY','RESULT'],auto_transitions=False,
+                   transitions=[['show_play',['TITLE','RESULT','PLAY'],'PLAY'],
+                                ['show_result','PLAY','RESULT'],
+                                ['show_title',['TITLE','PLAY','RESULT'],'TITLE']])
 
 
 def capture(path):

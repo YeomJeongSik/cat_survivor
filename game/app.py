@@ -7,8 +7,9 @@ import time
 from pathlib import Path
 import pico2d as p
 import pico2d.pico2d as native
-from .model import ROOT, BALANCE, SKINS, ACHIEVEMENTS, World
+from .model import ROOT, BALANCE, World
 from .storage import Store
+from .rewards import settle_run
 from .framework import capture, run, scene_machine
 from .audio import Audio
 
@@ -17,12 +18,10 @@ ART_V2 = ROOT/'output/nyangi_art_v2'
 ART_V3 = ROOT/'output/nyangi_art_v3'
 INK = (48,45,52)
 CREAM = (255,247,224)
-SKIN_NAMES = ('토비냥','까치냥','청설모냥','벌냥','뱀냥','무지개냥')
 KEY_BINDINGS = {p.SDLK_a:'left',p.SDLK_d:'right',p.SDLK_w:'up',p.SDLK_s:'down'}
 CONTROLS_BUTTON = (335,132,625,178)
 CONTROLS_PANEL = (275,190,685,490)
-ACHIEVEMENT_CLOSE = (410,187,550,221)
-ACHIEVEMENT_INFO = {a['skin_id']:a for a in ACHIEVEMENTS}
+RESULT_SECONDS = 3.
 # Source rectangles remove transparent UI padding without changing the supplied PNGs.
 UI_REGIONS = {'wave_banner':(68,14,3,36)}
 
@@ -144,11 +143,11 @@ class App:
         self.mouse, self.dragging = (0,0), None
         self.running, self.fullscreen = True, False
         self.ui_clock, self.last_mode = 0., None
-        self.skin_popup, self.selected_skin = False, self.store.profile['equipped_skin_id']
-        self.new_record, self.saved_result, self.error = False, False, ''
+        self.saved_result, self.error = False, ''
+        self.settlement = None
+        self.result_clock = 0.
+        self.exit_confirm = False
         self.controls_popup = False
-        self.achievement_queue = []
-        self.run_owned = set(self.store.profile['unlocked_skin_ids'])
         self.audio = Audio(self.store.profile)
         self.audio.scene(self.scene)
         self.last_countdown = None
@@ -161,16 +160,32 @@ class App:
         self.art.images.clear()
 
     def start(self):
-        self.run_owned = set(self.store.profile['unlocked_skin_ids'])
-        self.achievement_queue = []
+        if self.scene=='RESULT':
+            if not self.saved_result:
+                return
+            if self.result_clock<RESULT_SECONDS:
+                self.result_clock=RESULT_SECONDS
+                return
         self.controls_popup = False
         self.world = World(seed=time.time_ns() & 0xffffffff)
-        self.world.unlocked.update(self.store.profile['unlocked_skin_ids'])
         self.show_play()
-        self.saved_result, self.skin_popup = False, False
+        self.saved_result = False
+        self.settlement = None
+        self.result_clock = 0.
+        self.exit_confirm = False
+        self.error = ''
         self.keys.clear()
         self.last_countdown = None
         self.audio.scene('PLAY')
+
+    def retry_settlement(self):
+        try:
+            self.settlement = self.store.settle(self.world)
+            self.saved_result = True
+            self.error = ''
+        except (OSError,ValueError) as exc:
+            self.saved_result = False
+            self.error = f'보상 저장 실패: {exc}'
 
     def save(self):
         try:
@@ -184,15 +199,12 @@ class App:
             if self.world.mode == 'PLAYING':
                 self.world.aim = self.mouse
             self.world.update(dt,self.keys)
-            try:
-                self.store.unlock(self.world.unlocked)
-                if self.world.mode == 'GAME_OVER' and not self.saved_result:
-                    self.new_record = self.store.record(self.world)
-                    self.saved_result = True
-                    self.achievement_queue = [s for s in SKINS[1:] if s in self.world.unlocked and s not in self.run_owned]
-                    self.show_result()
-            except OSError as exc:
-                self.error = f'기록 저장 실패: {exc}'
+            if self.world.mode=='GAME_OVER' and self.world.end_reason=='death':
+                self.settlement = settle_run(self.store.profile,self.world)
+                self.result_clock = 0.
+                self.keys.clear()
+                self.show_result()
+                self.retry_settlement()
             for event in self.world.events:
                 self.audio.play(event)
             self.world.events.clear()
@@ -203,6 +215,8 @@ class App:
                     self.last_countdown=number
             else:
                 self.last_countdown=None
+        if self.scene=='RESULT' and self.saved_result:
+            self.result_clock=min(RESULT_SECONDS,self.result_clock+dt)
         self.audio.scene(self.scene)
 
     def button(self,label,rect,action,enabled=True):
@@ -218,7 +232,7 @@ class App:
         p.draw_rectangle(left,bottom,right,top,99,79,68)
 
     def cat(self,x,y,state='idle',clock=0.,skin=None,flip=False,alpha=1.,scale=1.):
-        skin = skin or self.store.profile['equipped_skin_id']
+        skin = skin or 'tobi_default'
         self.art.sprite(f'sprites/cat/{skin}/{state}.png',x,y,clock,flip,alpha,foot=True,scale=scale)
 
     def background(self,title=False):
@@ -289,14 +303,18 @@ class App:
         if w.warning_message:
             self.art.draw('ui/wave_banner.png',480,541,960,32)
             self.art.text('WARNING  ·  '+w.warning_message,480,541,19,CREAM,True)
-        if w.notices and w.time-w.notices[-1][1] < 3:
-            skin = w.notices[-1][0]
-            self.panel(300,480,660,515)
-            self.art.text(f'{SKIN_NAMES[SKINS.index(skin)]} 해금!',480,498,18,INK,True)
         if w.mode == 'PAUSED':
             self.pause_panel()
         elif w.mode == 'COUNTDOWN':
             self.art.outlined_text(str(max(1,math.ceil(w.countdown))),480,330)
+        if self.exit_confirm:
+            self.panel(275,210,685,430)
+            self.art.text('이번 판 보상을 포기할까요?',480,386,23,INK,True)
+            self.art.text('획득한 EXP와 GOLD는 저장되지 않습니다.',480,346,16,INK,True)
+            self.buttons=[]
+            self.button('취소',(315,259,450,301),'cancel_exit')
+            self.button('포기하기',(510,259,645,301),'confirm_exit')
+
 
     def volume(self,key,x,y):
         value = self.store.profile[key]
@@ -323,66 +341,39 @@ class App:
         self.button('계속하기',(335,210,625,252),'resume')
         self.button('타이틀로 나가기',(335,150,625,192),'exit_run')
 
-    def ranking(self,left,bottom,width=490):
-        self.art.text('Record Score',left+300,bottom+10*34,14,INK)
-        for i in range(10):
-            y = bottom+(9-i)*34
-            self.art.draw('ui/rank_row.png',left+width/2,y,width,30)
-            self.art.text(f'{i+1:02}',left+120,y,15,CREAM)
-            if i < len(self.store.records):
-                row = self.store.records[i]
-                self.art.text('LOCAL'+('  CLEAR' if row['cleared'] else ''),left+164,y,14,CREAM)
-                self.art.text(f'{row["score"]:,}',left+300,y,15,CREAM)
-            else:
-                self.art.text('기록 없음',left+164,y,14,CREAM)
-
     def result(self):
         self.background(True)
-        self.panel(35,40,925,600)
-        title = '이번 산책의 기록' if self.scene == 'RESULT' else '로컬 랭킹'
-        self.art.text(title,480,560,32,INK,True)
-        if self.scene == 'RESULT':
-            self.art.text(f'{self.world.score:,} 점  ·  생존 {self.world.time:.1f}초',480,513,22,INK,True)
-            if self.new_record:
-                self.art.draw('v3/ui/new_record.png',180,547)
-        self.ranking(65,125,490)
-        self.button('코스튬',(580,420,715,462),'costume')
-        self.volume('bgm_volume',600,325)
-        self.volume('sfx_volume',600,240)
-        self.button('다시 시작하기' if self.scene == 'RESULT' else '시작하기',(580,115,865,164),'start')
-        self.button('타이틀',(580,57,865,99),'title')
-        if self.skin_popup:
-            self.panel(725,320,915,555)
-            self.buttons.append(((725,320,915,555),None,True))
-            self.art.text('장착 중',820,537,13,INK,True)
-            self.cat(820,463,'idle',self.ui_clock)
-            for i,skin in enumerate(SKINS):
-                x,y = 758+(i%3)*58,438-(i//3)*42
-                owned = skin in self.store.profile['unlocked_skin_ids']
-                if skin == self.selected_skin and owned:
-                    self.art.sprite(f'sprites/cat/{skin}/groom.png',x,y-14,self.ui_clock,foot=True,scale=.5)
-                else:
-                    self.art.draw(f'ui/portraits/{skin}.png',x,y,32,32,alpha=1 if owned else .3)
-                if not owned:
-                    self.art.draw('ui/lock.png',x,y,16,16)
-                if skin == self.selected_skin:
-                    p.draw_rectangle(x-18,y-18,x+18,y+18,232,142,50)
-                self.buttons.append(((x-20,y-18,x+20,y+18),('skin',skin),owned))
-            self.button('장착',(751,332,891,366),'equip')
-        if self.achievement_queue and self.scene=='RESULT':
-            self.achievement_popup()
-
-    def achievement_popup(self):
-        skin=self.achievement_queue[0]
-        info=ACHIEVEMENT_INFO[skin]
-        self.panel(275,160,685,510)
-        self.art.text('업적 달성!',480,478,26,INK,True)
-        self.art.text(info['name'],480,437,22,INK,True)
-        self.art.text(info['description'],480,401,16,INK,True)
-        self.cat(480,300,'groom',self.ui_clock,skin,scale=2.)
-        self.art.text(f'{SKIN_NAMES[SKINS.index(skin)]} 해금!',480,269,20,INK,True)
-        self.buttons.append(((0,0,960,640),None,True))
-        self.button('X',ACHIEVEMENT_CLOSE,'achievement_close')
+        self.panel(125,45,835,600)
+        self.art.text('이번 산책의 기록',480,554,30,INK,True)
+        result=self.settlement
+        self.cat(270,420,'idle',self.ui_clock,scale=2.)
+        self.art.text(f'나비   Lv. {result["level_after"]}',350,470,24,INK)
+        seconds=int(result['survival_time'])
+        self.art.text(f'생존 시간   {seconds//60:02d}:{seconds%60:02d}',350,432,20,INK)
+        if result['level_before']!=result['level_after']:
+            self.art.text(f'Lv. {result["level_before"]} → {result["level_after"]}   스킬 포인트 +{result["skill_points_gained"]}',350,398,16,INK)
+        def progress(start):
+            t=max(0.,min(1.,(self.result_clock-start)/1.3))
+            return 1-(1-t)**3
+        def number(value):
+            return f'{value:,.2f}'.rstrip('0').rstrip('.')
+        exp=result['applied_exp']*progress(0)
+        gold=int(result['gold_gained']*progress(1.4))
+        self.art.text('획득 EXP',205,330,21,INK)
+        self.art.text(number(exp),650,330,29,INK,True)
+        self.art.text(f'생존 배율 ×{result["exp_percent"]/100:.2f}',205,298,15,INK)
+        self.art.text('획득 GOLD',205,245,21,INK)
+        self.art.text(f'{gold:,}',650,245,29,INK,True)
+        self.art.text(f'생존 배율 ×{result["gold_percent"]/100:.2f}',205,213,15,INK)
+        if result['overflow_exp']:
+            self.art.text(f'만렙 초과 EXP {number(result["overflow_exp"])} → GOLD +{result["converted_gold"]}',480,175,16,INK,True)
+        if self.saved_result:
+            self.art.text('저장 완료' if self.result_clock>=RESULT_SECONDS else '클릭 또는 Enter로 합산 완료',480,145,14,INK,True)
+            self.button('다시 시작하기',(165,77,455,125),'start')
+            self.button('타이틀로',(505,77,795,125),'title')
+        else:
+            self.art.text('보상을 저장하지 못했습니다. 저장 후 이동할 수 있습니다.',480,155,16,(151,44,44),True)
+            self.button('저장 재시도',(335,77,625,125),'retry_save')
 
     def controls_panel(self):
         self.panel(*CONTROLS_PANEL)
@@ -454,7 +445,7 @@ class App:
         self.buttons = []
         if self.scene == 'PLAY':
             self.gameplay()
-        elif self.scene in ('RESULT','RANKING'):
+        elif self.scene == 'RESULT':
             self.result()
         else:
             self.background(True)
@@ -469,42 +460,43 @@ class App:
             self.art.text(self.error[:80],45,26,13,(151,44,44))
 
     def action(self,action,x):
+        if self.exit_confirm and action not in ('cancel_exit','confirm_exit'):
+            return
         if action is not None:
             self.audio.play('click')
+        if self.scene=='RESULT' and action!='retry_save':
+            if not self.saved_result:
+                return
+            if self.result_clock<RESULT_SECONDS:
+                self.result_clock=RESULT_SECONDS
+                return
         if isinstance(action,tuple):
             if action[0] == 'volume':
                 _,key,left = action
                 self.dragging = (key,left)
                 self.change_volume(x)
-            elif action[0] == 'skin':
-                self.selected_skin = action[1]
             return
         if action == 'start':
             self.start()
         elif action == 'resume':
             self.world.pause()
             self.keys.clear()
-        elif action == 'exit_run':
-            if self.world.mode in ('PLAYING','PAUSED','COUNTDOWN'):
-                self.world.finish_run()
+        elif action == 'exit_run' and self.world.mode=='PAUSED':
+            self.exit_confirm = True
+        elif action == 'cancel_exit':
+            self.exit_confirm = False
+        elif action == 'confirm_exit' and self.exit_confirm:
+            self.world.finish_run()
+            self.exit_confirm = False
+            self.keys.clear()
+            self.show_title()
         elif action == 'title':
             self.show_title()
-            self.skin_popup = False
             self.controls_popup = False
         elif action == 'controls' and self.scene=='TITLE':
             self.controls_popup = not self.controls_popup
-        elif action == 'achievement_close' and self.achievement_queue:
-            self.achievement_queue.pop(0)
-        elif action == 'ranking':
-            self.show_ranking()
-        elif action == 'costume':
-            self.skin_popup = not self.skin_popup
-            self.selected_skin = self.store.profile['equipped_skin_id']
-        elif action == 'equip':
-            if self.selected_skin in self.store.profile['unlocked_skin_ids']:
-                self.store.profile['equipped_skin_id'] = self.selected_skin
-                self.save()
-                self.skin_popup = False
+        elif action == 'retry_save' and self.scene=='RESULT' and not self.saved_result:
+            self.retry_settlement()
 
     def change_volume(self,x):
         if self.dragging:
@@ -513,6 +505,12 @@ class App:
             self.audio.volumes(self.store.profile)
 
     def click(self,x,y):
+        if self.exit_confirm:
+            if contains((315,259,450,301),x,y):
+                self.action('cancel_exit',x)
+            elif contains((510,259,645,301),x,y):
+                self.action('confirm_exit',x)
+            return
         if self.controls_popup and self.scene=='TITLE':
             if contains(CONTROLS_BUTTON,x,y):
                 self.action('controls',x)
@@ -520,9 +518,8 @@ class App:
                 self.controls_popup=False
                 self.audio.play('click')
             return
-        if self.achievement_queue and self.scene=='RESULT':
-            if contains(ACHIEVEMENT_CLOSE,x,y):
-                self.action('achievement_close',x)
+        if self.scene=='RESULT' and self.saved_result and self.result_clock<RESULT_SECONDS:
+            self.result_clock=RESULT_SECONDS
             return
         for rect,action,enabled in reversed(self.buttons):
             if contains(rect,x,y):
@@ -553,24 +550,22 @@ class App:
                 if key == p.SDLK_F11:
                     self.fullscreen = not self.fullscreen
                     p.SDL_SetWindowFullscreen(native.window,p.SDL_WINDOW_FULLSCREEN_DESKTOP if self.fullscreen else 0)
-                elif self.achievement_queue and self.scene=='RESULT':
-                    continue
                 elif key == p.SDLK_ESCAPE:
                     if self.controls_popup:
                         self.controls_popup=False
-                    elif self.skin_popup:
-                        self.skin_popup = False
-                    elif self.scene == 'PLAY':
+                    elif self.exit_confirm:
+                        self.exit_confirm=False
+                    elif self.scene=='PLAY':
                         self.world.pause()
                         self.keys.clear()
-                    elif self.scene != 'TITLE':
-                        self.show_title()
+                    elif self.scene=='RESULT':
+                        self.action('title',0)
                 elif key == p.SDLK_RETURN:
-                    if self.scene in ('TITLE','RESULT','RANKING'):
+                    if self.scene in ('TITLE','RESULT'):
                         self.start()
-                    elif self.world.mode == 'PAUSED':
+                    elif self.world.mode=='PAUSED' and not self.exit_confirm:
                         self.world.pause()
-                elif self.scene == 'PLAY':
+                elif self.scene=='PLAY':
                     if key in (p.SDLK_SPACE,p.SDLK_w):
                         self.world.jump(self.keys)
                     elif key in (p.SDLK_LSHIFT,p.SDLK_RSHIFT):

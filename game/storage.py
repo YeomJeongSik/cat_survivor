@@ -4,7 +4,8 @@ import json
 import math
 import os
 import time
-from .model import SKINS
+import copy
+from .rewards import initial_character, validate_progress, settle_run
 
 
 class Store:
@@ -12,16 +13,16 @@ class Store:
         self.folder = Path(folder)
         self.warnings = []
         self.profile = self.read('profile.json', {})
-        owned = self.profile.get('unlocked_skin_ids', [])
-        self.profile['unlocked_skin_ids'] = [s for s in SKINS if isinstance(owned,list) and s in owned or s == SKINS[0]]
-        if self.profile.get('equipped_skin_id') not in self.profile['unlocked_skin_ids']:
-            self.profile['equipped_skin_id'] = SKINS[0]
+        version=self.profile.get('version',1)
+        if type(version) is not int or version not in (1,2):
+            raise ValueError('Unsupported profile version; original save was not changed')
+        self.original_version=version
+        if version==1:
+            self.profile.update(version=2,gold=0,characters={'nabi':initial_character()},settled_runs={})
+        validate_progress(self.profile)
         for key in ('bgm_volume','sfx_volume'):
             value = self.profile.get(key,70)
             self.profile[key] = max(0,min(100,round(value/10)*10)) if isinstance(value,(float,int)) and math.isfinite(value) else 70
-        raw = self.read('leaderboard.json', [])
-        self.records = [r for r in raw if isinstance(r,dict) and isinstance(r.get('score'),int) and
-                        isinstance(r.get('timestamp'),(int,float)) and math.isfinite(r['timestamp']) and isinstance(r.get('cleared'),bool)]
 
     def read(self, name, default):
         path = self.folder/name
@@ -52,21 +53,33 @@ class Store:
             os.fsync(stream.fileno())
         os.replace(temporary,path)
 
+    def _write_profile(self, candidate):
+        validate_progress(candidate)
+        path=self.folder/'profile.json'
+        if self.original_version==1 and path.exists():
+            backup=self.folder/'profile.v1-backup.json'
+            if not backup.exists():
+                backup.write_bytes(path.read_bytes())
+        self.write('profile.json',candidate)
+        self.original_version=2
+
     def save_profile(self):
-        self.profile['version'] = 1
-        self.write('profile.json',self.profile)
+        self._write_profile(self.profile)
 
-    def unlock(self, skins):
-        owned = set(self.profile['unlocked_skin_ids']) | set(skins)
-        if owned != set(self.profile['unlocked_skin_ids']):
-            self.profile['unlocked_skin_ids'] = [s for s in SKINS if s in owned]
-            self.save_profile()
-
-    def record(self, world):
-        result = dict(player_name='LOCAL',score=world.score,
-                      time_survived=round(world.time,2),cleared=False,timestamp=time.time())
-        self.records.append(result)
-        self.records.sort(key=lambda r:(not r['cleared'],-r['score'],r['timestamp']))
-        self.records = self.records[:100]
-        self.write('leaderboard.json',self.records)
-        return result is self.records[0]
+    def settle(self, world):
+        if world.mode!='GAME_OVER' or world.end_reason!='death':
+            raise ValueError('Abandoned or unfinished runs cannot settle')
+        existing=self.profile['settled_runs'].get(world.run_id)
+        if existing is not None:
+            fields={'character_id':world.character_id,'raw_exp':world.run_exp,'raw_gold':world.run_gold,'survival_time':world.time}
+            if any(existing[key]!=value for key,value in fields.items()):
+                raise ValueError('Run ID already belongs to another result')
+            return copy.deepcopy(existing)
+        result=settle_run(self.profile,world)
+        candidate=copy.deepcopy(self.profile)
+        candidate['gold']+=result['gold_gained']
+        candidate['characters'][world.character_id]=copy.deepcopy(result['character_after'])
+        candidate['settled_runs'][world.run_id]=copy.deepcopy(result)
+        self._write_profile(candidate)
+        self.profile=candidate
+        return result
