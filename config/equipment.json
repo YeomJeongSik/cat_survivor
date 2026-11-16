@@ -1,0 +1,72 @@
+{
+  "gacha_price": 150,
+  "slot_costs": [
+    0,
+    250,
+    500
+  ],
+  "stack_step": 0.015,
+  "caps": {
+    "damage": 0.65,
+    "move_speed": 0.3,
+    "dash_reduction": 0.3
+  },
+  "rarities": {
+    "common": {
+      "name": "Common",
+      "weight": 70,
+      "sale": 45,
+      "cost": 30,
+      "chance": 95,
+      "enhance_step": 0.015,
+      "multiplier": 1
+    },
+    "rare": {
+      "name": "Rare",
+      "weight": 23,
+      "sale": 55,
+      "cost": 50,
+      "chance": 90,
+      "enhance_step": 0.016,
+      "multiplier": 1.5
+    },
+    "unique": {
+      "name": "Unique",
+      "weight": 6,
+      "sale": 65,
+      "cost": 80,
+      "chance": 85,
+      "enhance_step": 0.017,
+      "multiplier": 2.25
+    },
+    "legendary": {
+      "name": "Legendary",
+      "weight": 1,
+      "sale": 75,
+      "cost": 120,
+      "chance": 80,
+      "enhance_step": 0.018,
+      "multiplier": 3.375
+    }
+  },
+  "types": {
+    "bell": {
+      "name": "방울",
+      "stat": "damage",
+      "label": "공격력",
+      "base": 0.08
+    },
+    "boots": {
+      "name": "산책 신발",
+      "stat": "move_speed",
+      "label": "이동속도",
+      "base": 0.04
+    },
+    "ribbon": {
+      "name": "대시 리본",
+      "stat": "dash_reduction",
+      "label": "대시 충전 단축",
+      "base": 0.02
+    }
+  }
+}

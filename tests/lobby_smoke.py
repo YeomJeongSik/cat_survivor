@@ -61,6 +61,8 @@ def main():
                     before=copy.deepcopy(app.store.profile)
                     app.click(310,214);app.click(650,214)
                     assert app.store.profile==before
+                    if app.lobby.confirm:
+                        app.action(('lobby','cancel'),0)
                 key(p.SDLK_RETURN)
                 assert app.scene=='LOBBY' and app.world is None
                 key(p.SDLK_ESCAPE)
@@ -122,7 +124,7 @@ def main():
             app.draw()
             key(p.SDLK_RETURN)
             assert app.scene=='LOBBY'
-            print('LOBBY SDL PASS: title/lobby/play/result/lobby; live saved totals; all 7 panels; modal Enter/ESC; disabled shop; volume')
+            print('LOBBY SDL PASS: title/lobby/play/result/lobby; live saved totals; all 7 panels; modal Enter/ESC; purchase confirmations; volume')
             print('LOBBY BOUNDS PASS: all rendered text fits 960x640; 720x480 and 1280x720 panels and logical centers')
         finally:
             app.close()

@@ -9,6 +9,7 @@ import hashlib
 import random
 from uuid import uuid4
 from .transactions import apply_operation
+from .equipment import validate_equipment
 from .characters import CHARACTERS
 from .rewards import initial_character, validate_progress, settle_run
 
@@ -24,13 +25,19 @@ class Store:
         self.original_version=version
         if version==1:
             self.profile.update(version=2,gold=0,characters={'nabi':initial_character()},settled_runs={})
+        self.profile.setdefault('items',[])
+        self.profile.setdefault('equipment_slots',[None,None,None])
+        self.profile.setdefault('unlocked_slots',1)
+        validate_equipment(self.profile)
         self.profile.setdefault('transactions',{})
         self.profile.setdefault('claimed_achievements',{})
         self.profile.setdefault('stats',dict(kills=0,magpie=0,squirrel=0,bee=0,snake=0,
             runs=len(self.profile.get('settled_runs',{})),best_time=max((r['survival_time'] for r in self.profile.get('settled_runs',{}).values()),default=0)))
 
         self.pending=self.read('pending_transaction.json',{})
-        if self.pending and not all(key in self.pending for key in ('id','operation','args','seed','base')):
+        if self.pending and (not all(key in self.pending for key in ('id','operation','args','seed','base')) or
+                             not isinstance(self.pending['id'],str) or not isinstance(self.pending['operation'],str) or
+                             not isinstance(self.pending['args'],dict) or type(self.pending['seed']) is not int or not isinstance(self.pending['base'],str)):
             raise ValueError('Invalid pending transaction; original file preserved')
         validate_progress(self.profile)
         selected=self.profile.get('selected_character_id','nabi')
@@ -70,6 +77,7 @@ class Store:
 
     def _write_profile(self, candidate):
         validate_progress(candidate)
+        validate_equipment(candidate)
         if not isinstance(candidate.get('selected_character_id'),str) or candidate['selected_character_id'] not in CHARACTERS or candidate['selected_character_id'] not in candidate['characters']:
             raise ValueError('Cannot save an unowned or unavailable character')
         path=self.folder/'profile.json'
@@ -126,6 +134,8 @@ class Store:
 
     def transact(self, operation, args, request_id=None):
         request_id=request_id or str(uuid4())
+        if not isinstance(operation,str) or not isinstance(args,dict) or not isinstance(request_id,str):
+            raise ValueError('Invalid transaction request')
         existing=self.profile['transactions'].get(request_id)
         if existing:
             if existing['operation']!=operation or existing['args']!=args:

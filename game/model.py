@@ -5,6 +5,8 @@ import json
 import math
 import random
 from uuid import uuid4
+from .characters import CHARACTERS
+from .equipment import RULES as EQUIPMENT
 from .difficulty import SETTINGS, difficulty_at, monster_stats
 from .states import CAT_ACTIVE, ENEMY_GRAPHS, Machine, actor_machine
 
@@ -124,7 +126,8 @@ class Enemy(Actor):
             raise ValueError('Damage must be finite and positive')
         if not self.exposed:
             return False
-        self.hp = max(0.,self.hp-amount)
+        remaining=self.hp-amount
+        self.hp = 0. if remaining<=1e-9 else remaining
         self.hit_flash = .15
         if self.hp == 0:
             self.enter('HIT')
@@ -187,9 +190,18 @@ class Item(Actor):
 
 
 class World:
-    def __init__(self, seed=1, character_id="nabi"):
+    def __init__(self, seed=1, character_id="nabi", bonuses=None):
+        if character_id not in CHARACTERS:
+            raise ValueError("Unknown playable character")
         self.run_id = str(uuid4())
         self.character_id = character_id
+        bonuses=bonuses or {}
+        if any(not math.isfinite(v) or v<0 for v in bonuses.values()):
+            raise ValueError('Invalid equipment bonuses')
+        self.bonuses={key:min(bonuses.get(key,0.),cap) for key,cap in EQUIPMENT['caps'].items()}
+        self.attack_multiplier=1+self.bonuses['damage']
+        self.move_multiplier=1+self.bonuses['move_speed']
+        self.dash_cooldown=BALANCE['dash_cooldown']*(1-self.bonuses['dash_reduction'])
         self.run_exp = self.run_gold = 0
         self.run_kills = dict.fromkeys(SPECIES,0)
         self.end_reason = None
@@ -249,6 +261,7 @@ class World:
 
     def _start_death(self):
         self.end_reason = "death"
+        self.swings=[]
         self.cat.enter('DEAD')
         self.cat.vx = self.cat.vy = 0.
         self.cat.attack_left = 0.
@@ -278,7 +291,7 @@ class World:
         c.facing = move or c.facing
         c.dash_left = BALANCE['dash_duration']
         if c.dash_charges == BALANCE['dash_max_charges']:
-            c.dash_cd = BALANCE['dash_cooldown']
+            c.dash_cd = self.dash_cooldown
         c.dash_charges -= 1
         c.enter('DASH')
         self.events.append('dash')
@@ -328,7 +341,7 @@ class World:
             c.shot_cd=.4
         dx,dy=self.aim_direction()
         radius=112.5 if special else 90.
-        damage=3. if special else 2.
+        damage=(3. if special else 2.)*self.attack_multiplier
         c.facing=1 if dx>=0 else -1
         c.attack_left=.22
         self.swings.append((c.x,c.y+26,math.atan2(dy,dx),radius,self.time,special))
@@ -393,15 +406,15 @@ class World:
             c.dash_cd -= dt
             while c.dash_cd <= 1e-9 and c.dash_charges < BALANCE['dash_max_charges']:
                 c.dash_charges += 1
-                c.dash_cd += BALANCE['dash_cooldown']
+                c.dash_cd += self.dash_cooldown
             if c.dash_charges == BALANCE['dash_max_charges']:
                 c.dash_cd = 0.
         move = int('right' in keys)-int('left' in keys)
         if move and c.dash_left <= 0:
             c.facing = move
-        c.vx = move * BALANCE['move_speed']
+        c.vx = move * BALANCE['move_speed']*self.move_multiplier
         if c.dash_left > 0:
-            c.vx = c.facing * BALANCE['dash_speed']
+            c.vx = c.facing * BALANCE['dash_speed']*self.move_multiplier
             c.dash_left = max(0., c.dash_left-dt)
             if not self.trails or self.time-self.trails[-1][3] > .025:
                 self.trails.append((c.x, c.y, c.facing, self.time))
@@ -619,7 +632,7 @@ class World:
                            and (t:=segment_hit(old_x,old_y,p.x,p.y,e.box(5*p.scale))) is not None),key=lambda pair:pair[0])
             for _,e in hits if p.piercing else hits[:1]:
                 p.hit_enemies.append(e)
-                self.hit_enemy(e,1.)
+                self.hit_enemy(e,self.attack_multiplier)
                 if not p.piercing:
                     p.enter('HIT')
             if p.state != 'HIT' and (not 0 <= p.x <= 960 or not BALANCE['ground'] <= p.y <= 560):

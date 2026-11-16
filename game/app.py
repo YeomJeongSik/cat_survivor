@@ -11,6 +11,7 @@ from .model import ROOT, BALANCE, World
 from .storage import Store
 from .lobby import Lobby, contains as lobby_contains
 from .characters import CHARACTERS
+from .equipment import bonuses as equipment_bonuses
 from .rewards import settle_run
 from .framework import capture, run, scene_machine
 from .audio import Audio
@@ -188,7 +189,7 @@ class App:
                 self.result_clock=RESULT_SECONDS
                 return
         self.controls_popup = False
-        self.world = World(seed=time.time_ns() & 0xffffffff,character_id=self.store.profile['selected_character_id'])
+        self.world = World(seed=time.time_ns() & 0xffffffff,character_id=self.store.profile['selected_character_id'],bonuses=equipment_bonuses(self.store.profile))
         self.show_play()
         self.saved_result = False
         self.settlement = None
@@ -271,7 +272,7 @@ class App:
                 image.clip_draw(0,0,width,32,x+width/2,floor-16,width,32)
         self.aim_guide()
         for x,y,angle,radius,born,special in w.swings:
-            points=[(x+math.cos(angle+a)*radius,y+math.sin(angle+a)*radius) for a in [math.radians(-80+160*i/24) for i in range(25)]]
+            points=[(x+math.cos(angle+a)*radius,y+math.sin(angle+a)*radius) for a in [math.radians(-(80 if special else 55)+2*(80 if special else 55)*i/24) for i in range(25)]]
             for first,second in zip(points,points[1:]):
                 p.draw_line(*first,*second,255,226,69)
         for item in w.items:
@@ -405,8 +406,9 @@ class App:
     def controls_panel(self):
         self.panel(*CONTROLS_PANEL)
         self.art.text('조작 방법',480,459,24,INK,True)
+        black=self.store.profile['selected_character_id']=='black'
         rows=(('A / D','좌우 이동'),('W / SPACE','더블 점프'),('S + SPACE','발판 아래로 내려가기'),
-              ('SHIFT','대시 2회 · 공유 충전'),('마우스 좌','조준 방향 일반탄'),('마우스 우','관통탄 · 츄르 10개 충전'),
+              ('SHIFT','대시 2회 · 공유 충전'),('마우스 좌','전방 근접 공격' if black else '조준 방향 일반탄'),('마우스 우',('광역 발톱' if black else '관통탄')+' · 츄르 10개 충전'),
               ('ESC','일시정지 / 계속하기'),('F11','전체 화면'))
         for i,(key,description) in enumerate(rows):
             y=419-i*27
@@ -431,6 +433,14 @@ class App:
                 for offset in range(-width,width+1):
                     p.draw_line(ax+nx*offset,ay+ny*offset,bx+nx*offset,by+ny*offset,*color)
 
+        if w.character_id=='black':
+            angle=math.atan2(dy,dx)
+            points=[(x+math.cos(angle+math.radians(-55+110*i/20))*90,y+math.sin(angle+math.radians(-55+110*i/20))*90) for i in range(21)]
+            for first,second in zip(points,points[1:]):
+                stroke(*first,*second)
+            stroke(x,y,*points[0])
+            stroke(x,y,*points[-1])
+            length=0
         for distance in range(28,int(length),24):
             end=min(distance+15,length)
             stroke(x+dx*distance,y+dy*distance,x+dx*end,y+dy*end)
@@ -446,7 +456,7 @@ class App:
     def charge_hud(self):
         c=self.world.cat
         self.art.text(f'대시 {c.dash_charges}/2',315,24,15,CREAM)
-        progress=1-c.dash_cd/BALANCE['dash_cooldown']
+        progress=1-c.dash_cd/self.world.dash_cooldown
         for i in range(BALANCE['dash_max_charges']):
             left=405+i*54
             p.draw_rectangle(left,16,left+49,31,91,109,112,filled=True)

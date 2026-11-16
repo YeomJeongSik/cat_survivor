@@ -1,6 +1,7 @@
 """Deterministic profile operations; one journaled request commits atomically."""
 from .rewards import initial_character, grow_character
 from .achievements import ACHIEVEMENTS, progress
+from .equipment import apply_equipment
 
 
 def apply_operation(profile,operation,args,rng,request_id):
@@ -29,4 +30,4 @@ def apply_operation(profile,operation,args,rng,request_id):
         profile['gold']+=gold
         profile['claimed_achievements'][achievement['id']]=dict(character_id=key,exp=growth['applied_exp'],gold=gold)
         return dict(message='업적 보상을 수령했습니다.',exp=growth['applied_exp'],gold=gold)
-    raise ValueError('Unknown operation')
+    return apply_equipment(profile,operation,args,rng,request_id)

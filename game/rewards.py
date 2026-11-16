@@ -34,6 +34,15 @@ def validate_progress(profile):
             raise ValueError('Maximum-level EXP must be zero')
         if type(points) is not int or not 0<=points<=level-1+(level==50):
             raise ValueError('Invalid saved skill points')
+    for field in ('transactions','claimed_achievements'):
+        if field in profile and not isinstance(profile[field],dict):
+            raise ValueError('Invalid saved ledger')
+    if 'stats' in profile:
+        stats=profile['stats']
+        if not isinstance(stats,dict) or any(type(stats.get(key)) is not int or stats[key]<0 for key in ('kills','runs','magpie','squirrel','bee','snake')):
+            raise ValueError('Invalid saved achievement counters')
+        if type(stats.get('best_time')) not in (int,float) or not math.isfinite(stats['best_time']) or stats['best_time']<0:
+            raise ValueError('Invalid saved survival record')
     if not isinstance(profile['settled_runs'],dict):
         raise ValueError('Invalid settlement receipts')
     for run_id,receipt in profile['settled_runs'].items():
