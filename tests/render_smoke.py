@@ -9,7 +9,7 @@ from unittest.mock import patch
 import copy
 
 ROOT=Path(__file__).resolve().parents[1]
-OUTPUT=ROOT/'output/preview2_step2'
+OUTPUT=ROOT/'output/preview2_step3/regression'
 OUTPUT.mkdir(parents=True,exist_ok=True)
 sys.path.insert(0,str(ROOT))
 from game.app import App, capture, p, native
@@ -214,7 +214,7 @@ def main():
             assert app.scene=='RESULT' and app.world.run_id==original_id and app.result_clock==3
             app.draw()
             capture(OUTPUT/'result_complete.png')
-            assert [action for _,action,_ in app.buttons]==['start','title']
+            assert [action for _,action,_ in app.buttons]==['start','lobby']
             assert not hasattr(app,'show_ranking')
             # A later, separate Enter restarts.
             p.SDL_PushEvent(ctypes.byref(event))
@@ -270,7 +270,7 @@ def main():
             app.click(480,170)
             app.draw()
             app.click(580,280)
-            assert app.scene=='TITLE' and app.store.profile==before
+            assert app.scene=='LOBBY' and app.store.profile==before
             assert app.world.run_exp==app.world.run_gold==0
             app.start()
             app.world.pause()

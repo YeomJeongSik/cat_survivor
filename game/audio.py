@@ -4,7 +4,7 @@ import pico2d as p
 import pico2d.pico2d as native
 
 ROOT=Path(__file__).resolve().parents[1]/'assets/audio'
-TRACKS={'TITLE':'campus_stroll','PLAY':'jelly_rush','RESULT':'sunset_record'}
+TRACKS={'TITLE':'campus_stroll','LOBBY':'campus_stroll','PLAY':'jelly_rush','RESULT':'sunset_record'}
 COMBAT_SOUNDS=('shot','hurt','jump','enemy_hit','magpie_attack','squirrel_attack','bee_attack','snake_attack')
 CHANNELS={'shot':0,'dash':1,'jump':2,'land':2,'enemy_death':3,'magpie_attack':4,'bee_attack':11,
           'squirrel_attack':12,'snake_attack':13,'enemy_hit':14,'siren':5,'click':6,'countdown':6,

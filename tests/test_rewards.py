@@ -10,6 +10,7 @@ from game.rewards import RULES, level_cost, settle_run, bonus_percent
 from game.storage import Store
 from game.app import App, RESULT_SECONDS
 from game.framework import scene_machine
+from game.lobby import Lobby
 
 
 def dead_world(exp=12, gold=8, seconds=60):
@@ -27,6 +28,8 @@ def headless_app(store, world):
     scene_machine(app)
     app.show_play()
     app.store,app.world=store,world
+    app.lobby=Lobby()
+    app.dragging=None
     app.audio=Mock()
     app.ui_clock=app.result_clock=0.
     app.saved_result=False
@@ -195,7 +198,7 @@ class RewardTest(unittest.TestCase):
         self.assertEqual((app.scene,w.mode),('PLAY','PAUSED'))
         app.action('exit_run',0)
         app.action('confirm_exit',0)
-        self.assertEqual((app.scene,w.end_reason,w.run_exp,w.run_gold),('TITLE','abandoned',0,0))
+        self.assertEqual((app.scene,w.end_reason,w.run_exp,w.run_gold),('LOBBY','abandoned',0,0))
         self.assertEqual(self.store.profile,before)
 
 

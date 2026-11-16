@@ -9,6 +9,8 @@ import pico2d as p
 import pico2d.pico2d as native
 from .model import ROOT, BALANCE, World
 from .storage import Store
+from .lobby import Lobby, contains as lobby_contains
+from .characters import CHARACTERS
 from .rewards import settle_run
 from .framework import capture, run, scene_machine
 from .audio import Audio
@@ -138,6 +140,7 @@ class App:
         self.art = Art()
         self.store = Store(save_folder or ROOT/'save')
         self.world = None
+        self.lobby = Lobby()
         self.scene_machine = scene_machine(self)
         self.keys, self.buttons = set(), []
         self.mouse, self.dragging = (0,0), None
@@ -159,7 +162,22 @@ class App:
         self.art.labels.clear()
         self.art.images.clear()
 
+    def enter_lobby(self):
+        if self.scene=='RESULT':
+            if not self.saved_result:
+                return
+            if self.result_clock<RESULT_SECONDS:
+                self.result_clock=RESULT_SECONDS
+                return
+        self.lobby.close(self)
+        self.controls_popup=False
+        self.exit_confirm=False
+        self.show_lobby()
+        self.audio.scene('LOBBY')
+
     def start(self):
+        if self.scene=='LOBBY' and self.lobby.panel:
+            return
         if self.scene=='RESULT':
             if not self.saved_result:
                 return
@@ -167,7 +185,7 @@ class App:
                 self.result_clock=RESULT_SECONDS
                 return
         self.controls_popup = False
-        self.world = World(seed=time.time_ns() & 0xffffffff)
+        self.world = World(seed=time.time_ns() & 0xffffffff,character_id=self.store.profile['selected_character_id'])
         self.show_play()
         self.saved_result = False
         self.settlement = None
@@ -190,6 +208,7 @@ class App:
     def save(self):
         try:
             self.store.save_profile()
+            self.error = ''
         except OSError as exc:
             self.error = f'저장 실패: {exc}'
 
@@ -232,7 +251,8 @@ class App:
         p.draw_rectangle(left,bottom,right,top,99,79,68)
 
     def cat(self,x,y,state='idle',clock=0.,skin=None,flip=False,alpha=1.,scale=1.):
-        skin = skin or 'tobi_default'
+        character_id=self.world.character_id if self.scene in ('PLAY','RESULT') and self.world else self.store.profile['selected_character_id']
+        skin = skin or CHARACTERS[character_id]['skin']
         self.art.sprite(f'sprites/cat/{skin}/{state}.png',x,y,clock,flip,alpha,foot=True,scale=scale)
 
     def background(self,title=False):
@@ -339,7 +359,7 @@ class App:
         self.volume('bgm_volume',352,375)
         self.volume('sfx_volume',352,295)
         self.button('계속하기',(335,210,625,252),'resume')
-        self.button('타이틀로 나가기',(335,150,625,192),'exit_run')
+        self.button('로비로 나가기',(335,150,625,192),'exit_run')
 
     def result(self):
         self.background(True)
@@ -347,7 +367,7 @@ class App:
         self.art.text('이번 산책의 기록',480,554,30,INK,True)
         result=self.settlement
         self.cat(270,420,'idle',self.ui_clock,scale=2.)
-        self.art.text(f'나비   Lv. {result["level_after"]}',350,470,24,INK)
+        self.art.text(f'{CHARACTERS[result["character_id"]]["name"]}   Lv. {result["level_after"]}',350,470,24,INK)
         seconds=int(result['survival_time'])
         self.art.text(f'생존 시간   {seconds//60:02d}:{seconds%60:02d}',350,432,20,INK)
         if result['level_before']!=result['level_after']:
@@ -370,7 +390,7 @@ class App:
         if self.saved_result:
             self.art.text('저장 완료' if self.result_clock>=RESULT_SECONDS else '클릭 또는 Enter로 합산 완료',480,145,14,INK,True)
             self.button('다시 시작하기',(165,77,455,125),'start')
-            self.button('타이틀로',(505,77,795,125),'title')
+            self.button('로비로',(505,77,795,125),'lobby')
         else:
             self.art.text('보상을 저장하지 못했습니다. 저장 후 이동할 수 있습니다.',480,155,16,(151,44,44),True)
             self.button('저장 재시도',(335,77,625,125),'retry_save')
@@ -447,6 +467,8 @@ class App:
             self.gameplay()
         elif self.scene == 'RESULT':
             self.result()
+        elif self.scene == 'LOBBY':
+            self.lobby.draw(self)
         else:
             self.background(True)
             self.art.draw('ui/title_logo.png',480,477,420,280)
@@ -471,13 +493,20 @@ class App:
                 self.result_clock=RESULT_SECONDS
                 return
         if isinstance(action,tuple):
-            if action[0] == 'volume':
+            if action[0]=='lobby' and self.scene=='LOBBY':
+                self.lobby.action(self,action[1:])
+            elif action[0] == 'volume':
                 _,key,left = action
                 self.dragging = (key,left)
                 self.change_volume(x)
             return
         if action == 'start':
-            self.start()
+            if self.scene=='TITLE':
+                self.enter_lobby()
+            else:
+                self.start()
+        elif action == 'lobby':
+            self.enter_lobby()
         elif action == 'resume':
             self.world.pause()
             self.keys.clear()
@@ -489,7 +518,7 @@ class App:
             self.world.finish_run()
             self.exit_confirm = False
             self.keys.clear()
-            self.show_title()
+            self.enter_lobby()
         elif action == 'title':
             self.show_title()
             self.controls_popup = False
@@ -505,6 +534,10 @@ class App:
             self.audio.volumes(self.store.profile)
 
     def click(self,x,y):
+        if self.scene=='LOBBY' and self.lobby.panel:
+            if not lobby_contains(self.lobby.bounds,x,y):
+                self.lobby.close(self)
+                return
         if self.exit_confirm:
             if contains((315,259,450,301),x,y):
                 self.action('cancel_exit',x)
@@ -559,10 +592,15 @@ class App:
                         self.world.pause()
                         self.keys.clear()
                     elif self.scene=='RESULT':
-                        self.action('title',0)
+                        self.action('lobby',0)
+                    elif self.scene=='LOBBY':
+                        if self.lobby.panel:
+                            self.lobby.close(self)
+                        else:
+                            self.lobby.open(self,'settings')
                 elif key == p.SDLK_RETURN:
-                    if self.scene in ('TITLE','RESULT'):
-                        self.start()
+                    if self.scene in ('TITLE','LOBBY','RESULT'):
+                        self.action('start',0)
                     elif self.world.mode=='PAUSED' and not self.exit_confirm:
                         self.world.pause()
                 elif self.scene=='PLAY':

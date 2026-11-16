@@ -5,6 +5,7 @@ import math
 import os
 import time
 import copy
+from .characters import CHARACTERS
 from .rewards import initial_character, validate_progress, settle_run
 
 
@@ -20,6 +21,8 @@ class Store:
         if version==1:
             self.profile.update(version=2,gold=0,characters={'nabi':initial_character()},settled_runs={})
         validate_progress(self.profile)
+        selected=self.profile.get('selected_character_id','nabi')
+        self.profile['selected_character_id']=selected if isinstance(selected,str) and selected in self.profile['characters'] and selected in CHARACTERS else 'nabi'
         for key in ('bgm_volume','sfx_volume'):
             value = self.profile.get(key,70)
             self.profile[key] = max(0,min(100,round(value/10)*10)) if isinstance(value,(float,int)) and math.isfinite(value) else 70
@@ -55,6 +58,8 @@ class Store:
 
     def _write_profile(self, candidate):
         validate_progress(candidate)
+        if not isinstance(candidate.get('selected_character_id'),str) or candidate['selected_character_id'] not in CHARACTERS or candidate['selected_character_id'] not in candidate['characters']:
+            raise ValueError('Cannot save an unowned or unavailable character')
         path=self.folder/'profile.json'
         if self.original_version==1 and path.exists():
             backup=self.folder/'profile.v1-backup.json'
@@ -65,6 +70,16 @@ class Store:
 
     def save_profile(self):
         self._write_profile(self.profile)
+
+    def select_character(self, character_id):
+        if not isinstance(character_id,str) or character_id not in self.profile['characters'] or character_id not in CHARACTERS:
+            raise ValueError('Character is not owned or playable')
+        if character_id==self.profile['selected_character_id']:
+            return
+        candidate=copy.deepcopy(self.profile)
+        candidate['selected_character_id']=character_id
+        self._write_profile(candidate)
+        self.profile=candidate
 
     def settle(self, world):
         if world.mode!='GAME_OVER' or world.end_reason!='death':
