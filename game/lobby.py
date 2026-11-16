@@ -2,7 +2,7 @@
 from uuid import uuid4
 import pico2d as p
 from .characters import CHARACTERS
-from .visuals import REWARD_ART, NEW_BADGE
+from .visuals import REWARD_ART, NEW_BADGE, EQUIPMENT_ART
 from .gacha import GachaReveal
 from .achievements import ACHIEVEMENTS, progress
 from .equipment import RULES as GEAR, item_name, definition, stat_value, enhancement_offer, material_allowed, bonuses
@@ -217,7 +217,11 @@ class Lobby:
             x=(rect[0]+rect[2])/2
             equipped=inventory.get(profile['equipment_slots'][i])
             label=GEAR['types'][definition(equipped)['type']]['name'] if equipped else '빈 슬롯' if i<profile['unlocked_slots'] else '잠금'
-            art.text(label,x,287,13,INK,True)
+            if equipped:
+                EQUIPMENT_ART.draw(art,equipped,x,294,app.ui_clock,size=28)
+                art.text(label,x,272,10,INK,True)
+            else:
+                art.text(label,x,287,13,INK,True)
             app.buttons.append((rect,('lobby','open','equipment'),True))
         app.cat(480,225,'groom' if app.ui_clock%8>4 else 'idle',app.ui_clock,skin=info['skin'],scale=3.)
         art.outlined_text(info['name'],480,193,24)
@@ -370,7 +374,9 @@ class Lobby:
             rounded_box(rect,(240,207,139) if slot==self.slot else (231,221,192))
             item=by_id.get(profile['equipment_slots'][slot])
             text=f'{slot+1} · '+(GEAR['types'][definition(item)['type']]['name'] if item else '빈 슬롯' if slot<profile['unlocked_slots'] else f'잠금 {GEAR["slot_costs"][slot]} G')
-            art.text(text,left+110,475,15,INK,True)
+            if item:
+                EQUIPMENT_ART.draw(art,item,left+20,475,app.ui_clock,size=20)
+            art.text(text,left+120 if item else left+110,475,15,INK,True)
             app.buttons.append((rect,('lobby','slot',slot),slot<=profile['unlocked_slots']))
         target=by_id.get(self.material_target)
         shown=[item for item in inventory if material_allowed(profile,target,item)] if target else inventory
@@ -380,11 +386,12 @@ class Lobby:
             y=392-index*42
             rect=(100,y-18,490,y+18)
             rounded_box(rect,(240,207,139) if item['id']==self.item_id else (231,221,192))
-            art.text(item_name(item),112,y+5,16,INK)
+            EQUIPMENT_ART.draw(art,item,122,y,app.ui_clock,size=30)
+            art.text(item_name(item),149,y+5,16,INK)
             if item.get('is_new',False):
                 NEW_BADGE.draw(art,461,y+5,scale=.8)
             status=('잠금 · ' if item['locked'] else '')+('장착 · ' if item['id'] in profile['equipment_slots'] else '')+f'강화 +{item["enhancement"]} / 중첩 {item["stacks"]}'
-            art.text(status,112,y-11,12,INK)
+            art.text(status,149,y-11,12,INK)
             app.buttons.append((rect,('lobby','item',item['id']),True))
         if not shown:
             art.text('사용 가능한 재료가 없습니다.' if target else '상점에서 장비를 뽑아보세요.',295,335,18,INK,True)
@@ -393,6 +400,7 @@ class Lobby:
         selected=by_id.get(self.item_id)
         if selected:
             spec=definition(selected)
+            EQUIPMENT_ART.draw(art,selected,820,419,app.ui_clock,size=58)
             art.text(item_name(selected),535,435,20,INK)
             art.text(f'{GEAR["types"][spec["type"]]["label"]} +{stat_value(selected)*100:.2f}%',535,403,17,INK)
             art.text(f'강화 +{selected["enhancement"]} / 중첩 {selected["stacks"]}',535,375,16,INK)

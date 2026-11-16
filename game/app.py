@@ -23,6 +23,7 @@ ART_V3 = ROOT/'output/nyangi_art_v3'
 ART_V4 = ROOT/'output/nyangi_art_v4'
 ART_V5 = ROOT/'output/nyangi_art_v5'
 ART_V6 = ROOT/'output/nyangi_art_v6'
+ART_V7 = ROOT/'output/nyangi_art_v7'
 INK = (48,45,52)
 CREAM = (255,247,224)
 KEY_BINDINGS = {p.SDLK_a:'left',p.SDLK_d:'right',p.SDLK_w:'up',p.SDLK_s:'down'}
@@ -80,6 +81,9 @@ class Art:
         shop = json.loads((ART_V6/'assets_manifest.json').read_text(encoding='utf-8-sig'))
         self.v6_specs = {entry['file']:entry for entry in shop['entries']}
         self.specs.update(self.v6_specs)
+        equipment = json.loads((ART_V7/'assets_manifest.json').read_text(encoding='utf-8-sig'))
+        self.v7_specs = {entry['file']:entry for entry in equipment['entries']}
+        self.specs.update(self.v7_specs)
         self.overrides = versioned['overrides']
         for original,replacement in self.overrides.items():
             self.specs[original] = {**self.v2_specs[replacement],'file':original}
@@ -87,7 +91,9 @@ class Art:
 
     def image(self, name):
         if name not in self.images:
-            if name in self.v6_specs:
+            if name in self.v7_specs:
+                path = ART_V7/'png'/name
+            elif name in self.v6_specs:
                 path = ART_V6/'png'/name
             elif name in self.v5_specs:
                 path = ART_V5/'png'/name

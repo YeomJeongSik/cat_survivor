@@ -67,6 +67,108 @@
       "stat": "dash_reduction",
       "label": "대시 충전 단축",
       "base": 0.02
+    },
+    "fish_charm": {
+      "name": "물고기 참",
+      "stat": "damage",
+      "label": "공격력",
+      "base": 0.075
+    },
+    "paw_glove": {
+      "name": "발톱 장갑",
+      "stat": "damage",
+      "label": "공격력",
+      "base": 0.07
+    },
+    "star_pendant": {
+      "name": "별 목걸이",
+      "stat": "damage",
+      "label": "공격력",
+      "base": 0.065
+    },
+    "moon_badge": {
+      "name": "달 배지",
+      "stat": "damage",
+      "label": "공격력",
+      "base": 0.085
+    },
+    "lucky_coin": {
+      "name": "행운 동전",
+      "stat": "damage",
+      "label": "공격력",
+      "base": 0.06
+    },
+    "feather_pen": {
+      "name": "깃털 펜",
+      "stat": "damage",
+      "label": "공격력",
+      "base": 0.072
+    },
+    "sneakers": {
+      "name": "질주 운동화",
+      "stat": "move_speed",
+      "label": "이동속도",
+      "base": 0.045
+    },
+    "wind_scarf": {
+      "name": "바람 목도리",
+      "stat": "move_speed",
+      "label": "이동속도",
+      "base": 0.038
+    },
+    "wing_pin": {
+      "name": "날개 핀",
+      "stat": "move_speed",
+      "label": "이동속도",
+      "base": 0.035
+    },
+    "leaf_cape": {
+      "name": "나뭇잎 망토",
+      "stat": "move_speed",
+      "label": "이동속도",
+      "base": 0.042
+    },
+    "roller_skates": {
+      "name": "롤러스케이트",
+      "stat": "move_speed",
+      "label": "이동속도",
+      "base": 0.048
+    },
+    "cloud_socks": {
+      "name": "구름 양말",
+      "stat": "move_speed",
+      "label": "이동속도",
+      "base": 0.032
+    },
+    "hourglass": {
+      "name": "모래시계",
+      "stat": "dash_reduction",
+      "label": "대시 충전 단축",
+      "base": 0.024
+    },
+    "lightning_brooch": {
+      "name": "번개 브로치",
+      "stat": "dash_reduction",
+      "label": "대시 충전 단축",
+      "base": 0.022
+    },
+    "ninja_scroll": {
+      "name": "닌자 두루마리",
+      "stat": "dash_reduction",
+      "label": "대시 충전 단축",
+      "base": 0.018
+    },
+    "moon_bracelet": {
+      "name": "초승 팔찌",
+      "stat": "dash_reduction",
+      "label": "대시 충전 단축",
+      "base": 0.021
+    },
+    "magic_book": {
+      "name": "마법책",
+      "stat": "dash_reduction",
+      "label": "대시 충전 단축",
+      "base": 0.026
     }
   }
 }

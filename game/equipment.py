@@ -86,7 +86,7 @@ def discovered_equipment(profile):
     return seen
 
 
-def apply_equipment(profile,operation,args,rng,request_id):
+def apply_equipment(profile,operation,args,rng,request_id,gacha_pool=None):
     if operation=='gacha':
         count=args.get('count',1)
         if type(count) is not int or count not in (1,10):
@@ -94,12 +94,15 @@ def apply_equipment(profile,operation,args,rng,request_id):
         cost=RULES['gacha_price']*count
         if profile['gold']<cost:
             raise ValueError('GOLD가 부족합니다.')
+        pool=list(RULES['types']) if gacha_pool is None else gacha_pool
+        if not isinstance(pool,list) or not pool or any(not isinstance(key,str) or key not in RULES['types'] for key in pool) or len(pool)!=len(set(pool)):
+            raise ValueError('Invalid equipment draw pool')
         rarities=list(RULES['rarities'])
         seen=discovered_equipment(profile)
         items=[]
         for index in range(count):
             rarity=rng.choices(rarities,weights=[RULES['rarities'][key]['weight'] for key in rarities])[0]
-            kind=rng.choice(list(RULES['types']))
+            kind=rng.choice(pool)
             key=kind+'_'+rarity
             suffix=':item' if count==1 else f':item:{index}'
             item=dict(id=request_id+suffix,definition=key,enhancement=0,stacks=0,locked=False,is_new=key not in seen)

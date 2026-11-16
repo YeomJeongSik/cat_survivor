@@ -1,7 +1,7 @@
 """One presentation object per committed equipment draw transaction."""
 import pico2d as p
 from .equipment import RULES, definition
-from .visuals import CHEST_OPENING, NEW_BADGE
+from .visuals import CHEST_OPENING, NEW_BADGE, EQUIPMENT_ART
 
 INK=(48,45,52)
 RARITY_COLORS={'common':(218,218,218),'rare':(104,195,113),'unique':(187,133,224),'legendary':(234,184,67)}
@@ -40,8 +40,9 @@ class GachaReveal:
             spec=definition(item)
             p.draw_rectangle(x-64,y,x+64,y+74,*RARITY_COLORS[spec['rarity']],filled=True)
             p.draw_rectangle(x-62,y+2,x+62,y+72,255,247,224,filled=True)
-            art.text(RULES['types'][spec['type']]['name'],x,y+44,15,INK,True)
-            art.text(RULES['rarities'][spec['rarity']]['name'],x,y+20,13,INK,True)
+            EQUIPMENT_ART.draw(art,item,x,y+49,app.ui_clock,size=32)
+            art.text(RULES['types'][spec['type']]['name'],x,y+24,12,INK,True)
+            art.text(RULES['rarities'][spec['rarity']]['name'],x,y+9,10,INK,True)
             if item.get('is_new',False):
                 NEW_BADGE.draw(art,x+43,y+62,scale=.83)
         art.text(f'{count}개 획득 · {self.result["cost"]:,} GOLD 사용',480,160,16,INK,True)

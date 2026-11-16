@@ -9,7 +9,7 @@ import hashlib
 import random
 from uuid import uuid4
 from .transactions import apply_operation
-from .equipment import validate_equipment
+from .equipment import validate_equipment, RULES as EQUIPMENT_RULES
 from .characters import CHARACTERS
 from .rewards import initial_character, validate_progress, settle_run
 
@@ -154,8 +154,12 @@ class Store:
         else:
             journal=dict(id=request_id,operation=operation,args=copy.deepcopy(args),
                          seed=random.SystemRandom().getrandbits(64),base=fingerprint)
+            if operation=='gacha':
+                journal['equipment_types']=list(EQUIPMENT_RULES['types'])
         candidate=copy.deepcopy(self.profile)
-        result=apply_operation(candidate,operation,args,random.Random(journal['seed']),request_id)
+        # Pre-expansion journals used the original three equipment types.
+        pool=journal.get('equipment_types',['bell','boots','ribbon']) if operation=='gacha' else None
+        result=apply_operation(candidate,operation,args,random.Random(journal['seed']),request_id,gacha_pool=pool)
         candidate['transactions'][request_id]=dict(operation=operation,args=copy.deepcopy(args),result=copy.deepcopy(result))
         self.pending=journal
         self.write('pending_transaction.json',journal)

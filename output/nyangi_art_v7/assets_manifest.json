@@ -1,0 +1,406 @@
+{
+  "version": 7,
+  "generator": "Built-in ImageGen with local Pillow grid/alpha/palette normalization",
+  "equipment_types": 20,
+  "equipment_definitions": 80,
+  "sources": [
+    {
+      "file": "exec-ccff4218-0f32-4d89-b759-892c607f1345.png",
+      "sha256": "a61b7de5fe304ea9f5d767b552fd67afd4d98703f8406f7b202eb383cd093eaa"
+    },
+    {
+      "file": "exec-75d0991f-fa9b-4dd4-beaf-262ca98d7586.png",
+      "sha256": "1e9101d82c894b5acb87909cd339a1f514076c73c195a013d42c8a0ddd415127"
+    }
+  ],
+  "entries": [
+    {
+      "file": "sprites/equipment/bell.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "bell",
+      "width": 64,
+      "height": 64,
+      "sha256": "42d94d378c5693d79c9660f8588f147f0c743ccae51e4c9373ed6d0e102310e4"
+    },
+    {
+      "file": "sprites/equipment/boots.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "boots",
+      "width": 64,
+      "height": 64,
+      "sha256": "6b139f45553cc2cc40f3d83d855c740d475577d98e6457892ac85c3a7e3df4ea"
+    },
+    {
+      "file": "sprites/equipment/ribbon.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "ribbon",
+      "width": 64,
+      "height": 64,
+      "sha256": "6b9e48128cb52c4ef33bd10fb84d3a334b9d237e6be5af587310f19e9c286d70"
+    },
+    {
+      "file": "sprites/equipment/fish_charm.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "fish_charm",
+      "width": 64,
+      "height": 64,
+      "sha256": "02b6db9df844fd047b79e244b00f8c6ebe37653e3340f5abe5639f5b93824a2f"
+    },
+    {
+      "file": "sprites/equipment/paw_glove.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "paw_glove",
+      "width": 64,
+      "height": 64,
+      "sha256": "0a7c68c8abf0f8116a8367f641f34cdc7dea791af40dd07c83adc378f5682b6b"
+    },
+    {
+      "file": "sprites/equipment/star_pendant.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "star_pendant",
+      "width": 64,
+      "height": 64,
+      "sha256": "81b14897f384c29b8ff9377f4297f5349d1fc0c009b147e734fac6dd2e719541"
+    },
+    {
+      "file": "sprites/equipment/moon_badge.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "moon_badge",
+      "width": 64,
+      "height": 64,
+      "sha256": "cf0d918ef2fc3ecacff7fe9542494f51c54c2d37425dde13ca7131bc2365487d"
+    },
+    {
+      "file": "sprites/equipment/lucky_coin.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "lucky_coin",
+      "width": 64,
+      "height": 64,
+      "sha256": "894e898086f632d268c698ba8e07417697bdc3af24c67b933edf2e707ef6f789"
+    },
+    {
+      "file": "sprites/equipment/feather_pen.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "feather_pen",
+      "width": 64,
+      "height": 64,
+      "sha256": "9b08767376b2467c4a2562bc09e0a5092a909e1cc28eb12af9fa76561f8550fe"
+    },
+    {
+      "file": "sprites/equipment/sneakers.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "sneakers",
+      "width": 64,
+      "height": 64,
+      "sha256": "570fb90701b9b22e75652191b167c05de2c19111df29350e47b2e27f54da4850"
+    },
+    {
+      "file": "sprites/equipment/wind_scarf.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "wind_scarf",
+      "width": 64,
+      "height": 64,
+      "sha256": "830db902b450daa23cb1cbe1a050c9ed1c2d5c764fb3a4494fb4136d5f6cc011"
+    },
+    {
+      "file": "sprites/equipment/wing_pin.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "wing_pin",
+      "width": 64,
+      "height": 64,
+      "sha256": "65ca6c7dcdedc69e07fcfc0a60ecf6bf003c4f1b3a67dc30e20d4baf8048f8b2"
+    },
+    {
+      "file": "sprites/equipment/leaf_cape.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "leaf_cape",
+      "width": 64,
+      "height": 64,
+      "sha256": "4c0269b5ac0634c5b13629e24488a05c6956468a6115cb037878a5a8c258cbbf"
+    },
+    {
+      "file": "sprites/equipment/roller_skates.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "roller_skates",
+      "width": 64,
+      "height": 64,
+      "sha256": "287b1aafcc9baa09ccc9734ae584b3fb28f01f07b69b1235399017fcef32b282"
+    },
+    {
+      "file": "sprites/equipment/cloud_socks.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "cloud_socks",
+      "width": 64,
+      "height": 64,
+      "sha256": "773c498953ae6593151a7679d907fa141109650d7f4c2c081a18113332f28c75"
+    },
+    {
+      "file": "sprites/equipment/hourglass.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "hourglass",
+      "width": 64,
+      "height": 64,
+      "sha256": "64794ae06d5c18dfa7b40e749fa0e23281ec69481831f644c8727d003d19557f"
+    },
+    {
+      "file": "sprites/equipment/lightning_brooch.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "lightning_brooch",
+      "width": 64,
+      "height": 64,
+      "sha256": "749fd476028c65596e355f16e557f2069259cf9a2140250918fa6b69604ea5c0"
+    },
+    {
+      "file": "sprites/equipment/ninja_scroll.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "ninja_scroll",
+      "width": 64,
+      "height": 64,
+      "sha256": "55fd492ae2851d0b9ed76f75da6ffea3a94222d457bf45ecb9c7581bcb8bb254"
+    },
+    {
+      "file": "sprites/equipment/moon_bracelet.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "moon_bracelet",
+      "width": 64,
+      "height": 64,
+      "sha256": "e21db1515f7558d0d692928a0e70d86e0dc0f6573c2151bf7a8b992b4a4c5c24"
+    },
+    {
+      "file": "sprites/equipment/magic_book.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "type": "magic_book",
+      "width": 64,
+      "height": 64,
+      "sha256": "d02e3d81cca9edaf5035a3ebc15125ebd2c65767928a976bca45d5f252642a77"
+    },
+    {
+      "file": "sprites/equipment_fx/common.png",
+      "frame_width": 96,
+      "frame_height": 96,
+      "frames": 6,
+      "fps": 8,
+      "loop": true,
+      "pivot": [
+        48,
+        48
+      ],
+      "rarity": "common",
+      "unique_frames": 6,
+      "width": 576,
+      "height": 96,
+      "sha256": "0e5dbd8550dd63ccaf24700ba9496ee55e4a703027a0874903315cd4d814427a"
+    },
+    {
+      "file": "sprites/equipment_fx/rare.png",
+      "frame_width": 96,
+      "frame_height": 96,
+      "frames": 6,
+      "fps": 8,
+      "loop": true,
+      "pivot": [
+        48,
+        48
+      ],
+      "rarity": "rare",
+      "unique_frames": 6,
+      "width": 576,
+      "height": 96,
+      "sha256": "c18d837cddecc4bd8d89b461ce1cad9bf99f2ff9b2b33929d8ddfa822b961f52"
+    },
+    {
+      "file": "sprites/equipment_fx/unique.png",
+      "frame_width": 96,
+      "frame_height": 96,
+      "frames": 6,
+      "fps": 8,
+      "loop": true,
+      "pivot": [
+        48,
+        48
+      ],
+      "rarity": "unique",
+      "unique_frames": 6,
+      "width": 576,
+      "height": 96,
+      "sha256": "21d415ecf95986bccc552f99ef6212280955ca9a55a50d43395b76e466579f96"
+    },
+    {
+      "file": "sprites/equipment_fx/legendary.png",
+      "frame_width": 96,
+      "frame_height": 96,
+      "frames": 6,
+      "fps": 8,
+      "loop": true,
+      "pivot": [
+        48,
+        48
+      ],
+      "rarity": "legendary",
+      "unique_frames": 6,
+      "width": 576,
+      "height": 96,
+      "sha256": "781b3085f8a290ba4dcb2e7a5ed920ee83277d11511150ce6f9648ebb00f8c62"
+    }
+  ]
+}

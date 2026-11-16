@@ -1,5 +1,6 @@
 """Asset objects only; playable character rules remain in characters.py."""
 from dataclasses import dataclass
+from .equipment import RULES, definition
 
 
 @dataclass(frozen=True)
@@ -31,3 +32,17 @@ REWARD_ART = {kind:SpriteAsset(f'sprites/rewards/{kind}.png') for kind in ('gold
 CHEST_OPENING = {rarity:SpriteAsset(f'sprites/shop/chest_open_{rarity}.png')
                  for rarity in ('common','rare','unique','legendary')}
 NEW_BADGE = SpriteAsset('ui/new_badge.png')
+
+
+class EquipmentArt:
+    def __init__(self):
+        self.icons={key:SpriteAsset(f'sprites/equipment/{key}.png') for key in RULES['types']}
+        self.effects={rarity:SpriteAsset(f'sprites/equipment_fx/{rarity}.png') for rarity in RULES['rarities']}
+
+    def draw(self,art,item,x,y,clock=0.,size=48):
+        spec=definition(item)
+        self.effects[spec['rarity']].draw(art,x,y,clock,scale=size/64)
+        self.icons[spec['type']].draw(art,x,y,0.,scale=size/64)
+
+
+EQUIPMENT_ART = EquipmentArt()
