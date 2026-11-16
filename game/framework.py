@@ -62,7 +62,7 @@ def run(create_app, title, *, smoke=0, screenshot=None):
                 capture(screenshot)
             p.update_canvas()
             if smoke and frames >= smoke:
-                print(f'SMOKE PASS frames={frames} survival={app.world.time:.2f}s textures={len(app.art.images)}')
+                print(f'SMOKE PASS frames={frames} scene={app.scene} survival={getattr(app.world,"time",0.):.2f}s textures={len(app.art.images)}')
                 break
     finally:
         if app is not None:
