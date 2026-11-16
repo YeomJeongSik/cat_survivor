@@ -15,6 +15,7 @@ reference_materials/
 !/output/nyangi_art_v2/
 !/output/nyangi_art_v3/
 !/output/nyangi_art_v4/
+!/output/nyangi_art_v5/
 /output/nyangi_art_v1/*
 !/output/nyangi_art_v1/png/
 !/output/nyangi_art_v1/assets_manifest.json
@@ -28,3 +29,6 @@ reference_materials/
 /output/nyangi_art_v4/*
 !/output/nyangi_art_v4/png/
 !/output/nyangi_art_v4/assets_manifest.json
+/output/nyangi_art_v5/*
+!/output/nyangi_art_v5/png/
+!/output/nyangi_art_v5/assets_manifest.json

@@ -2,6 +2,7 @@
 from uuid import uuid4
 import pico2d as p
 from .characters import CHARACTERS
+from .visuals import REWARD_ART
 from .achievements import ACHIEVEMENTS, progress
 from .equipment import RULES as GEAR, item_name, definition, stat_value, enhancement_offer, material_allowed, bonuses
 from .rewards import level_cost
@@ -166,6 +167,7 @@ class Lobby:
         app.background(True)
         app.panel(28,566,932,616)
         art.text('산책 준비',48,592,24,INK)
+        REWARD_ART['gold'].draw(art,694,592,app.ui_clock,scale=1.4)
         art.text(f'GOLD   {profile["gold"]:,}',720,592,20,INK)
         app.panel(28,238,358,536)
         app.cat(110,440,'idle',app.ui_clock,skin=info['skin'],scale=2.)
@@ -174,7 +176,8 @@ class Lobby:
         maximum=character['level']==50
         exp=character['exp']
         label='EXP  MAX' if maximum else f'EXP  {exp:g} / {level_cost(character["level"])}'
-        art.text(label,52,404,16,INK)
+        REWARD_ART['exp'].draw(art,64,404,app.ui_clock,scale=1.3)
+        art.text(label,88,404,16,INK)
         p.draw_rectangle(52,367,334,381,*INK,filled=True)
         p.draw_rectangle(54,369,332,379,208,197,163,filled=True)
         ratio=1. if maximum else exp/level_cost(character['level'])
@@ -261,6 +264,7 @@ class Lobby:
         elif self.panel=='equipment':
             self.draw_equipment(app)
         elif self.panel=='shop':
+            REWARD_ART['gold'].draw(art,113,454,app.ui_clock,scale=1.1)
             art.text(f'보유 GOLD   {profile["gold"]:,}',132,454,18,INK)
             if 'black' not in profile['characters']:
                 art.text('흑냥이',310,423,24,INK,True)

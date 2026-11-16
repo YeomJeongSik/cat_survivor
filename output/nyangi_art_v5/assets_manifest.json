@@ -1,0 +1,389 @@
+{
+  "version": 5,
+  "generator": "Built-in ImageGen with local Pillow alpha/grid/palette normalization",
+  "policy": "Assets only: no character purchase, ownership, stats or attack mechanics changed",
+  "sources": [
+    {
+      "file": "exec-10fa911d-12ee-45a9-a78f-658aea266967.png",
+      "sha256": "fbfb10d370a7eef497abba52824e438a0b57fc8f23f37e343b73424ccc38cf58"
+    },
+    {
+      "file": "exec-76960339-b282-4ddb-b716-7c0c13445e67.png",
+      "sha256": "1aeeeb52790eef87d0c61c35a5f9e2aadc2ee6091eba6d7ece75c5c3c3962f86"
+    },
+    {
+      "file": "exec-9d9a2f0b-bc49-4cf7-8fa3-38a44d7d50a8.png",
+      "sha256": "16b47eb1705c1de46e832d96210ed0c43cf7c28c9ab751aad262fb727f3deba6"
+    }
+  ],
+  "entries": [
+    {
+      "file": "sprites/cat/witch/idle.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "7c7e530b9c8d42dfcbea49d80d3b6c602991fb747c2e7249916b396b8c821cb6"
+    },
+    {
+      "file": "sprites/cat/witch/walk.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "3fee0160c51e0880e1c55e710d9c8ccfc35b0cac5c8ff5d6eb8f3bec75395f7e"
+    },
+    {
+      "file": "sprites/cat/witch/jump.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "a0d1cf1a8888d064d3c8946bf90fa08ee2f1fb715ed749d8a2e8ab00db9eb533"
+    },
+    {
+      "file": "sprites/cat/witch/fall.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "555ca0b9cf4923fb50d872fc509d46a8012b48f4a8fbe79868235568ba2111a7"
+    },
+    {
+      "file": "sprites/cat/witch/dash.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "58f10624124d695d725f0d1f206a1aba9164c1d3a6e89796f6366788e6fe16e7"
+    },
+    {
+      "file": "sprites/cat/witch/attack.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "85920a6431ed4c847b928a448ef2abc827be84b9856722bf3a7be41bf84d7548"
+    },
+    {
+      "file": "sprites/cat/witch/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "sha256": "f1d59e7b428e3c6a0bd9b815099e05e2d5e6e524914c3e1c1c1d22129aad83bc"
+    },
+    {
+      "file": "sprites/cat/witch/dead.png",
+      "width": 448,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 7,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 7,
+      "sha256": "2a1acfc805d31a4592ac7e606f90813222309c037607d66f0900e8c8c56256f7"
+    },
+    {
+      "file": "sprites/cat/witch/groom.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "525f40a6a7cbb15143237ce606a1ea57c9e5746849f1248b1146d2b5adfad9d8"
+    },
+    {
+      "file": "sprites/cat/ninja/idle.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "f2ea98c6dbe01f1d7e3addb1d17542ff511bba13bfe4d838ed97cf54f105a1db"
+    },
+    {
+      "file": "sprites/cat/ninja/walk.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "a78d1f4eb7cdacaa03eb94e082d5ae868455dc270d472805e1e93cb8e8c2e31e"
+    },
+    {
+      "file": "sprites/cat/ninja/jump.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "a79c2c681822e27053a8782e7dec0a1e450cc605540218500d08839006cd325e"
+    },
+    {
+      "file": "sprites/cat/ninja/fall.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "3c86e3c9537d3694f4ee53222f406cddabad7c9c57b97045cc7db0640f78e46a"
+    },
+    {
+      "file": "sprites/cat/ninja/dash.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "bbbb10b72a63abd718f2cefafa71fde9463a015cc271789fad138551042765e8"
+    },
+    {
+      "file": "sprites/cat/ninja/attack.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "85f07fb19226797087511fd19dd271bee1f3fbc4ae8a9b59df1f19c2be454e51"
+    },
+    {
+      "file": "sprites/cat/ninja/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "sha256": "3bcf2ae25d2a5828467bdd3ea64fa13e0660348c2df0e0cc1c24e6b96c416282"
+    },
+    {
+      "file": "sprites/cat/ninja/dead.png",
+      "width": 448,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 7,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 7,
+      "sha256": "b30f399bbc6417d6560d09f36ca8d7b46ac737824b4674dbe71dac2d04c27222"
+    },
+    {
+      "file": "sprites/cat/ninja/groom.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "8964c02d541f5711ff08d17adadef258febd4f9d71ed85e8f9fb664d9e168a79"
+    },
+    {
+      "file": "sprites/rewards/gold.png",
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "width": 128,
+      "height": 32,
+      "sha256": "dc2ec2cd4dbeedf5d8809e37deb96f344424b88e103539e451e4a748cd907d4c"
+    },
+    {
+      "file": "sprites/rewards/exp.png",
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "width": 128,
+      "height": 32,
+      "sha256": "6da47ee94e54870b2172032d91fb1de262492e0c6e1eefe70e5473ee9545356d"
+    },
+    {
+      "file": "sprites/attacks/prophecy_orb.png",
+      "frame_width": 32,
+      "frame_height": 32,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "pivot": [
+        16,
+        16
+      ],
+      "unique_frames": 4,
+      "width": 128,
+      "height": 32,
+      "sha256": "1c8c05f3563ef92f584ce59dc2d022e87d2f3d7adadd35b6b2e34ca27b68c08d"
+    },
+    {
+      "file": "sprites/attacks/claw_slash.png",
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 18,
+      "loop": false,
+      "pivot": [
+        32,
+        32
+      ],
+      "unique_frames": 4,
+      "width": 256,
+      "height": 64,
+      "sha256": "4ffeb854f655b393c841455a0314e4bfe44a98b29283e90618480847858d52a3"
+    },
+    {
+      "file": "sprites/attacks/thunder_strike.png",
+      "frame_width": 128,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 18,
+      "loop": false,
+      "pivot": [
+        64,
+        32
+      ],
+      "unique_frames": 4,
+      "width": 512,
+      "height": 64,
+      "sha256": "7f2ae64550c2e6fef8aeb23f7a9ad4c12517169edb2de1ace0a371082bf755f8"
+    }
+  ]
+}

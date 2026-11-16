@@ -11,6 +11,7 @@ from .model import ROOT, BALANCE, World
 from .storage import Store
 from .lobby import Lobby, contains as lobby_contains
 from .characters import CHARACTERS
+from .visuals import CHARACTER_ART, REWARD_ART
 from .equipment import bonuses as equipment_bonuses
 from .rewards import settle_run
 from .framework import capture, run, scene_machine
@@ -20,6 +21,7 @@ ART = ROOT/'output/nyangi_art_v1'
 ART_V2 = ROOT/'output/nyangi_art_v2'
 ART_V3 = ROOT/'output/nyangi_art_v3'
 ART_V4 = ROOT/'output/nyangi_art_v4'
+ART_V5 = ROOT/'output/nyangi_art_v5'
 INK = (48,45,52)
 CREAM = (255,247,224)
 KEY_BINDINGS = {p.SDLK_a:'left',p.SDLK_d:'right',p.SDLK_w:'up',p.SDLK_s:'down'}
@@ -71,6 +73,9 @@ class Art:
         latest = json.loads((ART_V4/'assets_manifest.json').read_text(encoding='utf-8-sig'))
         self.v4_specs = {entry['file']:entry for entry in latest['entries']}
         self.specs.update(self.v4_specs)
+        additions = json.loads((ART_V5/'assets_manifest.json').read_text(encoding='utf-8-sig'))
+        self.v5_specs = {entry['file']:entry for entry in additions['entries']}
+        self.specs.update(self.v5_specs)
         self.overrides = versioned['overrides']
         for original,replacement in self.overrides.items():
             self.specs[original] = {**self.v2_specs[replacement],'file':original}
@@ -78,7 +83,9 @@ class Art:
 
     def image(self, name):
         if name not in self.images:
-            if name in self.v4_specs:
+            if name in self.v5_specs:
+                path = ART_V5/'png'/name
+            elif name in self.v4_specs:
                 path = ART_V4/'png'/name
             elif name.startswith('v3/'):
                 path = ART_V3/'png'/name[3:]
@@ -262,8 +269,7 @@ class App:
 
     def cat(self,x,y,state='idle',clock=0.,skin=None,flip=False,alpha=1.,scale=1.):
         character_id=self.world.character_id if self.scene in ('PLAY','RESULT') and self.world else self.store.profile['selected_character_id']
-        skin = skin or CHARACTERS[character_id]['skin']
-        self.art.sprite(f'sprites/cat/{skin}/{state}.png',x,y,clock,flip,alpha,foot=True,scale=scale)
+        CHARACTER_ART[character_id].draw(self.art,x,y,state,clock,skin=skin,flip=flip,alpha=alpha,scale=scale)
 
     def background(self,title=False):
         name = 'backgrounds/campus_title.png' if title else 'backgrounds/campus_gameplay.png'
@@ -281,9 +287,8 @@ class App:
                 image.clip_draw(0,0,width,32,x+width/2,floor-16,width,32)
         self.aim_guide()
         for x,y,angle,radius,born,special in w.swings:
-            points=[(x+math.cos(angle+a)*radius,y+math.sin(angle+a)*radius) for a in [math.radians(-(80 if special else 55)+2*(80 if special else 55)*i/24) for i in range(25)]]
-            for first,second in zip(points,points[1:]):
-                p.draw_line(*first,*second,255,226,69)
+            CHARACTER_ART[w.character_id].attack.draw(self.art,x+math.cos(angle)*radius*.4,
+                y+math.sin(angle)*radius*.4,w.time-born,rotation=angle,scale=radius/45)
         for item in w.items:
             if item.state=='PRE_SPAWN_WARNING':
                 continue
@@ -324,7 +329,7 @@ class App:
         if c.heal_left:
             p.draw_circle(c.x,c.y+26,int(34*(1-c.heal_left/.6)),75,216,151)
         for projectile in w.projectiles:
-            self.art.sprite('sprites/projectiles/paw_000.png',projectile.x,projectile.y,projectile.clock,
+            CHARACTER_ART[w.character_id].attack.draw(self.art,projectile.x,projectile.y,projectile.clock,
                             scale=projectile.scale,rotation=math.atan2(projectile.dy,projectile.dx))
         p.draw_rectangle(0,562,960,640,43,55,60,filled=True)
         p.draw_rectangle(0,0,960,46,43,55,60,filled=True)
@@ -396,9 +401,11 @@ class App:
             return f'{value:,.2f}'.rstrip('0').rstrip('.')
         exp=result['applied_exp']*progress(0)
         gold=int(result['gold_gained']*progress(1.4))
+        REWARD_ART['exp'].draw(self.art,175,330,self.ui_clock,scale=1.4)
         self.art.text('획득 EXP',205,330,21,INK)
         self.art.text(number(exp),650,330,29,INK,True)
         self.art.text(f'생존 배율 ×{result["exp_percent"]/100:.2f}',205,298,15,INK)
+        REWARD_ART['gold'].draw(self.art,175,245,self.ui_clock,scale=1.4)
         self.art.text('획득 GOLD',205,245,21,INK)
         self.art.text(f'{gold:,}',650,245,29,INK,True)
         self.art.text(f'생존 배율 ×{result["gold_percent"]/100:.2f}',205,213,15,INK)
