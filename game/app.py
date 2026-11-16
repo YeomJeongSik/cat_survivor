@@ -22,6 +22,7 @@ ART_V2 = ROOT/'output/nyangi_art_v2'
 ART_V3 = ROOT/'output/nyangi_art_v3'
 ART_V4 = ROOT/'output/nyangi_art_v4'
 ART_V5 = ROOT/'output/nyangi_art_v5'
+ART_V6 = ROOT/'output/nyangi_art_v6'
 INK = (48,45,52)
 CREAM = (255,247,224)
 KEY_BINDINGS = {p.SDLK_a:'left',p.SDLK_d:'right',p.SDLK_w:'up',p.SDLK_s:'down'}
@@ -76,6 +77,9 @@ class Art:
         additions = json.loads((ART_V5/'assets_manifest.json').read_text(encoding='utf-8-sig'))
         self.v5_specs = {entry['file']:entry for entry in additions['entries']}
         self.specs.update(self.v5_specs)
+        shop = json.loads((ART_V6/'assets_manifest.json').read_text(encoding='utf-8-sig'))
+        self.v6_specs = {entry['file']:entry for entry in shop['entries']}
+        self.specs.update(self.v6_specs)
         self.overrides = versioned['overrides']
         for original,replacement in self.overrides.items():
             self.specs[original] = {**self.v2_specs[replacement],'file':original}
@@ -83,7 +87,9 @@ class Art:
 
     def image(self, name):
         if name not in self.images:
-            if name in self.v5_specs:
+            if name in self.v6_specs:
+                path = ART_V6/'png'/name
+            elif name in self.v5_specs:
                 path = ART_V5/'png'/name
             elif name in self.v4_specs:
                 path = ART_V4/'png'/name
@@ -231,6 +237,8 @@ class App:
 
     def update(self,dt):
         self.ui_clock += dt
+        if self.scene=='LOBBY':
+            self.lobby.update(dt)
         if self.scene == 'PLAY':
             if self.world.mode == 'PLAYING':
                 self.world.aim = self.mouse

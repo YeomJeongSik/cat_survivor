@@ -27,3 +27,7 @@ CHARACTER_ART = {
     'ninja': CharacterArt('ninja',SpriteAsset('sprites/attacks/thunder_strike.png')),
 }
 REWARD_ART = {kind:SpriteAsset(f'sprites/rewards/{kind}.png') for kind in ('gold','exp')}
+
+CHEST_OPENING = {rarity:SpriteAsset(f'sprites/shop/chest_open_{rarity}.png')
+                 for rarity in ('common','rare','unique','legendary')}
+NEW_BADGE = SpriteAsset('ui/new_badge.png')

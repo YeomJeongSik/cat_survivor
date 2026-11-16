@@ -2,7 +2,8 @@
 from uuid import uuid4
 import pico2d as p
 from .characters import CHARACTERS
-from .visuals import REWARD_ART
+from .visuals import REWARD_ART, NEW_BADGE
+from .gacha import GachaReveal
 from .achievements import ACHIEVEMENTS, progress
 from .equipment import RULES as GEAR, item_name, definition, stat_value, enhancement_offer, material_allowed, bonuses
 from .rewards import level_cost
@@ -46,9 +47,12 @@ class Lobby:
         self.item_id=None
         self.material_target=None
         self.slot=0
+        self.reveal=None
 
     @property
     def bounds(self):
+        if self.reveal:
+            return self.reveal.BOUNDS
         return (210,170,750,470) if self.confirm else CONTROLS if self.panel=='controls' else (40,70,920,552) if self.panel=='equipment' else PANEL
 
     def open(self,app,name):
@@ -65,6 +69,11 @@ class Lobby:
         self.preview=app.store.profile['selected_character_id']
 
     def close(self,app):
+        if self.reveal:
+            if self.reveal.ready:
+                self.reveal=None
+                app.buttons=[]
+            return
         if app.store.pending:
             return
         if self.confirm:
@@ -78,6 +87,10 @@ class Lobby:
         self.error=''
         app.buttons=[]
         app.keys.clear()
+
+    def update(self,dt):
+        if self.reveal:
+            self.reveal.update(dt)
 
     def ask(self,app,operation,args,lines):
         self.confirm=dict(operation=operation,args=args,lines=lines)
@@ -96,6 +109,9 @@ class Lobby:
             self.error=str(exc)
         else:
             self.message=result['message']
+            if command['operation']=='gacha' and result.get('items'):
+                self.reveal=GachaReveal(result)
+                self.message=''
             app.error=''
             self.error=''
             self.confirm=None
@@ -103,6 +119,10 @@ class Lobby:
         app.buttons=[]
 
     def action(self,app,args):
+        if self.reveal:
+            if args[0]=='reveal_close':
+                self.close(app)
+            return
         if args[0]=='page':
             self.page=max(0,self.page+args[1])
             app.buttons=[]
@@ -111,7 +131,8 @@ class Lobby:
             self.ask(app,'claim_achievement',{'achievement_id':args[1],'character_id':app.store.profile['selected_character_id']},
                      [achievement['name'],f'EXP +{achievement["exp"]} / GOLD +{achievement["gold"]}','EXP는 현재 선택한 캐릭터에게 지급됩니다.'])
         elif args[0]=='gacha':
-            self.ask(app,'gacha',{},['장비를 1회 뽑을까요?','비용: 150 GOLD','중복 장비도 나옵니다.'])
+            count=args[1] if len(args)>1 else 1
+            self.ask(app,'gacha',{'count':count},[f'장비를 {count}회 뽑을까요?',f'비용: {GEAR["gacha_price"]*count:,} GOLD','중복 장비도 나옵니다.'])
         elif args[0]=='slot':
             slot=args[1]
             if slot>=app.store.profile['unlocked_slots']:
@@ -131,6 +152,11 @@ class Lobby:
                 self.material_target=None
             else:
                 self.item_id=args[1]
+                if material.get('is_new',False):
+                    try:
+                        app.store.transact('mark_seen',{'item_id':material['id']})
+                    except (OSError,ValueError) as exc:
+                        self.error=str(exc)
         elif args[0]=='gear':
             self.gear_action(app,args[1])
         elif args[0]=='cancel_material':
@@ -208,6 +234,9 @@ class Lobby:
             self.confirm=dict(operation=app.store.pending['operation'],args=app.store.pending['args'],lines=['저장이 끝나지 않은 거래가 있습니다.','같은 결과로 저장을 재시도합니다.'])
         if self.panel:
             app.buttons=[]
+            if self.reveal:
+                self.reveal.draw(app)
+                return
             if self.panel=='controls':
                 app.controls_panel()
                 return
@@ -278,7 +307,8 @@ class Lobby:
             art.draw('ui/equipment_chest.png',650,340,160,144)
             art.text('150 GOLD',650,257,21,INK,True)
             app.button('1회 뽑기',(508,193,793,235),('lobby','gacha'),profile['gold']>=150)
-            art.text('Common 70% · Rare 23% · Unique 6% · Legendary 1%',480,154,15,INK,True)
+            app.button('10연뽑 · 1,500 G',(508,139,793,181),('lobby','gacha',10),profile['gold']>=GEAR['gacha_price']*10)
+            art.text('Common 70% · Rare 23% · Unique 6% · Legendary 1%',480,480,14,INK,True)
         elif self.panel=='achievements':
             self.page=min(self.page,(len(ACHIEVEMENTS)-1)//5)
             for i,achievement in enumerate(ACHIEVEMENTS[self.page*5:self.page*5+5]):
@@ -351,6 +381,8 @@ class Lobby:
             rect=(100,y-18,490,y+18)
             rounded_box(rect,(240,207,139) if item['id']==self.item_id else (231,221,192))
             art.text(item_name(item),112,y+5,16,INK)
+            if item.get('is_new',False):
+                NEW_BADGE.draw(art,461,y+5,scale=.8)
             status=('잠금 · ' if item['locked'] else '')+('장착 · ' if item['id'] in profile['equipment_slots'] else '')+f'강화 +{item["enhancement"]} / 중첩 {item["stacks"]}'
             art.text(status,112,y-11,12,INK)
             app.buttons.append((rect,('lobby','item',item['id']),True))

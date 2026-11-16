@@ -37,6 +37,10 @@ def main():
             draw()
         def confirm():
             click(602,226)
+            if app.lobby.reveal:
+                for _ in range(21):app.update(.05)
+                draw()
+                click(480,125)
         try:
             checked_text()
             app.store.profile['gold']=100000

@@ -1,0 +1,95 @@
+{
+  "version": 6,
+  "generator": "Built-in ImageGen, local Pillow alpha/palette/grid normalization",
+  "sources": [
+    {
+      "file": "exec-a820d8cb-6dc0-4330-852b-a0acd617fe3b.png",
+      "sha256": "a0d8723c899758a84236d3aab21e0a024a1c14103baff3db669baaa5d9c144fc"
+    },
+    {
+      "file": "exec-f7ec9f78-99ba-44c1-9129-b7032db4cbda.png",
+      "sha256": "410a0d9f12c884aa36732d30af21be27d155fba89c898b1be8cdcd83c592341f"
+    }
+  ],
+  "entries": [
+    {
+      "file": "sprites/shop/chest_open_common.png",
+      "width": 1152,
+      "height": 192,
+      "frame_width": 192,
+      "frame_height": 192,
+      "frames": 6,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        96,
+        176
+      ],
+      "light": "white",
+      "sha256": "9526b8c4f38b1e669be5aa75405049b6bfcc449f70960b38d4737e0613597684"
+    },
+    {
+      "file": "sprites/shop/chest_open_rare.png",
+      "width": 1152,
+      "height": 192,
+      "frame_width": 192,
+      "frame_height": 192,
+      "frames": 6,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        96,
+        176
+      ],
+      "light": "green",
+      "sha256": "7a319374b2a805074394c4c91a0939e5a41211d4d755564ab7b2460b5a4e8cf1"
+    },
+    {
+      "file": "sprites/shop/chest_open_unique.png",
+      "width": 1152,
+      "height": 192,
+      "frame_width": 192,
+      "frame_height": 192,
+      "frames": 6,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        96,
+        176
+      ],
+      "light": "purple",
+      "sha256": "26eceaccf0f77b9054450e1f88ece21ef18439e47df1ee6e675206c99c34dcea"
+    },
+    {
+      "file": "sprites/shop/chest_open_legendary.png",
+      "width": 1152,
+      "height": 192,
+      "frame_width": 192,
+      "frame_height": 192,
+      "frames": 6,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        96,
+        176
+      ],
+      "light": "gold",
+      "sha256": "92e7eba1391a2e7e2d9fb4e89da3ff2342bf5194db6c3dda1c9957c2bae3ecf3"
+    },
+    {
+      "file": "ui/new_badge.png",
+      "width": 48,
+      "height": 20,
+      "frame_width": 48,
+      "frame_height": 20,
+      "frames": 1,
+      "fps": 1,
+      "loop": false,
+      "pivot": [
+        24,
+        10
+      ],
+      "sha256": "abfdfef428316c5e3943898412401d6bfd948860ca4a8cfbcf1cd7bed63ab7aa"
+    }
+  ]
+}

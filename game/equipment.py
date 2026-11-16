@@ -49,6 +49,9 @@ def bonuses(profile):
 def validate_equipment(profile):
     if not isinstance(profile['items'],list) or type(profile['unlocked_slots']) is not int or not 1<=profile['unlocked_slots']<=3:
         raise ValueError('Invalid equipment save')
+    discovered=profile.get('discovered_equipment',[])
+    if not isinstance(discovered,list) or any(not isinstance(key,str) or key not in DEFINITIONS for key in discovered) or len(discovered)!=len(set(discovered)):
+        raise ValueError('Invalid discovered equipment')
     ids=[]
     for item in profile['items']:
         if not isinstance(item,dict) or not isinstance(item.get('id'),str) or not isinstance(item.get('definition'),str) or item['definition'] not in DEFINITIONS:
@@ -58,6 +61,8 @@ def validate_equipment(profile):
                 raise ValueError('Invalid equipment growth')
         if type(item.get('locked')) is not bool:
             raise ValueError('Invalid equipment lock')
+        if type(item.get('is_new',False)) is not bool:
+            raise ValueError('Invalid equipment discovery flag')
         ids.append(item['id'])
     slots=profile['equipment_slots']
     if len(ids)!=len(set(ids)) or not isinstance(slots,list) or len(slots)!=3 or any(key is not None and not isinstance(key,str) for key in slots):
@@ -67,17 +72,45 @@ def validate_equipment(profile):
         raise ValueError('Invalid equipped item')
 
 
+def discovered_equipment(profile):
+    seen=set(profile.get('discovered_equipment',[]))
+    seen.update(item['definition'] for item in profile['items'])
+    # Older saves recorded single-draw names, including equipment since sold.
+    names={item_name({'definition':key})+' 획득!':key for key in DEFINITIONS}
+    for record in profile.get('transactions',{}).values():
+        if isinstance(record,dict) and record.get('operation')=='gacha':
+            result=record.get('result')
+            message=result.get('message') if isinstance(result,dict) else None
+            if isinstance(message,str) and message in names:
+                seen.add(names[message])
+    return seen
+
+
 def apply_equipment(profile,operation,args,rng,request_id):
     if operation=='gacha':
-        if profile['gold']<RULES['gacha_price']:
+        count=args.get('count',1)
+        if type(count) is not int or count not in (1,10):
+            raise ValueError('1회 또는 10회만 뽑을 수 있습니다.')
+        cost=RULES['gacha_price']*count
+        if profile['gold']<cost:
             raise ValueError('GOLD가 부족합니다.')
         rarities=list(RULES['rarities'])
-        rarity=rng.choices(rarities,weights=[RULES['rarities'][key]['weight'] for key in rarities])[0]
-        kind=rng.choice(list(RULES['types']))
-        item=dict(id=request_id+':item',definition=kind+'_'+rarity,enhancement=0,stacks=0,locked=False)
-        profile['gold']-=RULES['gacha_price']
-        profile['items'].append(item)
-        return dict(message=item_name(item)+' 획득!',item_id=item['id'])
+        seen=discovered_equipment(profile)
+        items=[]
+        for index in range(count):
+            rarity=rng.choices(rarities,weights=[RULES['rarities'][key]['weight'] for key in rarities])[0]
+            kind=rng.choice(list(RULES['types']))
+            key=kind+'_'+rarity
+            suffix=':item' if count==1 else f':item:{index}'
+            item=dict(id=request_id+suffix,definition=key,enhancement=0,stacks=0,locked=False,is_new=key not in seen)
+            seen.add(key)
+            profile['items'].append(item)
+            items.append(dict(item))
+        profile['gold']-=cost
+        profile['discovered_equipment']=sorted(seen)
+        highest=max((definition(item)['rarity'] for item in items),key=rarities.index)
+        return dict(message=item_name(items[0])+' 획득!' if count==1 else '장비 10개를 획득했습니다.',
+                    item_id=items[0]['id'],items=items,highest_rarity=highest,count=count,cost=cost)
     if operation=='unlock_slot':
         slot=args.get('slot')
         if type(slot) is not int or slot!=profile['unlocked_slots'] or slot>=3:
@@ -96,6 +129,9 @@ def apply_equipment(profile,operation,args,rng,request_id):
         return dict(message='장비를 해제했습니다.')
     item=next((item for item in profile['items'] if item['id']==args.get('item_id')),None)
     if item is None:raise ValueError('장비를 찾을 수 없습니다.')
+    if operation=='mark_seen':
+        item['is_new']=False
+        return dict(message='')
     if operation=='equip':
         slot=args.get('slot')
         if type(slot) is not int or not 0<=slot<profile['unlocked_slots']:raise ValueError('잠긴 슬롯입니다.')
