@@ -4,8 +4,10 @@ import math
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 from transitions import Machine, MachineError
-from game.model import ROOT, Cat, World, Enemy, Projectile, Item, WAVES, BALANCE, DEATH_SECONDS, wave_quota, segment_hit
+from game.model import ROOT, Cat, World, Enemy, Projectile, Item, BALANCE, DEATH_SECONDS, segment_hit
+from game.difficulty import SETTINGS, difficulty_at, monster_stats, validate_settings
 from game.storage import Store
 from game.app import fit_size, tile_segments, enemy_frame_state, KEY_BINDINGS, p
 
@@ -76,11 +78,19 @@ class RulesTest(unittest.TestCase):
         with self.assertRaises(MachineError):
             w.pause_play()
 
-    def test_wave_table(self):
-        self.assertEqual([w['index'] for w in WAVES],list(range(1,201)))
-        self.assertEqual(sum(w['quota'] for w in WAVES),953)
-        self.assertAlmostEqual(sum(w['duration'] for w in WAVES),1116.7)
-        self.assertEqual([WAVES[i-1]['stage'] for i in (35,36,78,79,134,135,200)],[1,2,2,3,3,4,4])
+    def test_difficulty_boundaries_and_initial_species_hp_order(self):
+        validate_settings(SETTINGS)
+        self.assertEqual(difficulty_at(29.99)['start'],0)
+        self.assertEqual(difficulty_at(30)['start'],30)
+        self.assertNotIn('bee',difficulty_at(0)['weights'])
+        self.assertIn('bee',difficulty_at(30)['weights'])
+        self.assertNotIn('snake',difficulty_at(59.99)['weights'])
+        self.assertIn('snake',difficulty_at(60)['weights'])
+        values=[monster_stats(k,difficulty_at(0))['max_hp'] for k in ('bee','magpie','snake','squirrel')]
+        self.assertEqual(values,sorted(set(values)))
+        self.assertTrue(all(isinstance(Enemy(0,100,species=k).hp,float) for k in SETTINGS['monsters']))
+        for invalid in (-1,math.nan,math.inf):
+            with self.assertRaises(ValueError):difficulty_at(invalid)
 
     def test_wasd_mapping_replaces_arrows_and_keyboard_fire(self):
         self.assertEqual(KEY_BINDINGS,{p.SDLK_a:'left',p.SDLK_d:'right',p.SDLK_w:'up',p.SDLK_s:'down'})
@@ -89,7 +99,7 @@ class RulesTest(unittest.TestCase):
 
     def test_mouse_vector_is_normalized_and_fixed_after_firing(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         w.aim=(w.cat.x+300,w.cat.y+26+400)
         w.shoot()
         bullet=w.projectiles[0]
@@ -112,7 +122,7 @@ class RulesTest(unittest.TestCase):
 
     def test_no_enemy_still_fires_and_projectiles_expire_at_map_edges(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         w.shoot()
         self.assertEqual((w.cat.ammo,len(w.projectiles)),(3,1))
         for x,y,dx,dy in ((959,300,1,0),(1,300,-1,0),(400,559,0,1),(400,81,0,-1)):
@@ -123,9 +133,9 @@ class RulesTest(unittest.TestCase):
 
     def test_piercing_hits_all_crossed_enemies_once_and_is_125_percent(self):
         w=World()
-        w.spawn_queue=[]
-        w.enemies=[Enemy(180,180,species='squirrel',state='CROUCH_CHARGE'),
-                   Enemy(240,180,species='squirrel',state='CROUCH_CHARGE')]
+        w.next_spawn_at=math.inf
+        w.enemies=[Enemy(180,180,species='squirrel',max_hp=2.,state='CROUCH_CHARGE'),
+                   Enemy(240,180,species='squirrel',max_hp=2.,state='CROUCH_CHARGE')]
         bullet=Projectile(100,180,piercing=True)
         self.assertEqual(bullet.scale,1.25)
         w.projectiles=[bullet]
@@ -136,9 +146,9 @@ class RulesTest(unittest.TestCase):
 
     def test_piercing_overlap_and_reentry_cannot_repeat_damage(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         w.update_enemy=lambda enemy,dt:None
-        enemy=Enemy(200,180,species='squirrel',state='CROUCH_CHARGE')
+        enemy=Enemy(200,180,species='squirrel',max_hp=2.,state='CROUCH_CHARGE')
         w.enemies=[enemy]
         bullet=Projectile(200,180,dx=0,dy=0,piercing=True)
         w.projectiles=[bullet]
@@ -151,14 +161,14 @@ class RulesTest(unittest.TestCase):
         bullet.x=200
         w.tick(.01,set())
         self.assertEqual(enemy.hp,1)
-        replacement=Enemy(200,180,species='squirrel',state='CROUCH_CHARGE')
+        replacement=Enemy(200,180,species='squirrel',max_hp=2.,state='CROUCH_CHARGE')
         w.enemies=[replacement]
         w.tick(.01,set())
         self.assertEqual(replacement.hp,1)
 
     def test_pickup_ten_counter_and_three_special_charges_are_independent(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         for count in range(1,41):
             w.items=[Item(w.cat.x,w.cat.y+18)]
             w.tick(.001,set())
@@ -177,7 +187,7 @@ class RulesTest(unittest.TestCase):
 
     def test_dash_two_charges_share_sequential_nonresetting_recharge(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         self.assertEqual(w.cat.dash_charges,2)
         w.dash({'right'})
         self.assertEqual(w.cat.dash_charges,1)
@@ -215,25 +225,27 @@ class RulesTest(unittest.TestCase):
         self.assertEqual(w.cat.ammo,4)
 
     def test_enemy_species_hp_and_nonlethal_hits_preserve_ai(self):
-        for species,required in (('magpie',3),('squirrel',2),('bee',1),('snake',2)):
-            for grade in range(3):
-                e=Enemy(200,200,species=species,grade=grade,state='POP_UP' if species=='snake' else 'IDLE',clock=.1)
-                self.assertEqual((e.hp,e.max_hp),(required,required))
-                state=e.state
-                for hit in range(1,required+1):
-                    killed=e.damage()
-                    self.assertEqual(e.hp,required-hit)
-                    self.assertEqual(killed,hit==required)
-                    if hit<required:
-                        self.assertTrue(e.alive)
-                        self.assertEqual((e.state,e.clock),(state,.1))
-                self.assertFalse(e.alive)
-                self.assertEqual(e.state,'HIT')
+        for species,spec in SETTINGS['monsters'].items():
+            e=Enemy(200,200,species=species,state='POP_UP' if species=='snake' else 'IDLE',clock=.1)
+            required=spec['hp']
+            state=e.state
+            for hit in range(1,math.ceil(required)+1):
+                killed=e.damage()
+                self.assertEqual(e.hp,max(0.,required-hit))
+                self.assertEqual(killed,hit==math.ceil(required))
+                if not killed:self.assertEqual((e.state,e.clock),(state,.1))
+            self.assertEqual(e.state,'HIT')
+            self.assertFalse(e.damage())
+        e=Enemy(200,200)
+        e.damage(.25)
+        self.assertEqual(e.hp,1.25)
+        for invalid in (0,-1,math.nan,math.inf):
+            with self.assertRaises(ValueError):e.damage(invalid)
 
     def test_projectile_consumed_on_nonlethal_hit_and_score_on_kill_only(self):
         w=World()
-        w.spawn_queue=[]
-        e=Enemy(200,180,species='squirrel',state='CROUCH_CHARGE')
+        w.next_spawn_at=math.inf
+        e=Enemy(200,180,species='squirrel',max_hp=2.,state='CROUCH_CHARGE')
         w.enemies=[e]
         for expected_hp in (1,0):
             w.events.clear()
@@ -247,7 +259,7 @@ class RulesTest(unittest.TestCase):
 
     def test_down_space_drops_through_only_the_current_platform(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         c=w.cat
         c.x,c.y=400,300
         w.events.clear()
@@ -297,7 +309,7 @@ class RulesTest(unittest.TestCase):
 
     def test_cat_jump_shot_and_hurt_sounds_follow_actual_actions(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         w.events.clear()
         w.jump()
         w.jump()
@@ -315,29 +327,34 @@ class RulesTest(unittest.TestCase):
         w.tick(.001,set())
         self.assertEqual(w.events.count('hurt'),1)
 
-    def test_faster_original_spawn_schedule(self):
-        self.assertEqual([wave_quota(WAVES[i-1]) for i in (1,36,79,135)],[3,4,5,6])
-        self.assertEqual(sum(wave_quota(spec) for spec in WAVES),953)
+    def test_continuous_spawns_skip_caps_without_accumulating_backlog(self):
         w=World()
-        for number in (1,36,79,135):
-            w.wave=number
-            w.start_wave()
-            times=[t for t,_ in w.spawn_queue]
-            self.assertEqual(len(times),wave_quota(w.spec))
-            self.assertAlmostEqual(times[0],.12)
-            self.assertAlmostEqual(times[1]-times[0],.2)
-            self.assertLess(times[-1],w.spec['duration'])
+        w.update(.24)
+        self.assertFalse(w.enemies)
+        w.update(.02)
+        self.assertEqual(w.spawn_stats['attempted'],1)
+        w.cat.invincible=9999
+        w.update(16)
+        self.assertLessEqual(sum(e.alive for e in w.enemies),w.rules['cap'])
+        attempts=w.spawn_stats['attempted']
+        w.enemies=[]
+        remaining=w.next_spawn_at-w.time
+        w.update(max(0,remaining-.01))
+        self.assertEqual(w.spawn_stats['attempted'],attempts)
+        w.update(.02)
+        self.assertEqual(w.spawn_stats['attempted'],attempts+1)
+        self.assertEqual(sum(e.alive for e in w.enemies),1)
 
     def test_pause_and_countdown_freeze_everything(self):
         w=World(42)
         w.update(1)
         w.pause()
-        before=copy.deepcopy((w.time,w.cat,w.enemies,w.items,w.wave_time,w.food_time,w.spawn_queue))
+        before=copy.deepcopy((w.time,w.cat,w.enemies,w.items,w.next_spawn_at,w.food_time,w.last_warning_boundary))
         w.update(20,{'right','shoot'})
-        self.assertEqual(before,(w.time,w.cat,w.enemies,w.items,w.wave_time,w.food_time,w.spawn_queue))
+        self.assertEqual(before,(w.time,w.cat,w.enemies,w.items,w.next_spawn_at,w.food_time,w.last_warning_boundary))
         w.pause()
         w.update(2.9,{'right','shoot'})
-        self.assertEqual(before,(w.time,w.cat,w.enemies,w.items,w.wave_time,w.food_time,w.spawn_queue))
+        self.assertEqual(before,(w.time,w.cat,w.enemies,w.items,w.next_spawn_at,w.food_time,w.last_warning_boundary))
         w.update(.2)
         self.assertEqual(w.mode,'PLAYING')
         self.assertEqual(w.time,before[0])
@@ -401,21 +418,30 @@ class RulesTest(unittest.TestCase):
 
     def test_death_animation_finishes_before_game_over(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         w.cat.hp=1
         w.enemies=[Enemy(w.cat.x,w.cat.y+24,species='bee',state='TARGET_LOCK',spawn_grace=0)]
         w.update(.01)
         self.assertEqual((w.mode,w.cat.state),('DYING','DEAD'))
-        frozen=(w.time,w.wave_time,w.enemies[0].x,w.food_time)
+        frozen=(w.time,w.next_spawn_at,w.enemies[0].x,w.food_time)
         w.update(DEATH_SECONDS-.01,{'right','shoot'})
         self.assertEqual(w.mode,'DYING')
-        self.assertEqual(frozen,(w.time,w.wave_time,w.enemies[0].x,w.food_time))
+        self.assertEqual(frozen,(w.time,w.next_spawn_at,w.enemies[0].x,w.food_time))
         w.update(.02)
         self.assertEqual(w.mode,'GAME_OVER')
 
+    def test_player_contact_padding_is_reduced_to_seventy_percent(self):
+        for gap, hp in ((34,3),(30,2)):
+            w=World()
+            w.next_spawn_at=math.inf
+            w.enemies=[Enemy(w.cat.x+gap,w.cat.y+24,species='squirrel',
+                             state='CROUCH_CHARGE',spawn_grace=0)]
+            w.tick(.001,set())
+            self.assertEqual(w.cat.hp,hp)
+
     def test_dash_prevents_contact_damage_only_during_dash(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         e=Enemy(w.cat.x,w.cat.y+24,species='bee',state='TARGET_LOCK',spawn_grace=0)
         w.enemies=[e]
         w.dash({'right'})
@@ -428,27 +454,15 @@ class RulesTest(unittest.TestCase):
         w.tick(.03,set())
         self.assertEqual(w.cat.hp,2)
 
-    def test_wave_clears_early_only_after_all_scheduled_spawns(self):
+    def test_killing_every_enemy_does_not_change_difficulty_or_end_run(self):
         w=World()
-        w.enemies=[]
-        w.update(.1)
-        self.assertEqual(w.wave,1)
-        w.spawn_queue=[]
-        w.enemies=[Enemy(100,300,species='bee',state='TARGET_LOCK')]
-        w.update(.01)
-        self.assertEqual(w.wave,1)
-        w.enemies[0].enter('HIT')
-        w.update(.01)
-        self.assertEqual((w.wave,w.completed),(2,1))
-        self.assertLess(w.time,1)
-        w.wave=200
-        w.completed=199
-        w.start_wave()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         w.enemies=[Enemy(100,300,species='bee',state='HIT')]
-        w.update(.01)
-        self.assertEqual(w.mode,'CLEAR')
-        self.assertIn('rainbow_clear',w.unlocked)
+        w.update(.5)
+        self.assertEqual((w.mode,w.rules['start']),('PLAYING',0))
+        self.assertFalse(hasattr(w,'wave'))
+        self.assertFalse(hasattr(w,'clear_run'))
+        self.assertNotIn('rainbow_clear',w.unlocked)
 
     def test_footstep_cadence_stops_while_paused(self):
         w=World()
@@ -458,20 +472,37 @@ class RulesTest(unittest.TestCase):
         w.update(2,{'right'})
         self.assertEqual(w.events.count('footstep'),2)
 
-    def test_siren_exactly_three_game_time_pulses(self):
+    def test_warning_precedes_boundary_once_and_freezes_during_pause(self):
         w=World()
-        w.events.clear()
-        w.update(.9)
-        self.assertEqual(w.events.count('siren'),3)
-        w.update(.4)
-        self.assertEqual(w.events.count('siren'),3)
+        w.next_spawn_at=math.inf
+        w.time=26.98
+        w.update(.01)
+        self.assertFalse(w.warning_message)
+        w.update(.02)
+        self.assertTrue(w.warning_message)
+        self.assertEqual(w.events.count('siren'),1)
         w.pause()
-        w.update(5)
+        before=(w.time,w.warning_message)
+        w.update(10)
+        self.assertEqual((w.time,w.warning_message),before)
+        w.pause();w.update(3)
+        w.update(2.98)
+        self.assertTrue(w.warning_message)
+        w.update(.02)
+        self.assertEqual(w.rules['start'],30)
+        self.assertFalse(w.warning_message)
+        self.assertEqual(w.events.count('siren'),1)
+        w.time=57
+        w.update(.01)
+        self.assertEqual(w.events.count('siren'),2)
+        w.time=537
+        w.update(.01)
+        self.assertTrue(w.warning_message)
         self.assertEqual(w.events.count('siren'),3)
 
     def test_swept_hit_only_nearest_enemy(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         w.enemies=[Enemy(200,180,state='TARGET_LOCK',species='bee'),Enemy(200,180,state='TARGET_LOCK',species='bee')]
         w.projectiles=[Projectile(170,180,dx=1,dy=0)]
         w.tick(.1,set())
@@ -482,7 +513,7 @@ class RulesTest(unittest.TestCase):
 
     def test_snake_underground_cannot_hit_or_be_hit(self):
         w=World()
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         w.enemies=[Enemy(w.cat.x,w.cat.y+24,species='snake')]
         w.projectiles=[Projectile(w.cat.x-40,w.cat.y+24)]
         w.tick(.05,set())
@@ -519,7 +550,7 @@ class RulesTest(unittest.TestCase):
         self.assertLessEqual(sum(e.species=='bee' for e in w.enemies),3)
         self.assertLessEqual(sum(i.kind=='churu' for i in w.items),6)
         w.items=[Item(100,98,kind='bandage')]
-        w.spawn_queue=[]
+        w.next_spawn_at=math.inf
         w.cat.invincible=9999
         w.update(25)
         self.assertTrue(any(i.kind=='bandage' for i in w.items))
@@ -528,26 +559,35 @@ class RulesTest(unittest.TestCase):
         self.assertFalse(any(i.kind=='bandage' for i in w.items))
         self.assertEqual(w.cat.hp,3)
 
-    def test_evolution_policy_stays_with_spawn(self):
+    def test_stats_are_fixed_at_spawn_across_difficulty_boundary(self):
         w=World()
-        e=Enemy(200,400,evolution=11.99,max_grade=1)
-        w.update_enemy(e,.02)
-        self.assertEqual(e.grade,1)
-        w.update_enemy(e,13)
-        self.assertEqual(e.grade,1)
+        w.time=89.9
+        w.spawn_enemy('magpie')
+        old=w.enemies[0]
+        snapshot=(old.hp,old.max_hp,old.attack_interval,old.grade,old.exp_reward,old.gold_reward)
+        w.time=120
+        w.spawn_enemy('magpie')
+        new=w.enemies[-1]
+        self.assertGreater(new.max_hp,old.max_hp)
+        self.assertLess(new.attack_interval,old.attack_interval)
+        for _ in range(200):w.update_enemy(old,.1)
+        self.assertEqual(snapshot,(old.hp,old.max_hp,old.attack_interval,old.grade,old.exp_reward,old.gold_reward))
 
-    def test_last_wave_waits_for_timer(self):
-        w=World()
-        w.wave=200
-        w.completed=199
-        w.start_wave()
-        w.cat.invincible=9999
-        w.update(4)
-        self.assertNotIn('rainbow_clear',w.unlocked)
-        w.update(.2)
-        self.assertEqual(w.mode,'CLEAR')
-        self.assertEqual(w.completed,200)
-        self.assertIn('rainbow_clear',w.unlocked)
+    def test_runtime_stat_caps_hold_for_arbitrarily_late_spawns(self):
+        for seconds in (480,540,3600,10**9):
+            rules=difficulty_at(seconds)
+            self.assertGreaterEqual(rules['spawn_interval'],.65)
+            self.assertLessEqual(rules['cap'],24)
+            for kind,spec in SETTINGS['monsters'].items():
+                stats=monster_stats(kind,rules)
+                self.assertLessEqual(stats['max_hp'],spec['max_hp'])
+                self.assertGreaterEqual(stats['attack_interval'],spec['min_attack_interval'])
+                self.assertGreaterEqual(stats['warning_seconds'],.4)
+                self.assertLessEqual(stats['exp_reward'],spec['max_exp'])
+                self.assertLessEqual(stats['gold_reward'],spec['max_gold'])
+            self.assertEqual(rules['hp_multiplier'],4)
+        self.assertNotEqual(difficulty_at(480)['weights'],difficulty_at(540)['weights'])
+        self.assertEqual(difficulty_at(480)['weights'],difficulty_at(600)['weights'])
 
     def test_seed_reproducibility(self):
         a,b=World(17),World(17)
@@ -556,16 +596,46 @@ class RulesTest(unittest.TestCase):
         self.assertEqual(a.enemies,b.enemies)
         self.assertEqual(a.items,b.items)
 
+    def test_excessive_config_is_clamped_and_unchanged_mix_has_no_warning(self):
+        excessive=dict(spawn_interval=.001,cap=999,hp_multiplier=999,attack_rate=999,reward_multiplier=999)
+        with patch.dict(SETTINGS['phases'][-1],excessive):
+            rules=difficulty_at(600)
+            self.assertEqual((rules['spawn_interval'],rules['cap']),(.65,24))
+            self.assertEqual((rules['hp_multiplier'],rules['attack_rate'],rules['reward_multiplier']),(4,1.5,3))
+        mix=SETTINGS['combinations'][0]
+        with patch.dict(SETTINGS,{'combinations':[mix,mix]}):
+            w=World()
+            w.next_spawn_at=math.inf
+            w.time=537
+            w.tick(.01,set())
+            self.assertFalse(w.warning_message)
+            self.assertNotIn('siren',w.events)
+
     def test_full_timeline_and_caps(self):
         w=World(17)
         w.cat.invincible=99999
-        while w.mode=='PLAYING':
-            w.update(.25)
-            self.assertLessEqual(sum(e.alive for e in w.enemies),w.spec['cap'])
-            self.assertLessEqual(sum(e.alive and e.species=='bee' for e in w.enemies),3)
-        self.assertEqual(w.mode,'CLEAR')
-        self.assertEqual(w.completed,200)
-        self.assertAlmostEqual(w.time,1116.7,places=5)
+        for _ in range(2500):
+            w.update(.5)
+            self.assertLessEqual(sum(e.alive for e in w.enemies),w.rules['cap'])
+            for kind,spec in SETTINGS['monsters'].items():
+                self.assertLessEqual(sum(e.alive and e.species==kind for e in w.enemies),spec['cap'])
+        self.assertEqual(w.mode,'PLAYING')
+        self.assertAlmostEqual(w.time,1250,places=5)
+        self.assertNotIn('rainbow_clear',w.unlocked)
+
+    def test_bandage_warns_before_time_spawn_and_cannot_collect_early(self):
+        w=World()
+        w.next_spawn_at=math.inf
+        w.time=27.99
+        w.cat.hp=2
+        w.update(.02)
+        item=next(i for i in w.items if i.kind=='bandage')
+        self.assertEqual(item.state,'PRE_SPAWN_WARNING')
+        self.assertEqual(w.cat.hp,2)
+        w.update(2)
+        self.assertEqual(w.cat.hp,3)
+        self.assertFalse(any(i.kind=='bandage' for i in w.items))
+        self.assertEqual(w.next_bandage_at,60)
 
 
 class StorageTest(unittest.TestCase):
@@ -581,14 +651,14 @@ class StorageTest(unittest.TestCase):
             path.write_text(json.dumps(s.profile),encoding='utf-8')
             self.assertEqual(Store(folder).profile['bgm_volume'],70)
 
-    def test_clear_ranks_before_higher_uncleared_score(self):
+    def test_endless_result_legacy_save_does_not_require_wave(self):
         with tempfile.TemporaryDirectory(dir=ROOT/'tests') as folder:
             s=Store(folder)
-            a=World(); a.kill_score=999999
-            s.record(a)
-            b=World(); b.clear_run()
-            s.record(b)
-            self.assertTrue(s.records[0]['cleared'])
+            world=World();world.time=75;world.finish_run()
+            s.record(world)
+            self.assertEqual(s.records[0]['time_survived'],75)
+            self.assertFalse(s.records[0]['cleared'])
+            self.assertNotIn('wave_reached',s.records[0])
             s.unlock({'bee_golden'})
             self.assertIn('bee_golden',Store(folder).profile['unlocked_skin_ids'])
 

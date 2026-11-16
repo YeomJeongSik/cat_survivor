@@ -3,8 +3,12 @@ from pathlib import Path
 import ctypes
 import sys
 import tempfile
+import time
+import statistics
 
 ROOT=Path(__file__).resolve().parents[1]
+OUTPUT=ROOT/'output/preview2_step1'
+OUTPUT.mkdir(parents=True,exist_ok=True)
 sys.path.insert(0,str(ROOT))
 from game.app import App, capture, p, native
 from game.model import Enemy, SKINS, DEATH_SECONDS
@@ -20,12 +24,12 @@ def main():
         try:
             assert not app.scene_machine.auto_transitions
             app.draw()
-            capture(ROOT/'output/title_first_run.png')
+            capture(OUTPUT/'title_first_run.png')
             assert [action for _,action,_ in app.buttons]==['start','controls']
             app.click(480,155)
             assert app.controls_popup
             app.draw()
-            capture(ROOT/'output/title_controls.png')
+            capture(OUTPUT/'title_controls.png')
             app.click(480,320)
             assert app.controls_popup
             app.click(480,155)
@@ -86,20 +90,51 @@ def main():
             app.world.cat.dash_charges=1
             app.world.cat.dash_cd=.7
             app.draw()
-            capture(ROOT/'output/combat_charges_current.png')
+            capture(OUTPUT/'combat_charges_current.png')
             app.ui_clock+=.2
             app.draw()
-            capture(ROOT/'output/combat_charges_ripple.png')
+            capture(OUTPUT/'combat_charges_ripple.png')
             app.draw()
             assert not any(isinstance(action,tuple) and action[0]=='volume' for _,action,_ in app.buttons)
             app.world.enemies=[Enemy(200,480,species='magpie'),Enemy(350,250,species='squirrel'),
                                Enemy(600,350,species='bee'),Enemy(480,102,species='snake',state='CHARGE')]
             app.world.enemies[0].damage()
             app.draw()
-            capture(ROOT/'output/enemy_hp_snake_charge.png')
+            capture(OUTPUT/'enemy_hp_snake_charge.png')
+            app.world.time=27.1
+            app.draw()
+            capture(OUTPUT/'warning_bee.png')
+            assert app.world.warning_message
+            assert app.world.rules['start']==0
+            app.world.time=30
+            assert not app.world.warning_message and app.world.rules['start']==30
+            app.world.time=537.1
+            app.draw()
+            capture(OUTPUT/'warning_combination.png')
+            assert app.world.warning_message
+            app.world.time=0
+            app.world.time=600
+            app.world.enemies=[]
+            for index in range(500):
+                app.world.spawn_enemy(('magpie','squirrel','bee','snake')[index%4])
+                if sum(e.alive for e in app.world.enemies)==24:
+                    break
+            assert sum(e.alive for e in app.world.enemies)==24
+            timings=[]
+            for _ in range(120):
+                before=time.perf_counter()
+                app.draw()
+                p.update_canvas()
+                timings.append((time.perf_counter()-before)*1000)
+                app.ui_clock+=1/60
+            capture(OUTPUT/'cap_24_enemies.png')
+            print(f'RENDER TIMING (24 enemies, no vsync): mean={statistics.mean(timings):.2f}ms p95={sorted(timings)[114]:.2f}ms')
+            app.world.time=0
+            app.world.enemies=[]
+
             app.world.pause()
             app.draw()
-            capture(ROOT/'output/pause_first_run.png')
+            capture(OUTPUT/'pause_first_run.png')
             app.action(('volume','bgm_volume',352),360)
             assert app.store.profile['bgm_volume']==0
             app.change_volume(600)
@@ -130,7 +165,7 @@ def main():
             app.dragging=None
             app.world.pause()
             app.draw()
-            capture(ROOT/'output/countdown_current.png')
+            capture(OUTPUT/'countdown_current.png')
             app.world.update(3)
             app.world.cat.invincible=99999
             app.world.spawn_enemy('magpie')
@@ -138,7 +173,7 @@ def main():
             app.world.update(.05)
             assert app.world.projectiles
             app.draw()
-            capture(ROOT/'output/mouse_aim_current.png')
+            capture(OUTPUT/'mouse_aim_current.png')
             for species in ('magpie','squirrel','bee','snake'):
                 prefix=f'sprites/enemies/{species}/'
                 for file in app.art.specs:
@@ -156,12 +191,12 @@ def main():
             app.update(DEATH_SECONDS/2)
             assert app.scene=='PLAY' and app.world.mode=='DYING'
             app.draw()
-            capture(ROOT/'output/cat_death_current.png')
+            capture(OUTPUT/'cat_death_current.png')
             app.update(DEATH_SECONDS/2+.01)
             assert app.scene=='RESULT'
             assert app.achievement_queue==['bee_golden','snake_silver']
             app.draw()
-            capture(ROOT/'output/achievement_current.png')
+            capture(OUTPUT/'achievement_current.png')
             app.click(700,135)  # The underlying restart button must stay blocked.
             assert app.scene=='RESULT' and len(app.achievement_queue)==2
             event=p.SDL_Event()
@@ -179,7 +214,7 @@ def main():
             app.store.profile['unlocked_skin_ids']=list(SKINS)
             app.skin_popup=True
             app.draw()
-            capture(ROOT/'output/result_first_run.png')
+            capture(OUTPUT/'result_first_run.png')
             assert app.new_record
             assert 35 < 180-120 and 180+120 < 330 and 40 < 547-48 < 547+48 < 600
             # The popup is to the costume button's right and completely inside the main panel.
@@ -209,7 +244,7 @@ def main():
                 p.SDL_RenderWindowToLogical(native.renderer,width//2,height//2,ctypes.byref(x),ctypes.byref(y))
                 assert abs(x.value-480)<1 and abs(y.value-320)<1,(x.value,y.value)
                 app.draw()
-                capture(ROOT/f'output/pause_{width}x{height}.png')
+                capture(OUTPUT/f'pause_{width}x{height}.png')
             print(f'RENDER PASS: {len(app.art.specs)} manifest assets; title/play/pause/result; 6 skins; all enemy states/grades; volume endpoints')
             print('VIEWPORT PASS: 720x480 and 1280x720 logical center/mouse transform')
         finally:

@@ -63,8 +63,8 @@ class Store:
             self.save_profile()
 
     def record(self, world):
-        result = dict(player_name='LOCAL',score=world.score,wave_reached=world.wave,
-                      time_survived=round(world.time,2),cleared=world.mode=='CLEAR',timestamp=time.time())
+        result = dict(player_name='LOCAL',score=world.score,
+                      time_survived=round(world.time,2),cleared=False,timestamp=time.time())
         self.records.append(result)
         self.records.sort(key=lambda r:(not r['cleared'],-r['score'],r['timestamp']))
         self.records = self.records[:100]

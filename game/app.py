@@ -9,7 +9,7 @@ import pico2d as p
 import pico2d.pico2d as native
 from .model import ROOT, BALANCE, SKINS, ACHIEVEMENTS, World
 from .storage import Store
-from .states import Machine
+from .framework import capture, run, scene_machine
 from .audio import Audio
 
 ART = ROOT/'output/nyangi_art_v1'
@@ -139,12 +139,7 @@ class App:
         self.art = Art()
         self.store = Store(save_folder or ROOT/'save')
         self.world = None
-        self.scene_machine = Machine(model=self,model_attribute='scene',initial='TITLE',
-                                     states=['TITLE','PLAY','RESULT','RANKING'],auto_transitions=False,
-                                     transitions=[['show_play',['TITLE','RESULT','RANKING','PLAY'],'PLAY'],
-                                                  ['show_result','PLAY','RESULT'],
-                                                  ['show_title',['TITLE','PLAY','RESULT','RANKING'],'TITLE'],
-                                                  ['show_ranking',['TITLE','RANKING'],'RANKING']])
+        self.scene_machine = scene_machine(self)
         self.keys, self.buttons = set(), []
         self.mouse, self.dragging = (0,0), None
         self.running, self.fullscreen = True, False
@@ -159,6 +154,11 @@ class App:
         self.last_countdown = None
         if not self.audio.available:
             self.error = '오디오 장치를 열 수 없습니다. 소리 없이 플레이합니다.'
+
+    def close(self):
+        self.audio.close()
+        self.art.labels.clear()
+        self.art.images.clear()
 
     def start(self):
         self.run_owned = set(self.store.profile['unlocked_skin_ids'])
@@ -186,7 +186,7 @@ class App:
             self.world.update(dt,self.keys)
             try:
                 self.store.unlock(self.world.unlocked)
-                if self.world.mode in ('GAME_OVER','CLEAR') and not self.saved_result:
+                if self.world.mode == 'GAME_OVER' and not self.saved_result:
                     self.new_record = self.store.record(self.world)
                     self.saved_result = True
                     self.achievement_queue = [s for s in SKINS[1:] if s in self.world.unlocked and s not in self.run_owned]
@@ -234,6 +234,8 @@ class App:
                 image.clip_draw(0,0,width,32,x+width/2,floor-16,width,32)
         self.aim_guide()
         for item in w.items:
+            if item.state=='PRE_SPAWN_WARNING':
+                continue
             self.art.sprite(f'sprites/items/{item.kind}.png',item.x,item.y+math.sin(item.clock*4)*3,item.clock)
         if w.bandage_due is not None:
             p.draw_circle(480,BALANCE['ground']+8,24,78,173,118)
@@ -259,10 +261,8 @@ class App:
                 p.draw_circle(e.x,BALANCE['ground']+10,18,255,255,255)
             if e.targetable:
                 p.draw_rectangle(e.x-19,e.y+35,e.x+19,e.y+42,34,33,35,filled=True)
-                for i in range(e.max_hp):
-                    left=e.x-18+i*36/e.max_hp
-                    color=(245,124,99) if i<e.hp else (90,83,86)
-                    p.draw_rectangle(left+1,e.y+37,left+36/e.max_hp-1,e.y+40,*color,filled=True)
+                p.draw_rectangle(e.x-18,e.y+37,e.x+18,e.y+40,90,83,86,filled=True)
+                p.draw_rectangle(e.x-18,e.y+37,e.x-18+36*e.hp/e.max_hp,e.y+40,245,124,99,filled=True)
         for x,y,facing,born in w.trails:
             self.cat(x,y,'dash',0,flip=facing<0,alpha=.4*(1-(w.time-born)/.23))
         states = {'MOVE':'walk'}
@@ -283,17 +283,12 @@ class App:
         for i in range(BALANCE['ammo_max']):
             self.art.draw(f'ui/ammo_{"full" if i<c.ammo else "empty"}.png',208+i*23,24,20,20)
         self.charge_hud()
-        self.art.text(f'WAVE {w.wave:03d} / 200',28,611,22,CREAM)
-        self.art.text(f'{w.spec["stage"]}단계   {w.time:05.1f}s',28,581,15,(186,214,210))
-        self.art.text(f'{w.score:,}',780,610,26,CREAM)
+        self.art.text('무한 생존',28,611,22,CREAM)
+        self.art.text(f'생존 시간  {int(w.time)//60:02d}:{int(w.time)%60:02d}',28,581,18,(186,214,210))
         self.art.text('ESC  일시정지',780,580,14,(186,214,210))
-        if w.wave_time < 1.5:
+        if w.warning_message:
             self.art.draw('ui/wave_banner.png',480,541,960,32)
-            offset = (w.wave_time*180)%240
-            for x in range(-240,1200,240):
-                self.art.text(f'WAVE {w.wave:03d}',x-offset,541,19,CREAM)
-                if w.wave % BALANCE['heal_wave_interval'] == 0:
-                    self.art.draw('ui/heart_full.png',x-offset+135,541,19,19)
+            self.art.text('WARNING  ·  '+w.warning_message,480,541,19,CREAM,True)
         if w.notices and w.time-w.notices[-1][1] < 3:
             skin = w.notices[-1][0]
             self.panel(300,480,660,515)
@@ -344,10 +339,10 @@ class App:
     def result(self):
         self.background(True)
         self.panel(35,40,925,600)
-        title = 'GAME CLEAR' if self.world and self.world.mode == 'CLEAR' else '이번 산책의 기록' if self.scene == 'RESULT' else '로컬 랭킹'
+        title = '이번 산책의 기록' if self.scene == 'RESULT' else '로컬 랭킹'
         self.art.text(title,480,560,32,INK,True)
         if self.scene == 'RESULT':
-            self.art.text(f'{self.world.score:,} 점  ·  WAVE {self.world.wave:03d}',480,513,22,INK,True)
+            self.art.text(f'{self.world.score:,} 점  ·  생존 {self.world.time:.1f}초',480,513,22,INK,True)
             if self.new_record:
                 self.art.draw('v3/ui/new_record.png',180,547)
         self.ranking(65,125,490)
@@ -604,57 +599,9 @@ class App:
                         self.save()
 
 
-def capture(path):
-    width,height = ctypes.c_int(),ctypes.c_int()
-    if p.SDL_GetRendererOutputSize(native.renderer,ctypes.byref(width),ctypes.byref(height)) != 0:
-        raise RuntimeError('Could not query renderer size')
-    surface = p.SDL_CreateRGBSurfaceWithFormat(0,width.value,height.value,32,p.SDL_PIXELFORMAT_RGBA32)
-    if not surface:
-        raise RuntimeError('Screenshot surface allocation failed')
-    try:
-        status = p.SDL_RenderReadPixels(native.renderer,None,p.SDL_PIXELFORMAT_RGBA32,surface.contents.pixels,surface.contents.pitch)
-        if status != 0:
-            raise RuntimeError('Could not capture renderer')
-        path = Path(path)
-        path.parent.mkdir(parents=True,exist_ok=True)
-        if p.IMG_SavePNG(surface,str(path.resolve()).encode('utf-8')) != 0:
-            raise OSError('Could not save screenshot')
-    finally:
-        p.SDL_FreeSurface(surface)
-
-
 def main():
     parser = argparse.ArgumentParser(description='냥이 서바이버 · Python + pico2d')
     parser.add_argument('--smoke',type=int,default=0,metavar='FRAMES',help='run gameplay then exit after N frames')
     parser.add_argument('--screenshot',type=Path,help='save final rendered frame as PNG')
     args = parser.parse_args()
-    p.SDL_SetHint(p.SDL_HINT_RENDER_SCALE_QUALITY,b'0')
-    p.open_canvas(960,640,sync=True)
-    p.hide_lattice()
-    p.SDL_SetWindowTitle(native.window,'냥이 서바이버'.encode('utf-8'))
-    p.SDL_SetWindowResizable(native.window,p.SDL_TRUE)
-    p.SDL_SetWindowMinimumSize(native.window,720,480)
-    p.SDL_RenderSetLogicalSize(native.renderer,960,640)
-    app = App()
-    if args.smoke:
-        app.start()
-    frames, previous = 0,time.perf_counter()
-    try:
-        while app.running:
-            now = time.perf_counter()
-            dt, previous = min(now-previous,.25),now
-            app.events()
-            app.update(dt)
-            app.draw()
-            frames += 1
-            if args.screenshot and args.smoke and frames == args.smoke:
-                capture(args.screenshot)
-            p.update_canvas()
-            if args.smoke and frames >= args.smoke:
-                print(f'SMOKE PASS frames={frames} wave={app.world.wave} textures={len(app.art.images)}')
-                break
-    finally:
-        app.audio.close()
-        app.art.labels.clear()
-        app.art.images.clear()
-        p.close_canvas()
+    run(App, '냥이 서바이버', smoke=args.smoke, screenshot=args.screenshot)

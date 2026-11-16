@@ -4,21 +4,17 @@ from pathlib import Path
 import json
 import math
 import random
+from .difficulty import SETTINGS, difficulty_at, monster_stats
 from .states import CAT_ACTIVE, ENEMY_GRAPHS, Machine, actor_machine
 
 ROOT = Path(__file__).resolve().parents[1]
 BALANCE = json.loads((ROOT / 'config/balance.json').read_text(encoding='utf-8'))
-WAVES = json.loads((ROOT / 'config/wave_data.json').read_text(encoding='utf-8'))
 ACHIEVEMENTS = json.loads((ROOT/'config/achievements.json').read_text(encoding='utf-8'))
 _ART = json.loads((ROOT/'output/nyangi_art_v1/assets_manifest.json').read_text(encoding='utf-8-sig'))
 _DEATH = next(e for e in _ART['entries'] if e['file']=='sprites/cat/tobi_default/dead.png')
 DEATH_SECONDS = _DEATH['frames']/_DEATH['fps']
 SPECIES = ('magpie', 'squirrel', 'bee', 'snake')
 SKINS = ('tobi_default', 'magpie_tuxedo', 'squirrel_brown', 'bee_golden', 'snake_silver', 'rainbow_clear')
-
-
-def wave_quota(spec):
-    return math.ceil(spec['quota']*BALANCE['spawn_multiplier'])
 
 
 def segment_hit(ax, ay, bx, by, box):
@@ -88,12 +84,14 @@ class Cat(Actor):
 @dataclass
 class Enemy(Actor):
     species: str = 'magpie'
-    hp: int | None = None
-    max_hp: int = field(init=False)
+    hp: float | None = None
+    max_hp: float | None = None
+    attack_interval: float | None = None
+    warning_seconds: float = .6
+    exp_reward: int | None = None
+    gold_reward: int | None = None
     hit_flash: float = 0.
     grade: int = 0
-    max_grade: int = 1
-    evolution: float = 0.
     vx: float = 0.
     vy: float = 0.
     origin_y: float = 0.
@@ -109,15 +107,24 @@ class Enemy(Actor):
     speed_scale: float = 1.
 
     def __post_init__(self):
-        self.max_hp = BALANCE['enemy_hp'][self.species]
+        spec = SETTINGS['monsters'][self.species]
+        self.max_hp = float(spec['hp'] if self.max_hp is None else min(spec['max_hp'],self.max_hp))
+        if not math.isfinite(self.max_hp) or self.max_hp<=0:
+            raise ValueError('Enemy HP must be finite and positive')
+        self.attack_interval = max(spec['min_attack_interval'],spec['attack_interval'] if self.attack_interval is None else self.attack_interval)
+        self.warning_seconds = max(SETTINGS['limits']['min_warning_seconds'],self.warning_seconds)
+        self.exp_reward = spec['exp'] if self.exp_reward is None else min(spec['max_exp'],self.exp_reward)
+        self.gold_reward = spec['gold'] if self.gold_reward is None else min(spec['max_gold'],self.gold_reward)
         if self.hp is None:
             self.hp = 0 if self.state in ('HIT','DEAD') else self.max_hp
         super().__post_init__()
 
-    def damage(self):
+    def damage(self, amount=1.):
+        if not math.isfinite(amount) or amount<=0:
+            raise ValueError('Damage must be finite and positive')
         if not self.exposed:
             return False
-        self.hp = max(0,self.hp-1)
+        self.hp = max(0.,self.hp-amount)
         self.hit_flash = .15
         if self.hp == 0:
             self.enter('HIT')
@@ -186,49 +193,46 @@ class World:
         self.cat = Cat(480, BALANCE['ground'])
         self.aim = (960.,BALANCE['ground']+26.)
         self.enemies, self.projectiles, self.items, self.trails = [], [], [], []
-        self.time, self.wave_time, self.food_time = 0., 0., 0.
-        self.wave, self.completed, self.kill_score = 1, 0, 0
+        self.time, self.food_time = 0., 0.
+        self.kill_score = 0
+        self.spawn_rng = random.Random(seed ^ 2654435761)
+        self.next_spawn_at = SETTINGS['initial_spawn_delay']
+        self.next_bandage_at = SETTINGS['bandage_interval']
+        self.last_warning_boundary = None
         self.countdown = 0.
         self.machine = Machine(model=self,model_attribute='mode',initial='PLAYING',
-                               states=['PLAYING','PAUSED','COUNTDOWN','DYING','GAME_OVER','CLEAR'],
+                               states=['PLAYING','PAUSED','COUNTDOWN','DYING','GAME_OVER'],
                                auto_transitions=False,transitions=[
                                    ['pause_play','PLAYING','PAUSED'],
                                    dict(trigger='resume_play',source='PAUSED',dest='COUNTDOWN',before='_prepare_countdown'),
                                    ['finish_resume','COUNTDOWN','PLAYING'],
                                    dict(trigger='begin_death',source='PLAYING',dest='DYING',before='_start_death'),
                                    ['finish_death','DYING','GAME_OVER'],
-                                   ['finish_run',['PLAYING','PAUSED','COUNTDOWN'],'GAME_OVER'],
-                                   ['clear_run','PLAYING','CLEAR']])
+                                   ['finish_run',['PLAYING','PAUSED','COUNTDOWN'],'GAME_OVER']])
         self.unlocked = {'tobi_default'}
         self.notices, self.events = [], []
         self.spawn_stats = dict(attempted=0, success=0, skipped=0)
         self.bandage_due = None
-        self.start_wave()
         self.spawn_food(4)
 
     @property
-    def spec(self):
-        return WAVES[self.wave-1]
+    def rules(self):
+        return difficulty_at(self.time)
+
+    @property
+    def warning_message(self):
+        rules = self.rules
+        boundary = rules['next_change']
+        if not 1e-8 < boundary-self.time <= SETTINGS['warning_seconds']+1e-8:
+            return ''
+        following = difficulty_at(boundary)
+        keys = ('spawn_interval','cap','weights','hp_multiplier','attack_rate','reward_multiplier','grade')
+        return following['warning'] if any(rules[k]!=following[k] for k in keys) else ''
 
     @property
     def score(self):
-        return self.completed * 100 + int(self.time * 2) + self.kill_score + (50000 if self.mode == 'CLEAR' else 0)
-
-    def start_wave(self):
-        self.wave_time = 0.
-        self.wave_rng = random.Random(self.seed ^ (self.wave * 2654435761))
-        kinds = list(self.spec['species'])
-        offset = self.wave % len(kinds)
-        kinds = kinds[offset:] + kinds[:offset]
-        self.spawn_queue = []
-        due = BALANCE['spawn_first_delay']
-        for i in range(wave_quota(self.spec)):
-            self.spawn_queue.append((due,kinds[i%len(kinds)]))
-            due += BALANCE['spawn_fast_gap'] if i<2 else BALANCE['spawn_slow_gap']
-        if self.wave % BALANCE['heal_wave_interval'] == 0:
-            self.bandage_due = self.time + .4
-        self.events.append('wave')
-        self.siren_due = [0.,.32,.64]
+        # shortcut: legacy results retain score until the reward/result feature is replaced.
+        return int(self.time*2)+self.kill_score
 
     def pause(self):
         if self.mode == 'PLAYING':
@@ -319,25 +323,25 @@ class World:
     def spawn_enemy(self, kind):
         self.spawn_stats['attempted'] += 1
         living = [e for e in self.enemies if e.alive]
-        if len(living) >= self.spec['cap'] or (kind == 'bee' and sum(e.species == 'bee' for e in living) >= 3):
+        rules = self.rules
+        if len(living) >= rules['cap'] or sum(e.species == kind for e in living) >= SETTINGS['monsters'][kind]['cap']:
             self.spawn_stats['skipped'] += 1
             return
         for _ in range(24):
-            x = self.wave_rng.uniform(45, 915)
-            y = self.wave_rng.uniform(310, 480) if kind in ('magpie', 'bee') else BALANCE['ground']+22
+            x = self.spawn_rng.uniform(45, 915)
+            y = self.spawn_rng.uniform(310, 480) if kind in ('magpie', 'bee') else BALANCE['ground']+22
             if kind == 'magpie':
                 y = BALANCE['magpie_y']
             if kind == 'squirrel':
-                left, right, floor = self.wave_rng.choice(BALANCE['surfaces'])
-                x, y = self.wave_rng.uniform(left+25, right-25), floor+22
+                left, right, floor = self.spawn_rng.choice(BALANCE['surfaces'])
+                x, y = self.spawn_rng.uniform(left+25, right-25), floor+22
             if math.hypot(x-self.cat.x, y-self.cat.y-22) < 145:
                 continue
             if any(math.hypot(x-e.x, y-e.y) < 65 for e in living):
                 continue
-            grade = self.spec['grade']
-            self.enemies.append(Enemy(x, y, species=kind, grade=grade, max_grade=1 if grade == 0 else 2,
-                                      vx=self.wave_rng.choice((-1, 1))*70, origin_y=y,
-                                      behavior=self.wave_rng.randrange(3), speed_scale=1.1 if self.spec['stage'] >= 3 else 1.))
+            self.enemies.append(Enemy(x, y, species=kind, **monster_stats(kind,rules),
+                                      vx=self.spawn_rng.choice((-1, 1))*70, origin_y=y,
+                                      behavior=self.spawn_rng.randrange(3), speed_scale=1.1 if rules['grade']==2 else 1.))
             self.spawn_stats['success'] += 1
             return
         self.spawn_stats['skipped'] += 1
@@ -394,18 +398,14 @@ class World:
                 e.enter('DEAD')
             return
         e.spawn_grace = max(0., e.spawn_grace-dt)
-        e.evolution += dt
-        if e.grade < e.max_grade and e.evolution >= BALANCE['evolution_seconds']:
-            e.grade += 1
-            e.evolution = 0.
         g, c = e.grade, self.cat
-        warning = (.6, .45, .34)[g]
+        warning = e.warning_seconds
         if e.species == 'snake':
             if e.state in ('IDLE', 'BURROW_MOVE'):
                 e.y = BALANCE['ground']+22
                 dx = c.x-e.x
                 e.x += max(-1, min(1, dx))*(55, 62, 70)[g]*dt
-                if abs(dx) < 42 and e.clock > .8:
+                if abs(dx) < 42 and e.clock > e.attack_interval:
                     e.enter('CHARGE')
                 elif abs(dx) >= 42:
                     e.enter('BURROW_MOVE',reset_clock=False)
@@ -430,9 +430,9 @@ class World:
                     e.vx *= -1
                     e.x = max(surface[0]+25,min(surface[1]-25,e.x))
                 e.enter('PATROL',reset_clock=False)
-                if e.clock > 1.7:
+                if e.clock > e.attack_interval:
                     e.enter('CROUCH_CHARGE')
-            elif e.state == 'CROUCH_CHARGE' and e.clock > (.8, .6, .48)[g]:
+            elif e.state == 'CROUCH_CHARGE' and e.clock > warning+.2:
                 e.vy = (520, 600, 660)[g]
                 e.vx = (1 if c.x > e.x else -1)*150
                 e.enter('JUMP')
@@ -454,8 +454,7 @@ class World:
             self.update_magpie(e,dt,warning)
         else:
             if e.state in ('IDLE', 'WAIT'):
-                wait = (1.9, 1.45, 1.05)[g]
-                if e.clock > wait:
+                if e.clock > e.attack_interval:
                     dx,dy = c.x-e.x,c.y+24-e.y
                     length = max(1,math.hypot(dx,dy))
                     e.attack_dx, e.attack_dy = dx/length, dy/length
@@ -488,7 +487,7 @@ class World:
                 e.x = max(30,min(930,e.x))
                 e.vx *= -1
             e.enter('FLY',reset_clock=False)
-            if e.clock > 1.8:
+            if e.clock > e.attack_interval:
                 dx,dy = self.cat.x-e.x,self.cat.y+24-e.y
                 length = max(1.,math.hypot(dx,dy))
                 e.attack_dx,e.attack_dy = dx/length,dy/length
@@ -544,23 +543,32 @@ class World:
 
     def tick(self, dt, keys):
         self.time += dt
-        self.wave_time += dt
-        while self.siren_due and self.siren_due[0] <= self.wave_time:
-            self.siren_due.pop(0)
+        rules = self.rules
+        boundary = rules['next_change']
+        if self.warning_message and self.last_warning_boundary != boundary:
+            self.last_warning_boundary = boundary
             self.events.append('siren')
         self.food_time += dt
         self.update_cat(dt,keys)
         if 'shoot' in keys:
             self.shoot()
-        while self.spawn_queue and self.spawn_queue[0][0] <= self.wave_time:
-            _, kind = self.spawn_queue.pop(0)
-            self.spawn_enemy(kind)
-        if self.food_time >= self.spec['duration']/2:
-            self.food_time -= self.spec['duration']/2
+        if self.time+1e-8 >= self.next_spawn_at:
+            weights = rules['weights']
+            self.spawn_enemy(self.spawn_rng.choices(list(weights),weights=list(weights.values()))[0])
+            self.next_spawn_at = self.time+rules['spawn_interval']
+        if self.food_time >= SETTINGS['food_interval']:
+            self.food_time -= SETTINGS['food_interval']
             self.spawn_food(4)
-        if self.bandage_due is not None and self.time >= self.bandage_due:
-            self.items.append(Item(480,BALANCE['ground']+18,kind='bandage',state='SPAWN'))
+        if self.time >= self.next_bandage_at-SETTINGS['bandage_warning_seconds'] and self.bandage_due is None:
+            if not any(i.kind=='bandage' for i in self.items):
+                self.items.append(Item(480,BALANCE['ground']+18,kind='bandage',state='PRE_SPAWN_WARNING'))
+                self.bandage_due = self.next_bandage_at
+        if self.time+1e-8 >= self.next_bandage_at:
+            for item in self.items:
+                if item.kind=='bandage' and item.state=='PRE_SPAWN_WARNING':
+                    item.enter('SPAWN')
             self.bandage_due = None
+            self.next_bandage_at += SETTINGS['bandage_interval']
         for e in self.enemies:
             self.update_enemy(e,dt)
         for p in self.projectiles:
@@ -589,7 +597,7 @@ class World:
             i.clock += dt
             if i.state == 'SPAWN' and i.clock > .15:
                 i.enter('IDLE')
-            if math.hypot(i.x-c.x,i.y-c.y-18) < 35:
+            if i.state != 'PRE_SPAWN_WARNING' and math.hypot(i.x-c.x,i.y-c.y-18) < 35:
                 if i.kind == 'churu':
                     c.ammo = min(BALANCE['ammo_max'],c.ammo+1)
                     c.churu_collected += 1
@@ -607,7 +615,7 @@ class World:
         self.items = [i for i in self.items if i.state not in ('COLLECTED','DESPAWN')]
         if not c.invincible and c.dash_left <= 0:
             for e in self.enemies:
-                if e.exposed and not e.spawn_grace and segment_hit(c.x,c.y+24,c.x,c.y+24,e.box(13)) is not None:
+                if e.exposed and not e.spawn_grace and segment_hit(c.x,c.y+24,c.x,c.y+24,e.box(13*BALANCE['player_hitbox_scale'])) is not None:
                     c.hp -= 1
                     c.invincible = BALANCE['invincible_seconds']
                     self.events.append('hurt')
@@ -623,13 +631,3 @@ class World:
                 self.unlocked.add(skin)
                 self.notices.append((skin,self.time))
                 self.events.append('unlock')
-        cleared_early = not self.spawn_queue and not any(e.alive for e in self.enemies)
-        if self.mode == 'PLAYING' and (cleared_early or self.wave_time+1e-8 >= self.spec['duration']):
-            self.completed += 1
-            if self.wave == len(WAVES):
-                self.clear_run()
-                self.unlocked.add('rainbow_clear')
-                self.events.append('clear')
-            else:
-                self.wave += 1
-                self.start_wave()
