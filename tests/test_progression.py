@@ -69,3 +69,34 @@ class ProgressionTest(unittest.TestCase):
         reward=world.run_exp
         world.shoot(True)
         self.assertEqual(world.run_exp,reward)
+
+    def test_achievements_use_settled_kills_and_claim_once(self):
+        from test_rewards import dead_world
+        world=dead_world()
+        world.run_kills['bee']=3
+        self.store.settle(world)
+        self.store.settle(world)
+        self.assertEqual(self.store.profile['stats']['kills'],3)
+        before=self.store.profile['gold']
+        args={'achievement_id':'first_hunt','character_id':'nabi'}
+        self.store.transact('claim_achievement',args,'claim-1')
+        self.store.transact('claim_achievement',args,'claim-1')
+        self.assertEqual(self.store.profile['gold'],before+30)
+        with self.assertRaises(ValueError):self.store.transact('claim_achievement',args,'claim-2')
+        with self.assertRaises(ValueError):self.store.transact('claim_achievement',{'achievement_id':'hunter','character_id':'nabi'},'claim-3')
+
+    def test_max_level_achievement_converts_exp_separately_from_results(self):
+        self.store.profile['stats']['best_time']=180
+        self.store.profile['characters']['nabi'].update(level=50,exp=0,skill_points=50)
+        before=self.store.profile['gold']
+        result=self.store.transact('claim_achievement',{'achievement_id':'survivor','character_id':'nabi'},'achievement-max')
+        self.assertEqual((result['exp'],result['gold']),(0,75))
+        self.assertEqual(self.store.profile['gold'],before+75)
+        self.assertFalse(self.store.profile['settled_runs'])
+
+    def test_abandoned_run_does_not_advance_achievements(self):
+        world=World();world.run_kills['bee']=5;world.time=500
+        world.finish_run()
+        self.assertEqual(sum(world.run_kills.values()),0)
+        with self.assertRaises(ValueError):self.store.settle(world)
+        self.assertEqual(self.store.profile['stats']['kills'],0)

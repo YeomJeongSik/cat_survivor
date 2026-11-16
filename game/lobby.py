@@ -2,6 +2,7 @@
 from uuid import uuid4
 import pico2d as p
 from .characters import CHARACTERS
+from .achievements import ACHIEVEMENTS, progress
 from .rewards import level_cost
 
 INK=(48,45,52)
@@ -39,6 +40,7 @@ class Lobby:
         self.message=''
         self.confirm=None
         self.request_id=None
+        self.page=0
 
     @property
     def bounds(self):
@@ -51,6 +53,7 @@ class Lobby:
             return
         self.close(app)
         self.panel=name
+        self.page=0
         app.buttons=[]
         self.preview=app.store.profile['selected_character_id']
 
@@ -92,7 +95,14 @@ class Lobby:
         app.buttons=[]
 
     def action(self,app,args):
-        if args[0]=='confirm':
+        if args[0]=='page':
+            self.page=max(0,self.page+args[1])
+            app.buttons=[]
+        elif args[0]=='claim':
+            achievement=next(a for a in ACHIEVEMENTS if a['id']==args[1])
+            self.ask(app,'claim_achievement',{'achievement_id':args[1],'character_id':app.store.profile['selected_character_id']},
+                     [achievement['name'],f'EXP +{achievement["exp"]} / GOLD +{achievement["gold"]}','EXP는 현재 선택한 캐릭터에게 지급됩니다.'])
+        elif args[0]=='confirm':
             self.operate(app)
         elif args[0]=='cancel':
             if not app.store.pending:
@@ -235,9 +245,18 @@ class Lobby:
             art.text('150 GOLD',650,296,21,INK,True)
             app.button('뽑기 준비 중',(508,193,793,235),None,False)
         elif self.panel=='achievements':
-            art.text('업적 목록 준비 중',480,355,24,INK,True)
-            art.text('업적의 진행 상태와 보상은 이곳에서 확인합니다.',480,302,18,INK,True)
-            art.text('업적 EXP·GOLD는 판 정산과 별도로 관리합니다.',480,182,16,INK,True)
+            self.page=min(self.page,(len(ACHIEVEMENTS)-1)//5)
+            for i,achievement in enumerate(ACHIEVEMENTS[self.page*5:self.page*5+5]):
+                y=442-i*55
+                claimed=achievement['id'] in profile['claimed_achievements']
+                current=progress(profile,achievement)
+                art.text(achievement['name'],132,y,18,INK)
+                art.text(f'{achievement["description"]}  {current:g}/{achievement["target"]}',132,y-23,14,INK)
+                reward=f'EXP +{achievement["exp"]}' if achievement['exp'] else f'GOLD +{achievement["gold"]}'
+                art.text(reward,540,y-8,15,INK)
+                app.button('수령 완료' if claimed else '수령',(690,y-25,825,y+17),('lobby','claim',achievement['id']),not claimed and current>=achievement['target'])
+            app.button('이전',(170,140,305,182),('lobby','page',-1),self.page>0)
+            app.button('다음',(655,140,790,182),('lobby','page',1),(self.page+1)*5<len(ACHIEVEMENTS))
         elif self.panel=='settings':
             app.volume('bgm_volume',352,365)
             app.volume('sfx_volume',352,260)

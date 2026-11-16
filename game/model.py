@@ -191,6 +191,7 @@ class World:
         self.run_id = str(uuid4())
         self.character_id = character_id
         self.run_exp = self.run_gold = 0
+        self.run_kills = dict.fromkeys(SPECIES,0)
         self.end_reason = None
         self.seed = seed
         self.rng = random.Random(seed)
@@ -244,6 +245,7 @@ class World:
     def _abandon(self):
         self.end_reason = "abandoned"
         self.run_exp = self.run_gold = 0
+        self.run_kills = dict.fromkeys(SPECIES,0)
 
     def _start_death(self):
         self.end_reason = "death"
@@ -310,6 +312,7 @@ class World:
         killed=enemy.damage(damage)
         self.events.append('enemy_hit')
         if killed:
+            self.run_kills[enemy.species]+=1
             self.run_exp+=enemy.exp_reward
             self.run_gold+=enemy.gold_reward
             self.events.append('enemy_death')

@@ -25,6 +25,10 @@ class Store:
         if version==1:
             self.profile.update(version=2,gold=0,characters={'nabi':initial_character()},settled_runs={})
         self.profile.setdefault('transactions',{})
+        self.profile.setdefault('claimed_achievements',{})
+        self.profile.setdefault('stats',dict(kills=0,magpie=0,squirrel=0,bee=0,snake=0,
+            runs=len(self.profile.get('settled_runs',{})),best_time=max((r['survival_time'] for r in self.profile.get('settled_runs',{}).values()),default=0)))
+
         self.pending=self.read('pending_transaction.json',{})
         if self.pending and not all(key in self.pending for key in ('id','operation','args','seed','base')):
             raise ValueError('Invalid pending transaction; original file preserved')
@@ -106,6 +110,12 @@ class Store:
         candidate['gold']+=result['gold_gained']
         candidate['characters'][world.character_id]=copy.deepcopy(result['character_after'])
         candidate['settled_runs'][world.run_id]=copy.deepcopy(result)
+        candidate['stats']['runs']+=1
+        candidate['stats']['best_time']=max(candidate['stats']['best_time'],world.time)
+        for species,count in world.run_kills.items():
+            candidate['stats'][species]+=count
+            candidate['stats']['kills']+=count
+
         self._write_profile(candidate)
         self.profile=candidate
         return result

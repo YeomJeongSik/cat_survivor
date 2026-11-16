@@ -51,12 +51,26 @@ def settle_run(profile,world):
     if not math.isfinite(world.time) or world.time<0:
         raise ValueError('Invalid survival time')
     character=profile['characters'][world.character_id]
-    level=before_level=character['level']
-    exp=Decimal(str(character['exp']))
     exp_percent=bonus_percent(world.time,'exp')
     gold_percent=bonus_percent(world.time,'gold')
-    boosted=Decimal(world.run_exp)*exp_percent/100
-    remaining=boosted
+    growth=grow_character(character,Decimal(world.run_exp)*exp_percent/100)
+    combat_gold=int((Decimal(world.run_gold)*gold_percent/100).to_integral_value(rounding=ROUND_FLOOR))
+    result=dict(run_id=world.run_id,character_id=world.character_id,survival_time=world.time,
+                raw_exp=world.run_exp,raw_gold=world.run_gold,exp_percent=exp_percent,gold_percent=gold_percent,
+                applied_exp=growth['applied_exp'],overflow_exp=growth['overflow_exp'],converted_gold=growth['converted_gold'],
+                combat_gold=combat_gold,gold_gained=combat_gold+growth['converted_gold'],level_before=character['level'],
+                level_after=growth['character']['level'],exp_after=growth['character']['exp'],skill_points_gained=growth['points'])
+    result['character_after']=growth['character']
+    return result
+
+
+def grow_character(character, amount):
+    amount=Decimal(str(amount))
+    if not amount.is_finite() or amount<0:
+        raise ValueError('Invalid EXP reward')
+    level=character['level']
+    exp=Decimal(str(character['exp']))
+    remaining=amount
     points=0
     while level<RULES['max_level']:
         used=min(remaining,Decimal(level_cost(level))-exp)
@@ -68,14 +82,8 @@ def settle_run(profile,world):
         exp=Decimal(0)
         points+=1+(level==RULES['max_level'])
     converted=int((remaining*Decimal(RULES['exp_to_gold'])).quantize(Decimal(1),rounding=ROUND_HALF_UP))
-    combat_gold=int((Decimal(world.run_gold)*gold_percent/100).to_integral_value(rounding=ROUND_FLOOR))
-    result=dict(run_id=world.run_id,character_id=world.character_id,survival_time=world.time,
-                raw_exp=world.run_exp,raw_gold=world.run_gold,exp_percent=exp_percent,gold_percent=gold_percent,
-                applied_exp=float(boosted-remaining),overflow_exp=float(remaining),converted_gold=converted,
-                combat_gold=combat_gold,gold_gained=combat_gold+converted,level_before=before_level,
-                level_after=level,exp_after=float(exp),skill_points_gained=points)
-    result['character_after']=dict(level=level,exp=float(exp),skill_points=character['skill_points']+points)
-    return result
+    return dict(character=dict(level=level,exp=float(exp),skill_points=character['skill_points']+points),
+                applied_exp=float(amount-remaining),overflow_exp=float(remaining),converted_gold=converted,points=points)
 
 
 assert RULES['max_level']==50 and RULES['level_exp_base']>0 and RULES['level_exp_growth']>=0
