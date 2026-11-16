@@ -1,0 +1,250 @@
+{
+  "version": 4,
+  "generator": "Built-in ImageGen, local Pillow grid/alpha/palette normalization; no direct paid API, no Comfy Cloud",
+  "character": "black",
+  "sprite_grid": [
+    64,
+    64
+  ],
+  "pivot": [
+    32,
+    58
+  ],
+  "source_policy": "Original v1-v3 assets preserved; black character gets its own sheets.",
+  "sources": [
+    {
+      "file": "exec-d79e03db-9648-424c-8fb7-f67dd6058287.png",
+      "sha256": "3e250299f4fd8a5fb4399a7e971f032e16801fdee82beb76d0a743886b0ef7bd"
+    },
+    {
+      "file": "exec-30faab5c-0174-45f8-9dbd-b3d8cbdd2caf.png",
+      "sha256": "fe591753b71162832338c017451086155555c5d7a736625e5ce3a0793887e4a8"
+    },
+    {
+      "file": "exec-b8764d9f-5665-4808-a39b-018138608d31.png",
+      "sha256": "e333e1f31ed55313e3bbe04780fe284a5f418ac811c4eec3269434a5b7de2f4c"
+    }
+  ],
+  "entries": [
+    {
+      "file": "sprites/cat/black/idle.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "55f5f0a4763e7d0d298f124efa0818322961f8855daa4d6dfdc2739ae31fc38a"
+    },
+    {
+      "file": "sprites/cat/black/walk.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "5b89d8a883c7d44113f0ba1a7cec8d2ab017a5cd947edf11cb7fe68c000c764c"
+    },
+    {
+      "file": "sprites/cat/black/jump.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "cce4819cdaa32e2bae11ee8ca21d9aa9f155612dc16c06a785c74c8627070c65"
+    },
+    {
+      "file": "sprites/cat/black/fall.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "0b803d4763d7ecf1630f725e567f7eae75601b88e7815676fa155e82aaa49073"
+    },
+    {
+      "file": "sprites/cat/black/dash.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "d2b2b7738e3843ff5c169b5f7a50d2584ffe374bdc8780d429781c4f28608cfb"
+    },
+    {
+      "file": "sprites/cat/black/attack.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "110477f41fb0e28fff9270946472e54af9e172b4ebbc0ce5d8d3c69863f7e994"
+    },
+    {
+      "file": "sprites/cat/black/hit.png",
+      "width": 256,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 4,
+      "fps": 10,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 4,
+      "sha256": "11554f6b1b402563fe2a08c62d43d1e22b63b5e7c08be189a3490388959fac5b"
+    },
+    {
+      "file": "sprites/cat/black/dead.png",
+      "width": 448,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 7,
+      "fps": 8,
+      "loop": false,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 7,
+      "sha256": "eeefe229b6441df18a25e89223d6d4ca8522fbcfb39f00086830df25c4ba97bc"
+    },
+    {
+      "file": "sprites/cat/black/groom.png",
+      "width": 512,
+      "height": 64,
+      "frame_width": 64,
+      "frame_height": 64,
+      "frames": 8,
+      "fps": 6,
+      "loop": true,
+      "pivot": [
+        32,
+        58
+      ],
+      "unique_frames": 8,
+      "sha256": "69114618cb8136b67f312feeca6b6c5f504cee7e8f18a8c88e676bb79628a0c7"
+    },
+    {
+      "file": "ui/equipment_chest.png",
+      "width": 160,
+      "height": 144,
+      "transparent": true,
+      "sha256": "44b158f9689b1707fbfa9bff11e491b6c6b8698cb3b9d7f8b701c32cc43dc094"
+    },
+    {
+      "file": "backgrounds/campus_title_battle.png",
+      "width": 960,
+      "height": 640,
+      "transparent": false,
+      "sha256": "a62c516de7c0a226c126a98b8f1f06e64ad92c8f36425b0a458c4916d30f99a7"
+    }
+  ],
+  "palette": [
+    [
+      17,
+      19,
+      27
+    ],
+    [
+      27,
+      30,
+      40
+    ],
+    [
+      40,
+      44,
+      55
+    ],
+    [
+      57,
+      63,
+      76
+    ],
+    [
+      78,
+      86,
+      100
+    ],
+    [
+      108,
+      116,
+      127
+    ],
+    [
+      151,
+      157,
+      165
+    ],
+    [
+      210,
+      218,
+      96
+    ],
+    [
+      242,
+      234,
+      144
+    ],
+    [
+      200,
+      120,
+      142
+    ],
+    [
+      239,
+      165,
+      176
+    ],
+    [
+      76,
+      51,
+      67
+    ]
+  ]
+}

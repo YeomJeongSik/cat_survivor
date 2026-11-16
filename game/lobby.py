@@ -263,15 +263,16 @@ class Lobby:
         elif self.panel=='shop':
             art.text(f'보유 GOLD   {profile["gold"]:,}',132,454,18,INK)
             if 'black' not in profile['characters']:
-                art.text('흑냥이',310,374,24,INK,True)
-                art.text('근접 캐릭터',310,337,17,INK,True)
-                art.text('500 GOLD',310,296,21,INK,True)
+                art.text('흑냥이',310,423,24,INK,True)
+                art.text('근접 캐릭터',310,397,17,INK,True)
+                app.cat(310,284,'idle',app.ui_clock,skin=CHARACTERS['black']['skin'],scale=3.)
+                art.text('500 GOLD',310,257,21,INK,True)
                 app.button('구매하기',(168,193,453,235),('lobby','buy_black'),profile['gold']>=500)
             else:
                 art.text('모든 캐릭터 보유',310,355,21,INK,True)
-            art.text('장비 뽑기',650,374,24,INK,True)
-            art.text('1회 뽑기',650,337,17,INK,True)
-            art.text('150 GOLD',650,296,21,INK,True)
+            art.text('장비 뽑기',650,423,24,INK,True)
+            art.draw('ui/equipment_chest.png',650,340,160,144)
+            art.text('150 GOLD',650,257,21,INK,True)
             app.button('1회 뽑기',(508,193,793,235),('lobby','gacha'),profile['gold']>=150)
             art.text('Common 70% · Rare 23% · Unique 6% · Legendary 1%',480,154,15,INK,True)
         elif self.panel=='achievements':

@@ -7,7 +7,7 @@ CHARACTERS = {
         'features': '원거리 · 마우스 조준',
     },
     'black': {
-        'name':'흑냥이','skin':'magpie_tuxedo',
+        'name':'흑냥이','skin':'black',
         'story':('캠퍼스 골목을 지키는 근접 고양이.', '가까운 적을 발톱으로 한꺼번에 공격한다.'),
         'features':'근접 · 부채꼴 발톱',
     },

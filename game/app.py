@@ -19,6 +19,7 @@ from .audio import Audio
 ART = ROOT/'output/nyangi_art_v1'
 ART_V2 = ROOT/'output/nyangi_art_v2'
 ART_V3 = ROOT/'output/nyangi_art_v3'
+ART_V4 = ROOT/'output/nyangi_art_v4'
 INK = (48,45,52)
 CREAM = (255,247,224)
 KEY_BINDINGS = {p.SDLK_a:'left',p.SDLK_d:'right',p.SDLK_w:'up',p.SDLK_s:'down'}
@@ -67,6 +68,9 @@ class Art:
         self.v2_specs = {entry['file']:entry for entry in versioned['entries']}
         badge = json.loads((ART_V3/'assets_manifest.json').read_text(encoding='utf-8-sig'))
         self.v3_specs = {entry['file']:entry for entry in badge['entries']}
+        latest = json.loads((ART_V4/'assets_manifest.json').read_text(encoding='utf-8-sig'))
+        self.v4_specs = {entry['file']:entry for entry in latest['entries']}
+        self.specs.update(self.v4_specs)
         self.overrides = versioned['overrides']
         for original,replacement in self.overrides.items():
             self.specs[original] = {**self.v2_specs[replacement],'file':original}
@@ -74,7 +78,9 @@ class Art:
 
     def image(self, name):
         if name not in self.images:
-            if name.startswith('v3/'):
+            if name in self.v4_specs:
+                path = ART_V4/'png'/name
+            elif name.startswith('v3/'):
                 path = ART_V3/'png'/name[3:]
             elif name.startswith('v2/'):
                 path = ART_V2/'png'/name[3:]
@@ -260,7 +266,10 @@ class App:
         self.art.sprite(f'sprites/cat/{skin}/{state}.png',x,y,clock,flip,alpha,foot=True,scale=scale)
 
     def background(self,title=False):
-        self.art.draw('backgrounds/campus_title.png' if title else 'backgrounds/campus_gameplay.png',480,320,960,640)
+        name = 'backgrounds/campus_title.png' if title else 'backgrounds/campus_gameplay.png'
+        if title and self.scene=='TITLE':
+            name = 'backgrounds/campus_title_battle.png'
+        self.art.draw(name,480,320,960,640)
 
     def gameplay(self):
         w,c = self.world,self.world.cat
@@ -489,7 +498,6 @@ class App:
         else:
             self.background(True)
             self.art.draw('ui/title_logo.png',480,477,420,280)
-            self.cat(480,255,'groom' if self.ui_clock%8>4 else 'idle',self.ui_clock)
             self.button('시작하기',(335,182,625,230),'start')
             self.button('키 설명',CONTROLS_BUTTON,'controls')
             if self.controls_popup:
