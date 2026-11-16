@@ -5,6 +5,10 @@ import math
 import os
 import time
 import copy
+import hashlib
+import random
+from uuid import uuid4
+from .transactions import apply_operation
 from .characters import CHARACTERS
 from .rewards import initial_character, validate_progress, settle_run
 
@@ -20,6 +24,10 @@ class Store:
         self.original_version=version
         if version==1:
             self.profile.update(version=2,gold=0,characters={'nabi':initial_character()},settled_runs={})
+        self.profile.setdefault('transactions',{})
+        self.pending=self.read('pending_transaction.json',{})
+        if self.pending and not all(key in self.pending for key in ('id','operation','args','seed','base')):
+            raise ValueError('Invalid pending transaction; original file preserved')
         validate_progress(self.profile)
         selected=self.profile.get('selected_character_id','nabi')
         self.profile['selected_character_id']=selected if isinstance(selected,str) and selected in self.profile['characters'] and selected in CHARACTERS else 'nabi'
@@ -69,9 +77,11 @@ class Store:
         self.original_version=2
 
     def save_profile(self):
+        self._require_no_pending()
         self._write_profile(self.profile)
 
     def select_character(self, character_id):
+        self._require_no_pending()
         if not isinstance(character_id,str) or character_id not in self.profile['characters'] or character_id not in CHARACTERS:
             raise ValueError('Character is not owned or playable')
         if character_id==self.profile['selected_character_id']:
@@ -82,6 +92,7 @@ class Store:
         self.profile=candidate
 
     def settle(self, world):
+        self._require_no_pending()
         if world.mode!='GAME_OVER' or world.end_reason!='death':
             raise ValueError('Abandoned or unfinished runs cannot settle')
         existing=self.profile['settled_runs'].get(world.run_id)
@@ -97,4 +108,39 @@ class Store:
         candidate['settled_runs'][world.run_id]=copy.deepcopy(result)
         self._write_profile(candidate)
         self.profile=candidate
+        return result
+
+    def _require_no_pending(self):
+        if self.pending:
+            raise ValueError('미완료 거래를 먼저 재시도하세요.')
+
+    def transact(self, operation, args, request_id=None):
+        request_id=request_id or str(uuid4())
+        existing=self.profile['transactions'].get(request_id)
+        if existing:
+            if existing['operation']!=operation or existing['args']!=args:
+                raise ValueError('Transaction ID conflict')
+            if self.pending and self.pending['id']==request_id:
+                self.write('pending_transaction.json',{})
+                self.pending={}
+            return copy.deepcopy(existing['result'])
+        fingerprint=hashlib.sha256(json.dumps(self.profile,sort_keys=True,ensure_ascii=False).encode('utf-8')).hexdigest()
+        if self.pending:
+            if (self.pending['id'],self.pending['operation'],self.pending['args'])!=(request_id,operation,args):
+                raise ValueError('미완료 거래를 먼저 재시도하세요.')
+            if self.pending['base']!=fingerprint:
+                raise ValueError('저장 데이터가 변경되어 거래를 복구할 수 없습니다.')
+            journal=self.pending
+        else:
+            journal=dict(id=request_id,operation=operation,args=copy.deepcopy(args),
+                         seed=random.SystemRandom().getrandbits(64),base=fingerprint)
+        candidate=copy.deepcopy(self.profile)
+        result=apply_operation(candidate,operation,args,random.Random(journal['seed']),request_id)
+        candidate['transactions'][request_id]=dict(operation=operation,args=copy.deepcopy(args),result=copy.deepcopy(result))
+        self.pending=journal
+        self.write('pending_transaction.json',journal)
+        self._write_profile(candidate)
+        self.profile=candidate
+        self.write('pending_transaction.json',{})
+        self.pending={}
         return result

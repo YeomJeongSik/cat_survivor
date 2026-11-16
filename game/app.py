@@ -176,6 +176,9 @@ class App:
         self.audio.scene('LOBBY')
 
     def start(self):
+        if self.store.pending:
+            self.error='미완료 거래를 먼저 재시도하세요.'
+            return
         if self.scene=='LOBBY' and self.lobby.panel:
             return
         if self.scene=='RESULT':
@@ -209,7 +212,7 @@ class App:
         try:
             self.store.save_profile()
             self.error = ''
-        except OSError as exc:
+        except (OSError,ValueError) as exc:
             self.error = f'저장 실패: {exc}'
 
     def update(self,dt):
@@ -267,6 +270,10 @@ class App:
                 image = self.art.image(f'v2/tiles/{kind}_{part}.png')
                 image.clip_draw(0,0,width,32,x+width/2,floor-16,width,32)
         self.aim_guide()
+        for x,y,angle,radius,born,special in w.swings:
+            points=[(x+math.cos(angle+a)*radius,y+math.sin(angle+a)*radius) for a in [math.radians(-80+160*i/24) for i in range(25)]]
+            for first,second in zip(points,points[1:]):
+                p.draw_line(*first,*second,255,226,69)
         for item in w.items:
             if item.state=='PRE_SPAWN_WARNING':
                 continue
@@ -313,8 +320,8 @@ class App:
         p.draw_rectangle(0,0,960,46,43,55,60,filled=True)
         for i in range(3):
             self.art.draw(f'ui/heart_{"full" if i<c.hp else "empty"}.png',28+i*34,24,28,28)
-        self.art.text('츄르',142,24,17,CREAM)
-        for i in range(BALANCE['ammo_max']):
+        self.art.text('근접' if w.character_id=='black' else '츄르',142,24,17,CREAM)
+        for i in range(0 if w.character_id=='black' else BALANCE['ammo_max']):
             self.art.draw(f'ui/ammo_{"full" if i<c.ammo else "empty"}.png',208+i*23,24,20,20)
         self.charge_hud()
         self.art.text('무한 생존',28,611,22,CREAM)

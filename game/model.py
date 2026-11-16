@@ -213,6 +213,7 @@ class World:
                                    ['finish_death','DYING','GAME_OVER'],
                                    dict(trigger='finish_run',source=['PLAYING','PAUSED','COUNTDOWN'],dest='GAME_OVER',before='_abandon')])
         self.events = []
+        self.swings = []
         self.spawn_stats = dict(attempted=0, success=0, skipped=0)
         self.bandage_due = None
         self.spawn_food(4)
@@ -290,6 +291,8 @@ class World:
         c = self.cat
         if self.mode != 'PLAYING' or (not piercing and c.shot_cd > 0):
             return
+        if self.character_id=='black':
+            return self.melee(piercing)
         if not (c.pierce_charges if piercing else c.ammo):
             self.events.append('empty')
             return
@@ -301,6 +304,36 @@ class World:
             c.ammo -= 1
             c.shot_cd = BALANCE['shot_cooldown']
         c.attack_left = .2
+        self.events.append('shot')
+
+    def hit_enemy(self, enemy, damage):
+        killed=enemy.damage(damage)
+        self.events.append('enemy_hit')
+        if killed:
+            self.run_exp+=enemy.exp_reward
+            self.run_gold+=enemy.gold_reward
+            self.events.append('enemy_death')
+
+    def melee(self, special=False):
+        c=self.cat
+        if special and not c.pierce_charges:
+            self.events.append('empty')
+            return
+        if special:
+            c.pierce_charges-=1
+        else:
+            c.shot_cd=.4
+        dx,dy=self.aim_direction()
+        radius=112.5 if special else 90.
+        damage=3. if special else 2.
+        c.facing=1 if dx>=0 else -1
+        c.attack_left=.22
+        self.swings.append((c.x,c.y+26,math.atan2(dy,dx),radius,self.time,special))
+        for enemy in self.enemies:
+            ex,ey=enemy.x-c.x,enemy.y-c.y-26
+            length=math.hypot(ex,ey)
+            if enemy.exposed and length<=radius+15 and (length<1e-9 or (ex*dx+ey*dy)/length>=math.cos(math.radians(80 if special else 55))):
+                self.hit_enemy(enemy,damage)
         self.events.append('shot')
 
     def spawn_food(self, count):
@@ -583,14 +616,9 @@ class World:
                            and (t:=segment_hit(old_x,old_y,p.x,p.y,e.box(5*p.scale))) is not None),key=lambda pair:pair[0])
             for _,e in hits if p.piercing else hits[:1]:
                 p.hit_enemies.append(e)
-                killed = e.damage()
+                self.hit_enemy(e,1.)
                 if not p.piercing:
                     p.enter('HIT')
-                self.events.append('enemy_hit')
-                if killed:
-                    self.run_exp += e.exp_reward
-                    self.run_gold += e.gold_reward
-                    self.events.append('enemy_death')
             if p.state != 'HIT' and (not 0 <= p.x <= 960 or not BALANCE['ground'] <= p.y <= 560):
                 p.enter('DESPAWN')
         self.projectiles = [p for p in self.projectiles if p.state not in ('HIT','DESPAWN')]
@@ -626,3 +654,4 @@ class World:
                         self.begin_death()
                     break
         self.trails = [t for t in self.trails if self.time-t[3] < .23]
+        self.swings = [s for s in self.swings if self.time-s[4]<.22]

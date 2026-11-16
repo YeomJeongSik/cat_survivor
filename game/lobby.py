@@ -1,4 +1,5 @@
 """Lobby layout and panel state; economic actions belong to later features."""
+from uuid import uuid4
 import pico2d as p
 from .characters import CHARACTERS
 from .rewards import level_cost
@@ -35,12 +36,17 @@ class Lobby:
         self.panel=None
         self.preview='nabi'
         self.error=''
+        self.message=''
+        self.confirm=None
+        self.request_id=None
 
     @property
     def bounds(self):
-        return CONTROLS if self.panel=='controls' else PANEL
+        return (210,170,750,470) if self.confirm else CONTROLS if self.panel=='controls' else PANEL
 
     def open(self,app,name):
+        if app.store.pending:
+            return
         if name not in (*MENU,'settings','controls'):
             return
         self.close(app)
@@ -49,6 +55,12 @@ class Lobby:
         self.preview=app.store.profile['selected_character_id']
 
     def close(self,app):
+        if app.store.pending:
+            return
+        if self.confirm:
+            self.confirm=None
+            app.buttons=[]
+            return
         if app.dragging:
             app.dragging=None
             app.save()
@@ -57,8 +69,38 @@ class Lobby:
         app.buttons=[]
         app.keys.clear()
 
+    def ask(self,app,operation,args,lines):
+        self.confirm=dict(operation=operation,args=args,lines=lines)
+        self.request_id=None
+        app.buttons=[]
+
+    def operate(self,app):
+        pending=app.store.pending
+        command=pending or self.confirm
+        if not command:
+            return
+        self.request_id=pending.get('id') if pending else self.request_id or str(uuid4())
+        try:
+            result=app.store.transact(command['operation'],command['args'],self.request_id)
+        except (OSError,ValueError) as exc:
+            self.error=str(exc)
+        else:
+            self.message=result['message']
+            self.error=''
+            self.confirm=None
+            self.request_id=None
+        app.buttons=[]
+
     def action(self,app,args):
-        if args[0]=='open':
+        if args[0]=='confirm':
+            self.operate(app)
+        elif args[0]=='cancel':
+            if not app.store.pending:
+                self.confirm=None
+                app.buttons=[]
+        elif args[0]=='buy_black':
+            self.ask(app,'buy_character',{'character_id':'black'},['흑냥이를 구매할까요?','비용: 500 GOLD','구매 후 캐릭터 창에서 선택할 수 있습니다.'])
+        elif args[0]=='open':
             self.open(app,args[1])
         elif args[0]=='close':
             self.close(app)
@@ -113,12 +155,25 @@ class Lobby:
         app.button('키 설명',(185,84,320,126),('lobby','open','controls'))
         app.button('타이틀',(30,28,165,70),'title')
         art.outlined_text('Enter  출전하기',775,51,14)
+        if app.store.pending:
+            self.panel=self.panel or 'shop'
+            self.confirm=dict(operation=app.store.pending['operation'],args=app.store.pending['args'],lines=['저장이 끝나지 않은 거래가 있습니다.','같은 결과로 저장을 재시도합니다.'])
         if self.panel:
             app.buttons=[]
             if self.panel=='controls':
                 app.controls_panel()
                 return
             self.draw_panel(app)
+            if self.message or self.error:
+                art.text(('저장 실패 · 확인 버튼으로 재시도' if app.store.pending else (self.error or self.message))[:38],480,115,14,INK,True)
+            if self.confirm:
+                app.panel(210,170,750,470)
+                app.buttons=[]
+                art.text('거래 확인',480,430,24,INK,True)
+                for i,line in enumerate(self.confirm['lines']):
+                    art.text(line,480,382-i*32,17,INK,True)
+                app.button('취소',(290,205,425,247),('lobby','cancel'),not bool(app.store.pending))
+                app.button('저장 재시도' if app.store.pending else '확인',(535,205,670,247),('lobby','confirm'))
 
     def draw_panel(self,app):
         art=app.art
@@ -168,13 +223,16 @@ class Lobby:
             art.text('장착·해금·강화 기능 준비 중',480,242,17,INK,True)
         elif self.panel=='shop':
             art.text(f'보유 GOLD   {profile["gold"]:,}',132,454,18,INK)
-            art.text('흑냥이',310,374,24,INK,True)
-            art.text('근접 캐릭터',310,337,17,INK,True)
-            art.text('500 GOLD',310,296,21,INK,True)
+            if 'black' not in profile['characters']:
+                art.text('흑냥이',310,374,24,INK,True)
+                art.text('근접 캐릭터',310,337,17,INK,True)
+                art.text('500 GOLD',310,296,21,INK,True)
+                app.button('구매하기',(168,193,453,235),('lobby','buy_black'),profile['gold']>=500)
+            else:
+                art.text('모든 캐릭터 보유',310,355,21,INK,True)
             art.text('장비 뽑기',650,374,24,INK,True)
             art.text('1회 뽑기',650,337,17,INK,True)
             art.text('150 GOLD',650,296,21,INK,True)
-            app.button('구매 준비 중',(168,193,453,235),None,False)
             app.button('뽑기 준비 중',(508,193,793,235),None,False)
         elif self.panel=='achievements':
             art.text('업적 목록 준비 중',480,355,24,INK,True)
