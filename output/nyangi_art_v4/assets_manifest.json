@@ -211,6 +211,20 @@
       "height": 88,
       "transparent": true,
       "sha256": "941fd3ac156231eb2493d325b4906a3e45da6b646132bf766d5e7280ae11b1f4"
+    },
+    {
+      "file": "backgrounds/campus_field_v2.png",
+      "width": 960,
+      "height": 640,
+      "transparent": false,
+      "sha256": "7f433cb31420a9e5546fe658f030ad9a3748edc47f8f7dba66e5a2c455bcad97"
+    },
+    {
+      "file": "backgrounds/campus_title_duel_v2.png",
+      "width": 960,
+      "height": 640,
+      "transparent": false,
+      "sha256": "000c3cf4bfb7fa57786d76322967a144ae4c6091bb33823ff6960f4aa204261b"
     }
   ],
   "palette": [

@@ -29,6 +29,7 @@ KEY_BINDINGS = {p.SDLK_a:'left',p.SDLK_d:'right',p.SDLK_w:'up',p.SDLK_s:'down'}
 CONTROLS_BUTTON = (335,132,625,178)
 CONTROLS_PANEL = (275,190,685,490)
 RESULT_SECONDS = 3.
+TEXT_RASTER_SCALE = 2
 
 
 def contains(rect,x,y):
@@ -135,15 +136,21 @@ class Art:
                 font = Path('C:/Windows/Fonts/malgunbd.ttf')
                 if not font.exists():
                     raise FileNotFoundError('Korean font is required: C:/Windows/Fonts/malgunbd.ttf')
-                self.fonts[size] = p.load_font(str(font),size)
+                self.fonts[size] = p.load_font(str(font),size*TEXT_RASTER_SCALE)
             surface = p.TTF_RenderUTF8_Blended(self.fonts[size].font,text.encode('utf-8'),p.SDL_Color(*color))
             if not surface:
                 raise RuntimeError('Could not render text')
             texture = p.SDL_CreateTextureFromSurface(native.renderer,surface)
             p.SDL_FreeSurface(surface)
+            if not texture:
+                raise RuntimeError('Could not create text texture')
+            p.SDL_SetTextureScaleMode(texture,p.SDL_ScaleModeLinear)
             if len(self.labels) >= 300:
                 self.labels.clear()
-            self.labels[key] = p.Image(texture)
+            label = p.Image(texture)
+            label.w = round(label.w/TEXT_RASTER_SCALE)
+            label.h = round(label.h/TEXT_RASTER_SCALE)
+            self.labels[key] = label
         label = self.labels[key]
         label.draw(x if center else x+label.w/2,y)
 
@@ -306,7 +313,7 @@ class App:
         CHARACTER_ART[character_id].draw(self.art,x,y,state,clock,skin=skin,flip=flip,alpha=alpha,scale=scale)
 
     def background(self):
-        name = 'backgrounds/campus_title_duel.png' if self.scene=='TITLE' else 'backgrounds/campus_field.png'
+        name = 'backgrounds/campus_title_duel_v2.png' if self.scene=='TITLE' else 'backgrounds/campus_field_v2.png'
         self.art.draw(name,480,320,960,640)
 
     def gameplay(self):

@@ -27,6 +27,15 @@ def main():
             assert not app.scene_machine.auto_transitions
             app.draw()
             capture(OUTPUT/'title_first_run.png')
+            text = next(iter(app.art.labels.values()))
+            background = app.art.image('backgrounds/campus_title_duel_v2.png')
+            mode,width = ctypes.c_int(),ctypes.c_int()
+            assert p.SDL_GetTextureScaleMode(background.texture,ctypes.byref(mode))==0
+            assert mode.value==p.SDL_ScaleModeNearest
+            assert p.SDL_GetTextureScaleMode(text.texture,ctypes.byref(mode))==0
+            assert mode.value==p.SDL_ScaleModeLinear
+            assert p.SDL_QueryTexture(text.texture,None,None,ctypes.byref(width),None)==0
+            assert abs(width.value-2*text.w)<=1
             assert [action for _,action,_ in app.buttons]==['start','controls']
             app.click(480,155)
             assert app.controls_popup

@@ -38,6 +38,7 @@ def capture(path):
 
 
 def run(create_app, title, *, smoke=0, screenshot=None):
+    p.SDL_SetHint(b'SDL_WINDOWS_DPI_SCALING',b'1')
     p.SDL_SetHint(p.SDL_HINT_RENDER_SCALE_QUALITY,b'0')
     p.open_canvas(960,640,sync=True)
     p.hide_lattice()
