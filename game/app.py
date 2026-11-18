@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 import pico2d as p
 import pico2d.pico2d as native
-from .model import ROOT, BALANCE, World
+from .model import ROOT, BALANCE, WORLD_WIDTH, World
 from .storage import Store
 from .lobby import Lobby, contains as lobby_contains
 from .characters import CHARACTERS
@@ -30,6 +30,7 @@ CONTROLS_BUTTON = (335,132,625,178)
 CONTROLS_PANEL = (275,190,685,490)
 RESULT_SECONDS = 3.
 TEXT_RASTER_SCALE = 2
+UI_WIDTH = 960
 
 
 def contains(rect,x,y):
@@ -169,6 +170,7 @@ class App:
         self.scene_machine = scene_machine(self)
         self.keys, self.buttons = set(), []
         self.mouse, self.dragging = (0,0), None
+        self.scene_viewport = None
         self.running, self.fullscreen = True, False
         self.ui_clock, self.last_mode = 0., None
         self.saved_result, self.error = False, ''
@@ -300,9 +302,15 @@ class App:
         p.draw_rectangle(left+6,top-5,right-6,top-3,*LINE,filled=True)
 
     def shade(self):
+        viewport = p.SDL_Rect()
+        p.SDL_RenderGetViewport(native.renderer,ctypes.byref(viewport))
+        if self.scene_viewport is not None:
+            p.SDL_RenderSetViewport(native.renderer,self.scene_viewport)
         p.SDL_SetRenderDrawBlendMode(native.renderer,p.SDL_BLENDMODE_BLEND)
-        p.draw_rectangle(0,0,959,639,*FRAME,102,filled=True)
+        p.SDL_SetRenderDrawColor(native.renderer,*FRAME,102)
+        p.SDL_RenderFillRect(native.renderer,None)
         p.SDL_SetRenderDrawBlendMode(native.renderer,p.SDL_BLENDMODE_NONE)
+        p.SDL_RenderSetViewport(native.renderer,viewport)
 
     def modal(self,left,bottom,right,top):
         self.shade()
@@ -313,12 +321,11 @@ class App:
         CHARACTER_ART[character_id].draw(self.art,x,y,state,clock,skin=skin,flip=flip,alpha=alpha,scale=scale)
 
     def background(self):
-        name = 'backgrounds/campus_title_duel_v2.png' if self.scene=='TITLE' else 'backgrounds/campus_field_v2.png'
-        self.art.draw(name,480,320,960,640)
+        name = 'backgrounds/campus_title_duel_wide.png' if self.scene=='TITLE' else 'backgrounds/campus_field_wide.png'
+        self.art.draw(name,p.get_canvas_width()/2,320)
 
     def gameplay(self):
         w,c = self.world,self.world.cat
-        self.background()
         for left,right,floor in BALANCE['surfaces']:
             kind = 'ground' if floor == BALANCE['ground'] else 'platform'
             for x,width,part in tile_segments(left,right):
@@ -333,10 +340,11 @@ class App:
                 continue
             self.art.sprite(f'sprites/items/{item.kind}.png',item.x,item.y+math.sin(item.clock*4)*3,item.clock)
         if w.bandage_due is not None:
-            p.draw_circle(480,BALANCE['ground']+8,24,78,173,118)
+            center = WORLD_WIDTH/2
+            p.draw_circle(center,BALANCE['ground']+8,24,78,173,118)
             for i in range(0,360,30):
                 a = math.radians(i)
-                p.draw_line(480+math.cos(a)*28,88+math.sin(a)*9,480+math.cos(a+.15)*28,88+math.sin(a+.15)*9,130,140,135)
+                p.draw_line(center+math.cos(a)*28,88+math.sin(a)*9,center+math.cos(a+.15)*28,88+math.sin(a+.15)*9,130,140,135)
         for e in w.enemies:
             state = enemy_frame_state(e)
             if e.species == 'snake' and state == 'return_underground':
@@ -370,6 +378,9 @@ class App:
         for projectile in w.projectiles:
             CHARACTER_ART[w.character_id].attack.draw(self.art,projectile.x,projectile.y,projectile.clock,
                             scale=projectile.scale,rotation=math.atan2(projectile.dy,projectile.dx))
+
+    def gameplay_ui(self):
+        w,c = self.world,self.world.cat
         for i in range(3):
             self.art.draw(f'ui/heart_{"full" if i<c.hp else "empty"}.png',28+i*34,24,28,28)
         self.art.outlined_text('근접' if w.character_id=='black' else '일반탄',128,24,16,center=False)
@@ -414,7 +425,6 @@ class App:
         self.button('로비로 나가기',(335,150,625,192),'exit_run')
 
     def result(self):
-        self.background()
         self.modal(125,45,835,600)
         self.art.text('이번 산책의 기록',166,555,28,INK)
         p.draw_line(166,526,794,526,*LINE)
@@ -468,7 +478,7 @@ class App:
         x,y=c.x,c.y+26
         dx,dy=w.aim_direction()
         distances=[(bound-origin)/direction for origin,direction,bounds in
-                   ((x,dx,(0,960)),(y,dy,(BALANCE['ground'],560))) if abs(direction)>1e-9
+                   ((x,dx,(0,WORLD_WIDTH)),(y,dy,(BALANCE['ground'],560))) if abs(direction)>1e-9
                    for bound in bounds if (bound-origin)/direction>=0]
         length=min(distances,default=0.)
 
@@ -493,7 +503,7 @@ class App:
             end=min(distance+15,length)
             stroke(x+dx*distance,y+dy*distance,x+dx*end,y+dy*end)
         mx,my=w.aim
-        if 0<=mx<=960 and BALANCE['ground']<=my<=560:
+        if 0<=mx<=WORLD_WIDTH and BALANCE['ground']<=my<=560:
             for radii,color in ((range(10,15),(26,35,43)),(range(11,14),(255,226,69))):
                 for radius in radii:
                     p.draw_circle(mx,my,radius,*color)
@@ -526,14 +536,28 @@ class App:
     def draw(self):
         p.clear_canvas()
         self.buttons = []
+        self.background()
         if self.scene == 'PLAY':
             self.gameplay()
+        viewport = p.SDL_Rect()
+        p.SDL_RenderGetViewport(native.renderer,ctypes.byref(viewport))
+        padding = (p.get_canvas_width()-UI_WIDTH)//2
+        self.scene_viewport = viewport
+        p.SDL_RenderSetViewport(native.renderer,p.SDL_Rect(viewport.x+padding,viewport.y,UI_WIDTH,viewport.h))
+        try:
+            self.draw_ui()
+        finally:
+            p.SDL_RenderSetViewport(native.renderer,viewport)
+            self.scene_viewport = None
+
+    def draw_ui(self):
+        if self.scene == 'PLAY':
+            self.gameplay_ui()
         elif self.scene == 'RESULT':
             self.result()
         elif self.scene == 'LOBBY':
             self.lobby.draw(self)
         else:
-            self.background()
             self.art.draw('ui/title_wordmark_trail.png',480,499)
             self.button('시작하기',(335,182,625,230),'start',primary=True)
             self.button('키 설명',CONTROLS_BUTTON,'controls')
@@ -672,9 +696,10 @@ class App:
                         self.world.dash(self.keys)
             elif event.type in (p.SDL_MOUSEMOTION,p.SDL_MOUSEBUTTONDOWN,p.SDL_MOUSEBUTTONUP):
                 data = event.motion if event.type == p.SDL_MOUSEMOTION else event.button
-                self.mouse = data.x,640-data.y
+                padding = (p.get_canvas_width()-UI_WIDTH)//2
+                self.mouse = data.x-padding,640-data.y
                 if self.scene=='PLAY' and self.world.mode=='PLAYING':
-                    self.world.aim=self.mouse
+                    self.world.aim=data.x,self.mouse[1]
                 if event.type == p.SDL_MOUSEMOTION:
                     self.change_volume(self.mouse[0])
                 elif event.type == p.SDL_MOUSEBUTTONDOWN:

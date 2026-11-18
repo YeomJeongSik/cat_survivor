@@ -238,7 +238,6 @@ class Lobby:
 
     def draw(self,app):
         art=app.art
-        app.background()
         if app.store.pending:
             self.panel=self.panel or 'shop'
             self.confirm=dict(operation=app.store.pending['operation'],args=app.store.pending['args'],lines=['저장이 끝나지 않은 거래가 있습니다.','같은 결과로 저장을 재시도합니다.'])

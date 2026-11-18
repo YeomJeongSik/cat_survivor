@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from transitions import Machine, MachineError
-from game.model import ROOT, Cat, World, Enemy, Projectile, Item, BALANCE, DEATH_SECONDS, segment_hit
+from game.model import ROOT, Cat, World, Enemy, Projectile, Item, BALANCE, DEATH_SECONDS, WORLD_WIDTH, segment_hit
 from game.difficulty import SETTINGS, difficulty_at, monster_stats, validate_settings
 from game.storage import Store
 from game.app import fit_size, tile_segments, enemy_frame_state, KEY_BINDINGS, p
@@ -125,7 +125,7 @@ class RulesTest(unittest.TestCase):
         w.next_spawn_at=math.inf
         w.shoot()
         self.assertEqual((w.cat.ammo,len(w.projectiles)),(3,1))
-        for x,y,dx,dy in ((959,300,1,0),(1,300,-1,0),(400,559,0,1),(400,81,0,-1)):
+        for x,y,dx,dy in ((WORLD_WIDTH-1,300,1,0),(1,300,-1,0),(400,559,0,1),(400,81,0,-1)):
             for piercing in (False,True):
                 w.projectiles=[Projectile(x,y,dx=dx,dy=dy,piercing=piercing)]
                 w.tick(.01,set())
@@ -261,7 +261,7 @@ class RulesTest(unittest.TestCase):
         w=World()
         w.next_spawn_at=math.inf
         c=w.cat
-        c.x,c.y=400,300
+        c.x,c.y=488,300
         w.events.clear()
         w.jump({'down'})
         self.assertEqual((c.state,c.grounded,c.jumps_used),('FALL',False,1))
@@ -282,7 +282,7 @@ class RulesTest(unittest.TestCase):
 
     def test_drop_keeps_one_air_jump_and_is_blocked_while_paused(self):
         w=World()
-        w.cat.x=200
+        w.cat.x=288
         w.cat.y=195
         w.pause()
         w.jump({'down'})
@@ -376,7 +376,7 @@ class RulesTest(unittest.TestCase):
         self.assertTrue(w.trails)
         w.cat.invincible=9999
         w.update(6,{'right'})
-        self.assertLessEqual(w.cat.x,934)
+        self.assertEqual(w.cat.x,WORLD_WIDTH-26)
         self.assertGreaterEqual(w.cat.y,BALANCE['ground'])
         self.assertEqual(w.cat.jumps_used,0)
         w.jump()

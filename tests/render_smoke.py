@@ -13,14 +13,14 @@ OUTPUT=ROOT/'output/preview2_step3/regression'
 OUTPUT.mkdir(parents=True,exist_ok=True)
 sys.path.insert(0,str(ROOT))
 from game.app import App, capture, p, native
-from game.model import Enemy, SKINS, DEATH_SECONDS
+from game.model import Enemy, SKINS, DEATH_SECONDS, WORLD_WIDTH
 from game.audio import COMBAT_SOUNDS, CHANNELS
 
 
 def main():
-    p.open_canvas(960,640,sync=False)
+    p.open_canvas(WORLD_WIDTH,640,sync=False)
     p.hide_lattice()
-    p.SDL_RenderSetLogicalSize(native.renderer,960,640)
+    p.SDL_RenderSetLogicalSize(native.renderer,p.get_canvas_width(),640)
     with tempfile.TemporaryDirectory(dir=ROOT/'tests') as folder:
         app=App(folder)
         try:
@@ -28,7 +28,7 @@ def main():
             app.draw()
             capture(OUTPUT/'title_first_run.png')
             text = next(iter(app.art.labels.values()))
-            background = app.art.image('backgrounds/campus_title_duel_v2.png')
+            background = app.art.image('backgrounds/campus_title_duel_wide.png')
             mode,width = ctypes.c_int(),ctypes.c_int()
             assert p.SDL_GetTextureScaleMode(background.texture,ctypes.byref(mode))==0
             assert mode.value==p.SDL_ScaleModeNearest
@@ -37,7 +37,12 @@ def main():
             assert p.SDL_QueryTexture(text.texture,None,None,ctypes.byref(width),None)==0
             assert abs(width.value-2*text.w)<=1
             assert [action for _,action,_ in app.buttons]==['start','controls']
-            app.click(480,155)
+            event=p.SDL_Event()
+            event.type=p.SDL_MOUSEBUTTONDOWN
+            event.button.button=p.SDL_BUTTON_LEFT
+            event.button.x,event.button.y=WORLD_WIDTH//2+135,640-155
+            p.SDL_PushEvent(ctypes.byref(event))
+            app.events()
             assert app.controls_popup
             app.draw()
             capture(OUTPUT/'title_controls.png')
@@ -50,7 +55,7 @@ def main():
             assert not app.controls_popup and app.scene=='TITLE'
             app.show_title()  # Repeated menu clicks must remain harmless.
             app.start()
-            app.world.cat.x,app.world.cat.y=200,195
+            app.world.cat.x,app.world.cat.y=288,195
             for event_type,key in ((p.SDL_KEYDOWN,p.SDLK_s),(p.SDL_KEYDOWN,p.SDLK_SPACE)):
                 event=p.SDL_Event()
                 event.type=event_type
@@ -283,7 +288,7 @@ def main():
             assert app.world.run_exp==app.world.run_gold==0
             app.start()
             app.world.pause()
-            for width,height in ((720,480),(1280,720)):
+            for width,height in ((852,480),(1280,720)):
                 p.SDL_SetWindowSize(native.window,width,height)
                 for _ in range(5):
                     p.SDL_PumpEvents()
@@ -291,11 +296,11 @@ def main():
                     p.update_canvas()
                 x,y=ctypes.c_float(),ctypes.c_float()
                 p.SDL_RenderWindowToLogical(native.renderer,width//2,height//2,ctypes.byref(x),ctypes.byref(y))
-                assert abs(x.value-480)<1 and abs(y.value-320)<1,(x.value,y.value)
+                assert abs(x.value-p.get_canvas_width()/2)<1 and abs(y.value-320)<1,(x.value,y.value)
                 app.draw()
                 capture(OUTPUT/f'pause_{width}x{height}.png')
             print(f'RENDER PASS: {len(app.art.specs)} manifest assets; title/play/pause/result; 6 skins; all enemy states/grades; volume endpoints')
-            print('VIEWPORT PASS: 720x480 and 1280x720 logical center/mouse transform')
+            print('VIEWPORT PASS: 852x480 and 1280x720 logical center/mouse transform')
         finally:
             app.audio.close()
             app.art.labels.clear()

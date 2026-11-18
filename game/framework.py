@@ -7,6 +7,7 @@ import pico2d as p
 import pico2d.pico2d as native
 
 from .states import Machine
+from .model import WORLD_WIDTH
 
 
 def scene_machine(app):
@@ -40,12 +41,12 @@ def capture(path):
 def run(create_app, title, *, smoke=0, screenshot=None):
     p.SDL_SetHint(b'SDL_WINDOWS_DPI_SCALING',b'1')
     p.SDL_SetHint(p.SDL_HINT_RENDER_SCALE_QUALITY,b'0')
-    p.open_canvas(960,640,sync=True)
+    p.open_canvas(WORLD_WIDTH,640,sync=True)
     p.hide_lattice()
     p.SDL_SetWindowTitle(native.window,title.encode('utf-8'))
     p.SDL_SetWindowResizable(native.window,p.SDL_TRUE)
-    p.SDL_SetWindowMinimumSize(native.window,720,480)
-    p.SDL_RenderSetLogicalSize(native.renderer,960,640)
+    p.SDL_SetWindowMinimumSize(native.window,852,480)
+    p.SDL_RenderSetLogicalSize(native.renderer,WORLD_WIDTH,640)
     app = None
     try:
         app = create_app()

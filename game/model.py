@@ -12,6 +12,7 @@ from .states import CAT_ACTIVE, ENEMY_GRAPHS, Machine, actor_machine
 
 ROOT = Path(__file__).resolve().parents[1]
 BALANCE = json.loads((ROOT / 'config/balance.json').read_text(encoding='utf-8'))
+WORLD_WIDTH = BALANCE['surfaces'][0][1]
 _ART = json.loads((ROOT/'output/nyangi_art_v1/assets_manifest.json').read_text(encoding='utf-8-sig'))
 _DEATH = next(e for e in _ART['entries'] if e['file']=='sprites/cat/tobi_default/dead.png')
 DEATH_SECONDS = _DEATH['frames']/_DEATH['fps']
@@ -148,7 +149,7 @@ class Enemy(Actor):
 
     @property
     def targetable(self):
-        return self.exposed and 0 <= self.x <= 960 and BALANCE['ground'] <= self.y <= 560
+        return self.exposed and 0 <= self.x <= WORLD_WIDTH and BALANCE['ground'] <= self.y <= 560
 
     def box(self, padding=0):
         rx, ry = (13, 11) if self.species == 'bee' else (22, 23)
@@ -207,8 +208,8 @@ class World:
         self.end_reason = None
         self.seed = seed
         self.rng = random.Random(seed)
-        self.cat = Cat(480, BALANCE['ground'])
-        self.aim = (960.,BALANCE['ground']+26.)
+        self.cat = Cat(WORLD_WIDTH/2, BALANCE['ground'])
+        self.aim = (float(WORLD_WIDTH),BALANCE['ground']+26.)
         self.enemies, self.projectiles, self.items, self.trails = [], [], [], []
         self.time, self.food_time = 0., 0.
         self.spawn_rng = random.Random(seed ^ 2654435761)
@@ -362,7 +363,7 @@ class World:
                 else:
                     left, right, floor = self.rng.choice(BALANCE['surfaces'])
                     x, y = self.rng.uniform(left+22, right-22), floor+18
-                if not 35 < x < 925 or abs(x-self.cat.x) < 35:
+                if not 35 < x < WORLD_WIDTH-35 or abs(x-self.cat.x) < 35:
                     continue
                 if any(math.hypot(x-i.x, y-i.y) < 55 for i in self.items):
                     continue
@@ -379,7 +380,7 @@ class World:
             self.spawn_stats['skipped'] += 1
             return
         for _ in range(24):
-            x = self.spawn_rng.uniform(45, 915)
+            x = self.spawn_rng.uniform(45, WORLD_WIDTH-45)
             y = self.spawn_rng.uniform(310, 480) if kind in ('magpie', 'bee') else BALANCE['ground']+22
             if kind == 'magpie':
                 y = BALANCE['magpie_y']
@@ -419,7 +420,7 @@ class World:
             if not self.trails or self.time-self.trails[-1][3] > .025:
                 self.trails.append((c.x, c.y, c.facing, self.time))
         previous = c.y
-        c.x = max(26, min(934, c.x+c.vx*dt))
+        c.x = max(26, min(WORLD_WIDTH-26, c.x+c.vx*dt))
         c.vy -= BALANCE['gravity'] * dt
         c.y += c.vy * dt
         c.grounded = False
@@ -493,8 +494,8 @@ class World:
                 e.vy -= BALANCE['gravity']*dt
                 e.x += e.vx*dt
                 e.y += e.vy*dt
-                if e.x < 25 or e.x > 935:
-                    e.x = max(25, min(935, e.x))
+                if e.x < 25 or e.x > WORLD_WIDTH-25:
+                    e.x = max(25, min(WORLD_WIDTH-25, e.x))
                     e.vx *= -1
                 for left, right, floor in sorted(BALANCE['surfaces'], key=lambda s: -s[2]):
                     if left <= e.x <= right and e.vy <= 0 and old_y-22 >= floor and e.y-22 <= floor:
@@ -519,7 +520,7 @@ class World:
                 e.x += e.attack_dx*speed*dt
                 e.y += e.attack_dy*speed*dt
                 e.distance += speed*dt
-                e.x, e.y = max(25,min(935,e.x)), max(BALANCE['ground']+20,min(510,e.y))
+                e.x, e.y = max(25,min(WORLD_WIDTH-25,e.x)), max(BALANCE['ground']+20,min(510,e.y))
                 if e.distance >= 140:
                     e.enter('WAIT')
 
@@ -534,8 +535,8 @@ class World:
             elif e.behavior == 0 and self.rng.random() < dt*.6:
                 e.vx *= -1
             e.x += e.vx*dt*e.speed_scale
-            if e.x < 30 or e.x > 930:
-                e.x = max(30,min(930,e.x))
+            if e.x < 30 or e.x > WORLD_WIDTH-30:
+                e.x = max(30,min(WORLD_WIDTH-30,e.x))
                 e.vx *= -1
             e.enter('FLY',reset_clock=False)
             if e.clock > e.attack_interval:
@@ -544,7 +545,7 @@ class World:
                 e.attack_dx,e.attack_dy = dx/length,dy/length
                 e.attack_length = min(700.,max(260.,length+40))
                 e.arc_start_x = e.x
-                e.arc_end_x = max(30,min(930,2*self.cat.x-e.x))
+                e.arc_end_x = max(30,min(WORLD_WIDTH-30,2*self.cat.x-e.x))
                 e.arc_depth = max(60,min(home-BALANCE['ground']-22,home-self.cat.y-24))
                 e.enter('WARNING')
         elif e.state == 'WARNING' and e.clock >= warning:
@@ -559,7 +560,7 @@ class World:
                 e.enter('IDLE')
         elif e.state == 'RUSH':
             speed = (360,400,450)[e.grade]
-            e.x = max(25,min(935,e.x+e.attack_dx*speed*dt))
+            e.x = max(25,min(WORLD_WIDTH-25,e.x+e.attack_dx*speed*dt))
             e.y = max(BALANCE['ground']+22,min(520,e.y+e.attack_dy*speed*dt))
             e.distance += speed*dt
             if e.distance >= e.attack_length:
@@ -612,7 +613,7 @@ class World:
             self.spawn_food(4)
         if self.time >= self.next_bandage_at-SETTINGS['bandage_warning_seconds'] and self.bandage_due is None:
             if not any(i.kind=='bandage' for i in self.items):
-                self.items.append(Item(480,BALANCE['ground']+18,kind='bandage',state='PRE_SPAWN_WARNING'))
+                self.items.append(Item(WORLD_WIDTH/2,BALANCE['ground']+18,kind='bandage',state='PRE_SPAWN_WARNING'))
                 self.bandage_due = self.next_bandage_at
         if self.time+1e-8 >= self.next_bandage_at:
             for item in self.items:
@@ -635,7 +636,7 @@ class World:
                 self.hit_enemy(e,self.attack_multiplier)
                 if not p.piercing:
                     p.enter('HIT')
-            if p.state != 'HIT' and (not 0 <= p.x <= 960 or not BALANCE['ground'] <= p.y <= 560):
+            if p.state != 'HIT' and (not 0 <= p.x <= WORLD_WIDTH or not BALANCE['ground'] <= p.y <= 560):
                 p.enter('DESPAWN')
         self.projectiles = [p for p in self.projectiles if p.state not in ('HIT','DESPAWN')]
         self.enemies = [e for e in self.enemies if not(e.state == 'DEAD' and e.clock > .45)]
