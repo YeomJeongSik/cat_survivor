@@ -94,6 +94,7 @@ def main():
             capture(OUTPUT/'lobby_settings.png')
             app.click(480,365)
             assert app.lobby.panel=='sound'
+            sound_bounds=app.lobby.bounds
             app.draw()
             capture(OUTPUT/'lobby_sound.png')
             app.click(360,365)
@@ -106,6 +107,7 @@ def main():
             app.draw()
             app.click(480,282)
             assert app.lobby.panel=='controls'
+            assert app.lobby.bounds==sound_bounds
             app.draw()
             capture(OUTPUT/'lobby_controls.png')
             # Outside click closes the panel without activating the launch behind it.

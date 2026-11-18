@@ -55,7 +55,7 @@ class Lobby:
             return (210,170,750,470)
         if self.panel=='shop':
             return SHOP
-        return CONTROLS if self.panel in ('settings','controls') else (40,70,920,552) if self.panel=='equipment' else PANEL
+        return CONTROLS if self.panel in ('settings',*SETTINGS_PAGES) else (40,70,920,552) if self.panel=='equipment' else PANEL
 
     def open(self,app,name):
         if app.store.pending:
@@ -342,8 +342,8 @@ class Lobby:
             return
         if self.panel=='sound':
             app.modal(*self.bounds)
-            art.text('사운드',124,520,24,ACCENT)
-            app.button('뒤로',CLOSE,('lobby','close'))
+            art.text('사운드',480,459,24,INK,True)
+            app.button('뒤로',SETTINGS_BACK,('lobby','close'))
             app.volume('bgm_volume',352,365)
             app.volume('sfx_volume',352,260)
             return
