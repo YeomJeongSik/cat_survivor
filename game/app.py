@@ -387,9 +387,7 @@ class App:
         for i in range(0 if w.character_id=='black' else BALANCE['ammo_max']):
             self.art.draw(f'ui/ammo_{"full" if i<c.ammo else "empty"}.png',208+i*23,24,20,20)
         self.charge_hud()
-        self.art.outlined_text('무한 생존',28,601,18,SECONDARY,center=False)
         self.art.outlined_text(f'{int(w.time)//60:02d}:{int(w.time)%60:02d}',480,605,30)
-        self.art.outlined_text('ESC  일시정지',808,601,15,SECONDARY,center=False)
         if w.warning_message:
             self.art.outlined_text(w.warning_message,480,578,15,ACCENT)
         if w.mode == 'PAUSED':
@@ -531,7 +529,6 @@ class App:
                 gold=int(195+24*math.sin(self.ui_clock*7+i))
                 p.draw_rectangle(x-10,8,x+10,12,*FRAME,filled=True)
                 p.draw_rectangle(x-8,9,x+8,11,237,gold,111,filled=True)
-        self.art.outlined_text(f'츄르 {c.churu_collected}/10',803,24,15,SECONDARY,center=False)
 
     def draw(self):
         p.clear_canvas()
