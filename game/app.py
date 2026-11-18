@@ -16,6 +16,7 @@ from .equipment import bonuses as equipment_bonuses
 from .rewards import settle_run
 from .framework import capture, run, scene_machine
 from .audio import Audio
+from .ui import ACCENT, ERROR, FRAME, HUD, INK, LINE, PRIMARY, ROW, SECONDARY, SELECTED, SURFACE
 
 ART = ROOT/'output/nyangi_art_v1'
 ART_V2 = ROOT/'output/nyangi_art_v2'
@@ -24,14 +25,10 @@ ART_V4 = ROOT/'output/nyangi_art_v4'
 ART_V5 = ROOT/'output/nyangi_art_v5'
 ART_V6 = ROOT/'output/nyangi_art_v6'
 ART_V7 = ROOT/'output/nyangi_art_v7'
-INK = (48,45,52)
-CREAM = (255,247,224)
 KEY_BINDINGS = {p.SDLK_a:'left',p.SDLK_d:'right',p.SDLK_w:'up',p.SDLK_s:'down'}
 CONTROLS_BUTTON = (335,132,625,178)
 CONTROLS_PANEL = (275,190,685,490)
 RESULT_SECONDS = 3.
-# Source rectangles remove transparent UI padding without changing the supplied PNGs.
-UI_REGIONS = {'wave_banner':(68,14,3,36)}
 
 
 def contains(rect,x,y):
@@ -114,13 +111,8 @@ class Art:
     def draw(self,name,x,y,w=None,h=None,alpha=1.):
         image = self.image(name)
         image.opacify(alpha)
-        region = UI_REGIONS.get(Path(name).stem) if name.startswith('ui/') else None
-        if region:
-            left,top,fw,fh = region
-            image.clip_draw(left,image.h-top-fh,fw,fh,x,y,w or fw,h or fh)
-        else:
-            width,height = fit_size(image.w,image.h,w,h)
-            image.draw(x,y,width,height)
+        width,height = fit_size(image.w,image.h,w,h)
+        image.draw(x,y,width,height)
         image.opacify(1.)
 
     def sprite(self,name,x,y,clock=0.,flip=False,alpha=1.,foot=False,scale=1.,rotation=0.):
@@ -155,10 +147,10 @@ class Art:
         label = self.labels[key]
         label.draw(x if center else x+label.w/2,y)
 
-    def outlined_text(self,text,x,y,size=64):
-        for dx,dy in ((-3,-3),(0,-3),(3,-3),(-3,0),(3,0),(-3,3),(0,3),(3,3)):
-            self.text(text,x+dx,y+dy,size,(255,255,255),True)
-        self.text(text,x,y,size,INK,True)
+    def outlined_text(self,text,x,y,size=64,color=INK,center=True):
+        for dx,dy in ((-2,-2),(0,-2),(2,-2),(-2,0),(2,0),(-2,2),(0,2),(2,2)):
+            self.text(text,x+dx,y+dy,size,FRAME,center)
+        self.text(text,x,y,size,color,center)
 
 
 class App:
@@ -269,26 +261,52 @@ class App:
             self.result_clock=min(RESULT_SECONDS,self.result_clock+dt)
         self.audio.scene(self.scene)
 
-    def button(self,label,rect,action,enabled=True):
+    def button(self,label,rect,action,enabled=True,*,primary=False,wayfinding=False):
         left,bottom,right,top = rect
         hover = contains(rect,*self.mouse)
-        state = 'disabled' if not enabled else 'hover' if hover else 'normal'
-        self.art.draw(f'v2/ui/buttons/{state}_{right-left}x{top-bottom}.png',(left+right)/2,(bottom+top)/2)
-        self.art.text(label,(left+right)/2,(bottom+top)/2,18,INK if enabled else (105,100,98),True)
+        fill,detail,ink = HUD,(65,91,79),(153,177,159)
+        if enabled:
+            if primary:
+                fill,detail,ink = ((204,229,175) if hover else PRIMARY),(128,166,112),FRAME
+            else:
+                fill,detail,ink = (SELECTED if hover else ROW),(ACCENT if hover else LINE),INK
+        p.draw_rectangle(left+3,bottom,right-3,top,*FRAME,filled=True)
+        p.draw_rectangle(left,bottom+3,right,top-3,*FRAME,filled=True)
+        p.draw_rectangle(left+3,bottom+4,right-3,top-3,*fill,filled=True)
+        p.draw_rectangle(left+6,top-4,right-6,top-3,*detail,filled=True)
+        y=(bottom+top)/2
+        if wayfinding:
+            self.art.text(label,left+24,y,18,ink)
+            marker=ink
+            p.draw_rectangle(right-25,y-5,right-23,y+5,*marker,filled=True)
+            p.draw_rectangle(right-22,y-3,right-20,y+3,*marker,filled=True)
+            p.draw_rectangle(right-19,y-1,right-17,y+1,*marker,filled=True)
+        else:
+            self.art.text(label,(left+right)/2,y,18,ink,True)
         self.buttons.append((rect,action,enabled))
 
     def panel(self,left,bottom,right,top):
-        p.draw_rectangle(left,bottom,right,top,*CREAM,filled=True)
-        p.draw_rectangle(left,bottom,right,top,99,79,68)
+        p.draw_rectangle(left+6,bottom,right-6,top,*FRAME,filled=True)
+        p.draw_rectangle(left,bottom+6,right,top-6,*FRAME,filled=True)
+        p.draw_rectangle(left+3,bottom+3,right-3,top-3,*ROW,filled=True)
+        p.draw_rectangle(left+6,bottom+6,right-6,top-6,*SURFACE,filled=True)
+        p.draw_rectangle(left+6,top-5,right-6,top-3,*LINE,filled=True)
+
+    def shade(self):
+        p.SDL_SetRenderDrawBlendMode(native.renderer,p.SDL_BLENDMODE_BLEND)
+        p.draw_rectangle(0,0,959,639,*FRAME,102,filled=True)
+        p.SDL_SetRenderDrawBlendMode(native.renderer,p.SDL_BLENDMODE_NONE)
+
+    def modal(self,left,bottom,right,top):
+        self.shade()
+        self.panel(left,bottom,right,top)
 
     def cat(self,x,y,state='idle',clock=0.,skin=None,flip=False,alpha=1.,scale=1.):
         character_id=self.world.character_id if self.scene in ('PLAY','RESULT') and self.world else self.store.profile['selected_character_id']
         CHARACTER_ART[character_id].draw(self.art,x,y,state,clock,skin=skin,flip=flip,alpha=alpha,scale=scale)
 
-    def background(self,title=False):
-        name = 'backgrounds/campus_title.png' if title else 'backgrounds/campus_gameplay.png'
-        if title and self.scene=='TITLE':
-            name = 'backgrounds/campus_title_duel.png'
+    def background(self):
+        name = 'backgrounds/campus_title_duel.png' if self.scene=='TITLE' else 'backgrounds/campus_field.png'
         self.art.draw(name,480,320,960,640)
 
     def gameplay(self):
@@ -345,26 +363,27 @@ class App:
         for projectile in w.projectiles:
             CHARACTER_ART[w.character_id].attack.draw(self.art,projectile.x,projectile.y,projectile.clock,
                             scale=projectile.scale,rotation=math.atan2(projectile.dy,projectile.dx))
-        p.draw_rectangle(0,562,960,640,43,55,60,filled=True)
-        p.draw_rectangle(0,0,960,46,43,55,60,filled=True)
+        p.draw_rectangle(0,562,959,639,*HUD,filled=True)
+        p.draw_rectangle(0,0,959,46,*HUD,filled=True)
+        p.draw_rectangle(0,562,959,564,*LINE,filled=True)
+        p.draw_rectangle(0,44,959,46,*LINE,filled=True)
         for i in range(3):
             self.art.draw(f'ui/heart_{"full" if i<c.hp else "empty"}.png',28+i*34,24,28,28)
-        self.art.text('근접' if w.character_id=='black' else '츄르',142,24,17,CREAM)
+        self.art.text('근접' if w.character_id=='black' else '일반탄',128,24,16,INK)
         for i in range(0 if w.character_id=='black' else BALANCE['ammo_max']):
             self.art.draw(f'ui/ammo_{"full" if i<c.ammo else "empty"}.png',208+i*23,24,20,20)
         self.charge_hud()
-        self.art.text('무한 생존',28,611,22,CREAM)
-        self.art.text(f'생존 시간  {int(w.time)//60:02d}:{int(w.time)%60:02d}',28,581,18,(186,214,210))
-        self.art.text('ESC  일시정지',780,580,14,(186,214,210))
+        self.art.text('무한 생존',28,601,18,SECONDARY)
+        self.art.text(f'{int(w.time)//60:02d}:{int(w.time)%60:02d}',480,605,30,INK,True)
+        self.art.text('ESC  일시정지',808,601,15,SECONDARY)
         if w.warning_message:
-            self.art.draw('ui/wave_banner.png',480,541,960,32)
-            self.art.text('WARNING  ·  '+w.warning_message,480,541,19,CREAM,True)
+            self.art.text(w.warning_message,480,580,15,ACCENT,True)
         if w.mode == 'PAUSED':
             self.pause_panel()
         elif w.mode == 'COUNTDOWN':
             self.art.outlined_text(str(max(1,math.ceil(w.countdown))),480,330)
         if self.exit_confirm:
-            self.panel(275,210,685,430)
+            self.modal(275,210,685,430)
             self.art.text('이번 판 보상을 포기할까요?',480,386,23,INK,True)
             self.art.text('획득한 EXP와 GOLD는 저장되지 않습니다.',480,346,16,INK,True)
             self.buttons=[]
@@ -376,38 +395,34 @@ class App:
         value = self.store.profile[key]
         label=('BGM' if key == 'bgm_volume' else 'SFX')+f'   {value}'
         self.art.text(label,x,y+28,17,INK)
-        self.art.draw('ui/volume/track_base.png',x+128,y,256,32)
-        fill = self.art.image('ui/volume/track_fill.png')
         end = 8+240*value/100
+        p.draw_rectangle(x+8,y-2,x+248,y+2,*LINE,filled=True)
         if value:
-            fill.clip_draw_to_origin(0,0,int(end),32,x,y-16,int(end),32)
-        # A one-pixel texture row can disappear at 0.75x; SDL lines keep the axis readable.
-        p.draw_line(x+8,y,x+248,y,135,137,137)
-        if value:
-            p.draw_line(x+8,y,x+end,y,224,145,53)
-        self.art.draw('ui/volume/ticks.png',x+128,y,256,32)
-        self.art.draw('ui/volume/knob.png',x+end,y,24,24)
+            p.draw_rectangle(x+8,y-2,x+end,y+2,*ACCENT,filled=True)
+        p.draw_rectangle(x+end-5,y-9,x+end+5,y+9,*INK,filled=True)
         self.buttons.append(((x,y-15,x+256,y+15),('volume',key,x),True))
 
     def pause_panel(self):
-        self.panel(285,120,675,495)
+        self.modal(285,120,675,495)
         self.art.text('잠깐 쉬어가기',480,455,28,INK,True)
         self.volume('bgm_volume',352,375)
         self.volume('sfx_volume',352,295)
-        self.button('계속하기',(335,210,625,252),'resume')
+        self.button('계속하기',(335,210,625,252),'resume',primary=True)
         self.button('로비로 나가기',(335,150,625,192),'exit_run')
 
     def result(self):
-        self.background(True)
-        self.panel(125,45,835,600)
-        self.art.text('이번 산책의 기록',480,554,30,INK,True)
+        self.background()
+        self.modal(125,45,835,600)
+        self.art.text('이번 산책의 기록',166,555,28,INK)
+        p.draw_line(166,526,794,526,*LINE)
         result=self.settlement
-        self.cat(270,420,'idle',self.ui_clock,scale=2.)
-        self.art.text(f'{CHARACTERS[result["character_id"]]["name"]}   Lv. {result["level_after"]}',350,470,24,INK)
+        self.cat(214,424,'idle',self.ui_clock,scale=2.)
+        self.art.text(f'{CHARACTERS[result["character_id"]]["name"]}   Lv. {result["level_after"]}',278,468,23,INK)
         seconds=int(result['survival_time'])
-        self.art.text(f'생존 시간   {seconds//60:02d}:{seconds%60:02d}',350,432,20,INK)
+        self.art.text('생존 시간',733,484,15,SECONDARY,True)
+        self.art.text(f'{seconds//60:02d}:{seconds%60:02d}',733,444,36,INK,True)
         if result['level_before']!=result['level_after']:
-            self.art.text(f'Lv. {result["level_before"]} → {result["level_after"]}   스킬 포인트 +{result["skill_points_gained"]}',350,398,16,INK)
+            self.art.text(f'Lv. {result["level_before"]} → {result["level_after"]}   스킬 포인트 +{result["skill_points_gained"]}',278,431,16,SECONDARY)
         def progress(start):
             t=max(0.,min(1.,(self.result_clock-start)/1.3))
             return 1-(1-t)**3
@@ -415,26 +430,25 @@ class App:
             return f'{value:,.2f}'.rstrip('0').rstrip('.')
         exp=result['applied_exp']*progress(0)
         gold=int(result['gold_gained']*progress(1.4))
-        REWARD_ART['exp'].draw(self.art,175,330,self.ui_clock,scale=1.4)
-        self.art.text('획득 EXP',205,330,21,INK)
-        self.art.text(number(exp),650,330,29,INK,True)
-        self.art.text(f'생존 배율 ×{result["exp_percent"]/100:.2f}',205,298,15,INK)
-        REWARD_ART['gold'].draw(self.art,175,245,self.ui_clock,scale=1.4)
-        self.art.text('획득 GOLD',205,245,21,INK)
-        self.art.text(f'{gold:,}',650,245,29,INK,True)
-        self.art.text(f'생존 배율 ×{result["gold_percent"]/100:.2f}',205,213,15,INK)
+        for y,kind,value,percent in ((354,'exp',number(exp),result['exp_percent']),
+                                    (273,'gold',f'{gold:,}',result['gold_percent'])):
+            p.draw_line(166,y+31,794,y+31,*LINE)
+            REWARD_ART[kind].draw(self.art,186,y,scale=1.4)
+            self.art.text(f'획득 {kind.upper()}',217,y+6,20,INK)
+            self.art.text(f'생존 배율 ×{percent/100:.2f}',217,y-20,15,SECONDARY)
+            self.art.text(value,695,y,28,INK,True)
         if result['overflow_exp']:
             self.art.text(f'만렙 초과 EXP {number(result["overflow_exp"])} → GOLD +{result["converted_gold"]}',480,175,16,INK,True)
         if self.saved_result:
             self.art.text('저장 완료' if self.result_clock>=RESULT_SECONDS else '클릭 또는 Enter로 합산 완료',480,145,14,INK,True)
-            self.button('다시 시작하기',(165,77,455,125),'start')
+            self.button('다시 시작하기',(165,77,455,125),'start',primary=True)
             self.button('로비로',(505,77,795,125),'lobby')
         else:
-            self.art.text('보상을 저장하지 못했습니다. 저장 후 이동할 수 있습니다.',480,155,16,(151,44,44),True)
-            self.button('저장 재시도',(335,77,625,125),'retry_save')
+            self.art.text('보상을 저장하지 못했습니다. 저장 후 이동할 수 있습니다.',480,155,16,ERROR,True)
+            self.button('저장 재시도',(335,77,625,125),'retry_save',primary=True)
 
     def controls_panel(self):
-        self.panel(*CONTROLS_PANEL)
+        self.modal(*CONTROLS_PANEL)
         self.art.text('조작 방법',480,459,24,INK,True)
         black=self.store.profile['selected_character_id']=='black'
         rows=(('A / D','좌우 이동'),('W / SPACE','더블 점프'),('S + SPACE','발판 아래로 내려가기'),
@@ -442,7 +456,8 @@ class App:
               ('ESC','일시정지 / 계속하기'),('F11','전체 화면'))
         for i,(key,description) in enumerate(rows):
             y=419-i*27
-            self.art.text(key,296,y,16)
+            p.draw_rectangle(294,y-10,406,y+10,*ROW,filled=True)
+            self.art.text(key,350,y,15,INK,True)
             self.art.text(description,420,y,16)
 
     def aim_guide(self):
@@ -485,27 +500,25 @@ class App:
 
     def charge_hud(self):
         c=self.world.cat
-        self.art.text(f'대시 {c.dash_charges}/2',315,24,15,CREAM)
+        p.draw_line(301,9,301,37,91,109,99)
+        p.draw_line(548,9,548,37,91,109,99)
+        self.art.text(f'대시 {c.dash_charges}/2',319,24,15,INK)
         progress=1-c.dash_cd/self.world.dash_cooldown
         for i in range(BALANCE['dash_max_charges']):
             left=405+i*54
-            p.draw_rectangle(left,16,left+49,31,91,109,112,filled=True)
+            p.draw_rectangle(left,20,left+45,27,91,109,99,filled=True)
             fill=1. if i<c.dash_charges else progress if i==c.dash_charges else 0.
             if fill>0:
-                p.draw_rectangle(left+1,17,left+1+47*fill,30,131,222,188,filled=True)
+                p.draw_rectangle(left,20,left+45*fill,27,167,210,163,filled=True)
+        self.art.text('광역' if self.world.character_id=='black' else '관통',566,24,15,INK)
         for i in range(BALANCE['pierce_max_charges']):
-            x=662+i*56
+            x=644+i*44
             ready=i<c.pierce_charges
-            self.art.sprite('sprites/projectiles/paw_000.png',x,24,self.ui_clock,scale=.84,alpha=1. if ready else .22)
+            self.art.sprite('sprites/projectiles/paw_000.png',x,25,scale=.65,alpha=1. if ready else .35)
             if ready:
-                points=[]
-                for j in range(40):
-                    angle=j*math.tau/40
-                    radius=19+2*math.sin(angle*5+self.ui_clock*7+i)
-                    points.append((x+math.cos(angle)*radius,24+math.sin(angle)*radius))
-                for a,b in zip(points,points[1:]+points[:1]):
-                    p.draw_line(*a,*b,255,203,107)
-        self.art.text(f'츄르 {c.churu_collected}/10',831,24,14,CREAM)
+                gold=int(195+24*math.sin(self.ui_clock*7+i))
+                p.draw_rectangle(x-9,8,x+9,10,237,gold,111,filled=True)
+        self.art.text(f'츄르 {c.churu_collected}/10',803,24,15,SECONDARY)
 
     def draw(self):
         p.clear_canvas()
@@ -517,15 +530,15 @@ class App:
         elif self.scene == 'LOBBY':
             self.lobby.draw(self)
         else:
-            self.background(True)
-            self.art.draw('ui/title_logo.png',480,477,420,280)
-            self.button('시작하기',(335,182,625,230),'start')
+            self.background()
+            self.art.draw('ui/title_wordmark_trail.png',480,499)
+            self.button('시작하기',(335,182,625,230),'start',primary=True)
             self.button('키 설명',CONTROLS_BUTTON,'controls')
             if self.controls_popup:
                 self.controls_panel()
         if self.error:
             self.panel(30,10,930,42)
-            self.art.text(self.error[:80],45,26,13,(151,44,44))
+            self.art.text(self.error[:80],45,26,13,ERROR)
 
     def action(self,action,x):
         if self.exit_confirm and action not in ('cancel_exit','confirm_exit'):

@@ -7,8 +7,8 @@ from .gacha import GachaReveal
 from .achievements import ACHIEVEMENTS, progress
 from .equipment import RULES as GEAR, item_name, definition, stat_value, enhancement_offer, material_allowed, bonuses
 from .rewards import level_cost
+from .ui import ACCENT, ERROR, FRAME, INK, LINE, PRIMARY, ROW, SECONDARY, SELECTED
 
-INK=(48,45,52)
 PANEL=(100,100,860,552)
 CLOSE=(696,492,836,526)
 CONTROLS=(275,190,685,490)
@@ -24,15 +24,6 @@ SLOTS=[(52+101*i,264,132+101*i,310) for i in range(3)]
 
 def contains(rect,x,y):
     return rect[0]<=x<=rect[2] and rect[1]<=y<=rect[3]
-
-
-def rounded_box(rect,color,radius=8):
-    left,bottom,right,top=rect
-    p.draw_rectangle(left+radius,bottom,right-radius,top,*color,filled=True)
-    p.draw_rectangle(left,bottom+radius,right,top-radius,*color,filled=True)
-    for x in (left+radius,right-radius):
-        for y in (bottom+radius,top-radius):
-            p.draw_circle(x,y,radius,*color,filled=True)
 
 
 class Lobby:
@@ -53,7 +44,9 @@ class Lobby:
     def bounds(self):
         if self.reveal:
             return self.reveal.BOUNDS
-        return (210,170,750,470) if self.confirm else CONTROLS if self.panel=='controls' else (40,70,920,552) if self.panel=='equipment' else PANEL
+        if self.confirm:
+            return (210,170,750,470)
+        return CONTROLS if self.panel=='controls' else (40,70,920,552) if self.panel=='equipment' else PANEL
 
     def open(self,app,name):
         if app.store.pending:
@@ -184,36 +177,36 @@ class Lobby:
             else:
                 self.close(app)
 
-    def draw(self,app):
+    def draw_lobby(self,app):
         art=app.art
         profile=app.store.profile
         selected=profile['selected_character_id']
         info=CHARACTERS[selected]
         character=profile['characters'][selected]
-        app.background(True)
-        app.panel(28,566,932,616)
+        app.panel(28,566,227,616)
         art.text('산책 준비',48,592,24,INK)
+        app.panel(664,566,932,616)
         REWARD_ART['gold'].draw(art,694,592,app.ui_clock,scale=1.4)
-        art.text(f'GOLD   {profile["gold"]:,}',720,592,20,INK)
-        app.panel(28,238,358,536)
-        app.cat(110,440,'idle',app.ui_clock,skin=info['skin'],scale=2.)
-        art.text(info['name'],196,493,24,INK)
-        art.text(f'Lv. {character["level"]}',196,460,21,INK)
+        art.text(f'GOLD   {profile["gold"]:,}',720,592,20,ACCENT)
+        app.panel(28,238,352,536)
+        art.text(info['name'],52,489,28,INK)
+        art.text(f'Lv. {character["level"]}',263,489,18,INK)
+        art.text(info['features'],52,452,15,SECONDARY)
+        p.draw_line(52,429,328,429,*LINE)
         maximum=character['level']==50
         exp=character['exp']
         label='EXP  MAX' if maximum else f'EXP  {exp:g} / {level_cost(character["level"])}'
         REWARD_ART['exp'].draw(art,64,404,app.ui_clock,scale=1.3)
         art.text(label,88,404,16,INK)
-        p.draw_rectangle(52,367,334,381,*INK,filled=True)
-        p.draw_rectangle(54,369,332,379,208,197,163,filled=True)
+        p.draw_rectangle(52,371,328,378,*LINE,filled=True)
         ratio=1. if maximum else exp/level_cost(character['level'])
         if ratio:
-            p.draw_rectangle(54,369,54+278*ratio,379,84,141,104,filled=True)
+            p.draw_rectangle(52,371,52+276*ratio,378,*PRIMARY,filled=True)
         art.text(f'미사용 스킬 포인트  {character["skill_points"]}',52,333,16,INK)
         app.buttons.append(((46,317,340,351),('lobby','open','skills'),True))
         inventory={item['id']:item for item in profile['items']}
         for i,rect in enumerate(SLOTS):
-            rounded_box(rect,(240,207,139) if contains(rect,*app.mouse) else (231,221,192))
+            p.draw_rectangle(*rect,*(SELECTED if contains(rect,*app.mouse) else ROW),filled=True)
             x=(rect[0]+rect[2])/2
             equipped=inventory.get(profile['equipment_slots'][i])
             label=GEAR['types'][definition(equipped)['type']]['name'] if equipped else '빈 슬롯' if i<profile['unlocked_slots'] else '잠금'
@@ -223,19 +216,24 @@ class Lobby:
             else:
                 art.text(label,x,287,13,INK,True)
             app.buttons.append((rect,('lobby','open','equipment'),True))
-        app.cat(480,225,'groom' if app.ui_clock%8>4 else 'idle',app.ui_clock,skin=info['skin'],scale=3.)
-        art.outlined_text(info['name'],480,193,24)
-        art.outlined_text(info['features'],480,159,15)
+        app.cat(483,132,'groom' if app.ui_clock%8>4 else 'idle',app.ui_clock,skin=info['skin'],scale=3.5)
+        p.draw_rectangle(871,178,889,526,*FRAME,filled=True)
+        p.draw_rectangle(875,182,884,526,107,88,63,filled=True)
         for name,(label,rect) in MENU.items():
-            app.button(label,rect,('lobby','open',name))
-        app.button('출전하기',(630,80,920,128),'start')
+            app.button(label,rect,('lobby','open',name),wayfinding=True)
+        app.button('출전하기',(630,80,920,128),'start',primary=True)
         app.button('설정',(30,84,165,126),('lobby','open','settings'))
         app.button('키 설명',(185,84,320,126),('lobby','open','controls'))
         app.button('타이틀',(30,28,165,70),'title')
-        art.outlined_text('Enter  출전하기',775,51,14)
+        art.outlined_text('Enter',775,54,14)
+
+    def draw(self,app):
+        art=app.art
+        app.background()
         if app.store.pending:
             self.panel=self.panel or 'shop'
             self.confirm=dict(operation=app.store.pending['operation'],args=app.store.pending['args'],lines=['저장이 끝나지 않은 거래가 있습니다.','같은 결과로 저장을 재시도합니다.'])
+        self.draw_lobby(app)
         if self.panel:
             app.buttons=[]
             if self.reveal:
@@ -246,15 +244,16 @@ class Lobby:
                 return
             self.draw_panel(app)
             if self.message or self.error:
-                art.text(('저장 실패 · 확인 버튼으로 재시도' if app.store.pending else (self.error or self.message))[:38],480,150 if self.panel=='equipment' else 115,14,INK,True)
+                x,y={'equipment':(480,150)}.get(self.panel,(480,115))
+                art.text(('저장 실패 · 확인 버튼으로 재시도' if app.store.pending else (self.error or self.message))[:38],x,y,14,INK,True)
             if self.confirm:
-                app.panel(210,170,750,470)
+                app.modal(210,170,750,470)
                 app.buttons=[]
                 art.text('거래 확인',480,430,24,INK,True)
                 for i,line in enumerate(self.confirm['lines']):
                     art.text(line,480,382-i*32,17,INK,True)
                 app.button('취소',(290,205,425,247),('lobby','cancel'),not bool(app.store.pending))
-                app.button('저장 재시도' if app.store.pending else '확인',(535,205,670,247),('lobby','confirm'))
+                app.button('저장 재시도' if app.store.pending else '확인',(535,205,670,247),('lobby','confirm'),primary=True)
 
     def draw_panel(self,app):
         art=app.art
@@ -263,17 +262,17 @@ class Lobby:
         info=CHARACTERS[selected]
         character=profile['characters'][selected]
         title=MENU[self.panel][0] if self.panel in MENU else '설정'
-        app.panel(*( (40,70,920,552) if self.panel=='equipment' else PANEL))
-        art.text(title,124,520,24,INK)
+        app.modal(*((40,70,920,552) if self.panel=='equipment' else PANEL))
+        art.text(title,124,520,24,ACCENT)
         app.button('닫기',CLOSE,('lobby','close'))
         if self.panel=='character':
-            p.draw_line(480,195,480,482,188,171,133)
+            p.draw_line(480,195,480,482,*LINE)
             for index,key in enumerate(k for k in profile['characters'] if k in CHARACTERS):
                 rect=(132,378-index*110,456,474-index*110)
-                color=(240,207,139) if key==self.preview else (231,221,192)
-                if contains(rect,*app.mouse):
-                    color=(247,219,157)
-                rounded_box(rect,color)
+                color=SELECTED if key==self.preview or contains(rect,*app.mouse) else ROW
+                p.draw_rectangle(*rect,*color,filled=True)
+                if key==self.preview:
+                    p.draw_rectangle(rect[0],rect[1],rect[0]+3,rect[3],*ACCENT,filled=True)
                 y=(rect[1]+rect[3])/2
                 app.cat(180,y-18,'idle',app.ui_clock,skin=CHARACTERS[key]['skin'])
                 art.text(CHARACTERS[key]['name'],240,y+14,19,INK)
@@ -286,9 +285,9 @@ class Lobby:
                 art.text(line,510,420-i*27,16,INK)
             art.text(preview['features'],510,348,16,INK)
             art.text(f'Lv. {growth["level"]}   스킬 포인트 {growth["skill_points"]}',510,305,16,INK)
-            app.button('선택하기',(525,130,815,178),('lobby','select'))
+            app.button('선택하기',(525,130,815,178),('lobby','select'),primary=True)
             if self.error:
-                art.text('선택 저장 실패 · 선택하기로 재시도',480,195,16,(151,44,44),True)
+                art.text('선택 저장 실패 · 선택하기로 재시도',480,195,16,ERROR,True)
         elif self.panel=='skills':
             art.text(f'{info["name"]}   Lv. {character["level"]}',132,451,22,INK)
             art.text(f'미사용 스킬 포인트  {character["skill_points"]}',132,409,18,INK)
@@ -317,6 +316,7 @@ class Lobby:
             self.page=min(self.page,(len(ACHIEVEMENTS)-1)//5)
             for i,achievement in enumerate(ACHIEVEMENTS[self.page*5:self.page*5+5]):
                 y=442-i*55
+                p.draw_line(132,y-32,826,y-32,*LINE)
                 claimed=achievement['id'] in profile['claimed_achievements']
                 current=progress(profile,achievement)
                 art.text(achievement['name'],132,y,18,INK)
@@ -371,7 +371,9 @@ class Lobby:
         for slot in range(3):
             left=100+slot*250
             rect=(left,460,left+220,490)
-            rounded_box(rect,(240,207,139) if slot==self.slot else (231,221,192))
+            p.draw_rectangle(*rect,*(SELECTED if slot==self.slot else ROW),filled=True)
+            if slot==self.slot:
+                p.draw_rectangle(left,460,left+220,462,*ACCENT,filled=True)
             item=by_id.get(profile['equipment_slots'][slot])
             text=f'{slot+1} · '+(GEAR['types'][definition(item)['type']]['name'] if item else '빈 슬롯' if slot<profile['unlocked_slots'] else f'잠금 {GEAR["slot_costs"][slot]} G')
             if item:
@@ -385,7 +387,10 @@ class Lobby:
         for index,item in enumerate(shown[self.page*5:self.page*5+5]):
             y=392-index*42
             rect=(100,y-18,490,y+18)
-            rounded_box(rect,(240,207,139) if item['id']==self.item_id else (231,221,192))
+            highlighted=item['id']==self.item_id
+            p.draw_rectangle(*rect,*(SELECTED if highlighted else ROW),filled=True)
+            if highlighted:
+                p.draw_rectangle(100,y-18,103,y+18,*ACCENT,filled=True)
             EQUIPMENT_ART.draw(art,item,122,y,app.ui_clock,size=30)
             art.text(item_name(item),149,y+5,16,INK)
             if item.get('is_new',False):
@@ -404,7 +409,7 @@ class Lobby:
             art.text(item_name(selected),535,435,20,INK)
             art.text(f'{GEAR["types"][spec["type"]]["label"]} +{stat_value(selected)*100:.2f}%',535,403,17,INK)
             art.text(f'강화 +{selected["enhancement"]} / 중첩 {selected["stacks"]}',535,375,16,INK)
-            app.button('장착',(540,315,675,357),('lobby','gear','equip'))
+            app.button('장착',(540,315,675,357),('lobby','gear','equip'),primary=True)
             app.button('해제',(705,315,840,357),('lobby','gear','unequip'),profile['equipment_slots'][self.slot] is not None)
             cost,chance=enhancement_offer(selected)
             app.button('강화',(540,260,675,302),('lobby','gear','enhance'),selected['enhancement']<10 and profile['gold']>=cost)

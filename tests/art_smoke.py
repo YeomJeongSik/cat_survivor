@@ -43,7 +43,7 @@ def main():
                     app.draw()
                     names = [call.args[0] for call in draws.call_args_list]
                     assert 'ui/equipment_chest.png' in names
-                    assert 'backgrounds/campus_title.png' in names
+                    assert 'backgrounds/campus_field.png' in names
                     assert 'backgrounds/campus_title_duel.png' not in names
                 assert any(rect==(508,193,793,235) and action==('lobby','gacha') for rect,action,_ in app.buttons)
                 capture(OUTPUT/'shop_chest.png')
