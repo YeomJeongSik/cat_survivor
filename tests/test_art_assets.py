@@ -14,7 +14,9 @@ ART = ROOT/'output/nyangi_art_v4'
 class ArtAssetTests(unittest.TestCase):
     def test_manifest_matches_png_files(self):
         manifest = json.loads((ART/'assets_manifest.json').read_text(encoding='utf-8'))
-        self.assertEqual(len(manifest['entries']),11)
+        png = ART/'png'
+        files = sorted(path.relative_to(png).as_posix() for path in png.rglob('*.png'))
+        self.assertEqual(sorted(spec['file'] for spec in manifest['entries']),files)
         for spec in manifest['entries']:
             with self.subTest(file=spec['file']):
                 data = (ART/'png'/spec['file']).read_bytes()

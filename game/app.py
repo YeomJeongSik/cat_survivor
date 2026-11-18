@@ -288,7 +288,7 @@ class App:
     def background(self,title=False):
         name = 'backgrounds/campus_title.png' if title else 'backgrounds/campus_gameplay.png'
         if title and self.scene=='TITLE':
-            name = 'backgrounds/campus_title_battle.png'
+            name = 'backgrounds/campus_title_duel.png'
         self.art.draw(name,480,320,960,640)
 
     def gameplay(self):

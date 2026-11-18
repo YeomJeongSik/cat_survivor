@@ -183,6 +183,13 @@
       "height": 640,
       "transparent": false,
       "sha256": "a62c516de7c0a226c126a98b8f1f06e64ad92c8f36425b0a458c4916d30f99a7"
+    },
+    {
+      "file": "backgrounds/campus_title_duel.png",
+      "width": 960,
+      "height": 640,
+      "transparent": false,
+      "sha256": "c4ba2f65c6529ce638498e887ed931f85b9e7670d4352ce774fb3b5e1b754043"
     }
   ],
   "palette": [

@@ -24,7 +24,7 @@ def main():
                     with patch.object(app.art,'draw',wraps=app.art.draw) as draws:
                         app.draw()
                         names = [call.args[0] for call in draws.call_args_list]
-                        assert 'backgrounds/campus_title_battle.png' in names
+                        assert 'backgrounds/campus_title_duel.png' in names
                 capture(OUTPUT/'intro_960x640.png')
                 app.click(480,155)
                 assert app.controls_popup
@@ -44,7 +44,7 @@ def main():
                     names = [call.args[0] for call in draws.call_args_list]
                     assert 'ui/equipment_chest.png' in names
                     assert 'backgrounds/campus_title.png' in names
-                    assert 'backgrounds/campus_title_battle.png' not in names
+                    assert 'backgrounds/campus_title_duel.png' not in names
                 assert any(rect==(508,193,793,235) and action==('lobby','gacha') for rect,action,_ in app.buttons)
                 capture(OUTPUT/'shop_chest.png')
                 p.clear_canvas()
