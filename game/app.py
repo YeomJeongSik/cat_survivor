@@ -370,21 +370,17 @@ class App:
         for projectile in w.projectiles:
             CHARACTER_ART[w.character_id].attack.draw(self.art,projectile.x,projectile.y,projectile.clock,
                             scale=projectile.scale,rotation=math.atan2(projectile.dy,projectile.dx))
-        p.draw_rectangle(0,562,959,639,*HUD,filled=True)
-        p.draw_rectangle(0,0,959,46,*HUD,filled=True)
-        p.draw_rectangle(0,562,959,564,*LINE,filled=True)
-        p.draw_rectangle(0,44,959,46,*LINE,filled=True)
         for i in range(3):
             self.art.draw(f'ui/heart_{"full" if i<c.hp else "empty"}.png',28+i*34,24,28,28)
-        self.art.text('근접' if w.character_id=='black' else '일반탄',128,24,16,INK)
+        self.art.outlined_text('근접' if w.character_id=='black' else '일반탄',128,24,16,center=False)
         for i in range(0 if w.character_id=='black' else BALANCE['ammo_max']):
             self.art.draw(f'ui/ammo_{"full" if i<c.ammo else "empty"}.png',208+i*23,24,20,20)
         self.charge_hud()
-        self.art.text('무한 생존',28,601,18,SECONDARY)
-        self.art.text(f'{int(w.time)//60:02d}:{int(w.time)%60:02d}',480,605,30,INK,True)
-        self.art.text('ESC  일시정지',808,601,15,SECONDARY)
+        self.art.outlined_text('무한 생존',28,601,18,SECONDARY,center=False)
+        self.art.outlined_text(f'{int(w.time)//60:02d}:{int(w.time)%60:02d}',480,605,30)
+        self.art.outlined_text('ESC  일시정지',808,601,15,SECONDARY,center=False)
         if w.warning_message:
-            self.art.text(w.warning_message,480,580,15,ACCENT,True)
+            self.art.outlined_text(w.warning_message,480,578,15,ACCENT)
         if w.mode == 'PAUSED':
             self.pause_panel()
         elif w.mode == 'COUNTDOWN':
@@ -507,25 +503,25 @@ class App:
 
     def charge_hud(self):
         c=self.world.cat
-        p.draw_line(301,9,301,37,91,109,99)
-        p.draw_line(548,9,548,37,91,109,99)
-        self.art.text(f'대시 {c.dash_charges}/2',319,24,15,INK)
+        self.art.outlined_text(f'대시 {c.dash_charges}/2',319,24,15,center=False)
         progress=1-c.dash_cd/self.world.dash_cooldown
         for i in range(BALANCE['dash_max_charges']):
             left=405+i*54
-            p.draw_rectangle(left,20,left+45,27,91,109,99,filled=True)
+            p.draw_rectangle(left-2,18,left+47,29,*FRAME,filled=True)
+            p.draw_rectangle(left,20,left+45,27,*LINE,filled=True)
             fill=1. if i<c.dash_charges else progress if i==c.dash_charges else 0.
             if fill>0:
-                p.draw_rectangle(left,20,left+45*fill,27,167,210,163,filled=True)
-        self.art.text('광역' if self.world.character_id=='black' else '관통',566,24,15,INK)
+                p.draw_rectangle(left,20,left+45*fill,27,*PRIMARY,filled=True)
+        self.art.outlined_text('광역' if self.world.character_id=='black' else '관통',566,24,15,center=False)
         for i in range(BALANCE['pierce_max_charges']):
             x=644+i*44
             ready=i<c.pierce_charges
-            self.art.sprite('sprites/projectiles/paw_000.png',x,25,scale=.65,alpha=1. if ready else .35)
+            self.art.draw(f'ui/ammo_{"full" if ready else "empty"}.png',x,25,24,24)
             if ready:
                 gold=int(195+24*math.sin(self.ui_clock*7+i))
-                p.draw_rectangle(x-9,8,x+9,10,237,gold,111,filled=True)
-        self.art.text(f'츄르 {c.churu_collected}/10',803,24,15,SECONDARY)
+                p.draw_rectangle(x-10,8,x+10,12,*FRAME,filled=True)
+                p.draw_rectangle(x-8,9,x+8,11,237,gold,111,filled=True)
+        self.art.outlined_text(f'츄르 {c.churu_collected}/10',803,24,15,SECONDARY,center=False)
 
     def draw(self):
         p.clear_canvas()
