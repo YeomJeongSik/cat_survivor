@@ -46,7 +46,7 @@ def main():
             app.store.profile['gold']=100000
             app.store.save_profile()
             draw();click(480,205)
-            click(775,317);click(340,417);draw('buy_black_confirmation');confirm()
+            click(775,317);click(120,440);click(340,417);draw('buy_black_confirmation');confirm()
             assert 'black' in app.store.profile['characters']
             assert app.store.profile['selected_character_id']=='nabi'
             assert any(action==('lobby','buy_black') and not enabled for _,action,enabled in app.buttons)
@@ -73,7 +73,7 @@ def main():
             click(775,317)
             before=app.store.profile['gold']
             for _ in range(3):
-                click(580,417);confirm()
+                click(340,417);confirm()
             assert app.store.profile['gold']==before-450 and len(app.store.profile['items'])==3
             draw('gacha_result')
             def fixture(key,definition):
@@ -120,7 +120,7 @@ def main():
             click(757,438);draw('achievement_claim');confirm()
             assert app.store.profile['gold']==before+30
             draw('achievements')
-            click(766,509);click(775,317);click(580,417)
+            click(766,509);click(775,317);click(340,417)
             write=app.store.write
             def fail_profile(name,value):
                 if name=='profile.json':raise OSError('test: disk full')

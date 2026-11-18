@@ -59,14 +59,15 @@ def main():
                     assert '???' not in records
                 if name=='shop':
                     before=copy.deepcopy(app.store.profile)
-                    app.click(340,417)
-                    app.click(820,417)
+                    assert app.lobby.shop_category=='equipment'
+                    assert '전체' not in records
+                    app.click(580,417)
                     assert app.lobby.confirm is None
                     app.click(120,440)
                     app.draw()
                     assert app.lobby.shop_category=='character'
                     assert [action for _,action,_ in app.buttons if action[1] in ('buy_black','gacha')]==[('lobby','buy_black')]
-                    app.click(120,384)
+                    app.click(120,496)
                     app.draw()
                     assert app.lobby.shop_category=='equipment'
                     assert [action for _,action,_ in app.buttons if action[1] in ('buy_black','gacha')]==[('lobby','gacha'),('lobby','gacha',10)]
@@ -74,13 +75,16 @@ def main():
                     assert app.lobby.confirm['args']=={'count':1}
                     assert app.store.profile==before
                     app.action(('lobby','cancel'),0)
+                    assert app.lobby.shop_category=='equipment'
+                    app.draw()
+                    app.click(120,440)
                 key(p.SDLK_RETURN)
                 assert app.scene=='LOBBY' and app.world is None
                 key(p.SDLK_ESCAPE)
                 assert app.lobby.panel is None
                 if name=='shop':
                     app.lobby.open(app,'shop')
-                    assert app.lobby.shop_category=='all'
+                    assert app.lobby.shop_category=='equipment'
                     app.lobby.close(app)
             app.draw()
             app.click(95,105)

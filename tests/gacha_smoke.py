@@ -46,7 +46,7 @@ def main():
                 click(480,205)
                 click(775,317)
                 draw('shop_ten_draw')
-                click(820,417)
+                click(580,417)
                 draw('ten_confirmation')
                 rng=Mock()
                 rng.choices.side_effect=[[r] for r in ['common','rare','unique','common','legendary']*2]
@@ -97,7 +97,7 @@ def main():
                 draw('inventory_seen')
                 click(766,509)
                 click(775,317)
-                click(820,417)
+                click(580,417)
                 write=app.store.write
                 def fail(name,value):
                     if name=='profile.json':raise OSError('test: disk unavailable')
@@ -113,7 +113,7 @@ def main():
                 finish()
                 click(480,125)
                 assert app.lobby.reveal is None
-                click(580,417)
+                click(340,417)
                 click(602,226)
                 assert app.lobby.reveal.result['count']==1
                 finish()

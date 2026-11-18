@@ -13,7 +13,7 @@ PANEL=(100,100,860,552)
 CLOSE=(696,492,836,526)
 CONTROLS=(275,190,685,490)
 SHOP=(28,34,932,608)
-SHOP_CATEGORIES={'all':'전체','character':'캐릭터','equipment':'장비'}
+SHOP_CATEGORIES={'equipment':'장비','character':'캐릭터'}
 MENU={
     'character':('캐릭터 선택',(630,480,920,526)),
     'skills':('스킬 트리',(630,418,920,464)),
@@ -41,7 +41,7 @@ class Lobby:
         self.material_target=None
         self.slot=0
         self.reveal=None
-        self.shop_category='all'
+        self.shop_category='equipment'
 
     @property
     def bounds(self):
@@ -61,7 +61,7 @@ class Lobby:
         self.close(app)
         self.panel=name
         self.message=''
-        self.shop_category='all'
+        self.shop_category='equipment'
         self.page=0
         self.material_target=None
         app.buttons=[]
@@ -290,7 +290,7 @@ class Lobby:
             ('equipment','장비 뽑기 ×1','장비 1개',price,('lobby','gacha')),
             ('equipment','장비 뽑기 ×10','장비 10개',price*10,('lobby','gacha',10)),
         )
-        visible=[offer for offer in offers if self.shop_category in ('all',offer[0])]
+        visible=[offer for offer in offers if self.shop_category==offer[0]]
         for i,(category,label,description,cost,action) in enumerate(visible):
             left=228+i*240
             x=left+112
@@ -313,7 +313,7 @@ class Lobby:
             art.text(status,x,233,15,FRAME if hovered else INK if enabled else SECONDARY,True)
             app.buttons.append((rect,action,enabled))
 
-        if self.shop_category!='character':
+        if self.shop_category=='equipment':
             app.panel(228,120,932,177)
             odds='   /   '.join(f'{tier["name"]} {tier["weight"]}%' for tier in GEAR['rarities'].values())
             art.text('장비 등급 확률',250,148,15,INK)
