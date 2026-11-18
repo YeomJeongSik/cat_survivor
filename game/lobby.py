@@ -1,7 +1,7 @@
 """Lobby layout and panel state; economic actions belong to later features."""
 from uuid import uuid4
 import pico2d as p
-from .characters import CHARACTERS
+from .characters import BLACK_PRICE, CHARACTERS
 from .visuals import REWARD_ART, NEW_BADGE, EQUIPMENT_ART
 from .gacha import GachaReveal
 from .achievements import ACHIEVEMENTS, progress
@@ -12,6 +12,8 @@ from .ui import ACCENT, ERROR, FRAME, INK, LINE, PRIMARY, ROW, SECONDARY, SELECT
 PANEL=(100,100,860,552)
 CLOSE=(696,492,836,526)
 CONTROLS=(275,190,685,490)
+SHOP=(28,34,932,608)
+SHOP_CATEGORIES={'all':'전체','character':'캐릭터','equipment':'장비'}
 MENU={
     'character':('캐릭터 선택',(630,480,920,526)),
     'skills':('스킬 트리',(630,418,920,464)),
@@ -39,6 +41,7 @@ class Lobby:
         self.material_target=None
         self.slot=0
         self.reveal=None
+        self.shop_category='all'
 
     @property
     def bounds(self):
@@ -46,6 +49,8 @@ class Lobby:
             return self.reveal.BOUNDS
         if self.confirm:
             return (210,170,750,470)
+        if self.panel=='shop':
+            return SHOP
         return CONTROLS if self.panel=='controls' else (40,70,920,552) if self.panel=='equipment' else PANEL
 
     def open(self,app,name):
@@ -56,6 +61,7 @@ class Lobby:
         self.close(app)
         self.panel=name
         self.message=''
+        self.shop_category='all'
         self.page=0
         self.material_target=None
         app.buttons=[]
@@ -116,7 +122,10 @@ class Lobby:
             if args[0]=='reveal_close':
                 self.close(app)
             return
-        if args[0]=='page':
+        if args[0]=='shop_category' and self.panel=='shop' and not self.confirm:
+            self.shop_category=args[1]
+            app.buttons=[]
+        elif args[0]=='page':
             self.page=max(0,self.page+args[1])
             app.buttons=[]
         elif args[0]=='claim':
@@ -161,7 +170,7 @@ class Lobby:
                 self.confirm=None
                 app.buttons=[]
         elif args[0]=='buy_black':
-            self.ask(app,'buy_character',{'character_id':'black'},['흑냥이를 구매할까요?','비용: 500 GOLD','구매 후 캐릭터 창에서 선택할 수 있습니다.'])
+            self.ask(app,'buy_character',{'character_id':'black'},['흑냥이를 구매할까요?',f'비용: {BLACK_PRICE:,} GOLD','구매 후 캐릭터 창에서 선택할 수 있습니다.'])
         elif args[0]=='open':
             self.open(app,args[1])
         elif args[0]=='close':
@@ -233,7 +242,8 @@ class Lobby:
         if app.store.pending:
             self.panel=self.panel or 'shop'
             self.confirm=dict(operation=app.store.pending['operation'],args=app.store.pending['args'],lines=['저장이 끝나지 않은 거래가 있습니다.','같은 결과로 저장을 재시도합니다.'])
-        self.draw_lobby(app)
+        if self.panel!='shop':
+            self.draw_lobby(app)
         if self.panel:
             app.buttons=[]
             if self.reveal:
@@ -242,9 +252,12 @@ class Lobby:
             if self.panel=='controls':
                 app.controls_panel()
                 return
-            self.draw_panel(app)
+            if self.panel=='shop':
+                self.draw_shop(app)
+            else:
+                self.draw_panel(app)
             if self.message or self.error:
-                x,y={'equipment':(480,150)}.get(self.panel,(480,115))
+                x,y={'equipment':(480,150),'shop':(577,76)}.get(self.panel,(480,115))
                 art.text(('저장 실패 · 확인 버튼으로 재시도' if app.store.pending else (self.error or self.message))[:38],x,y,14,INK,True)
             if self.confirm:
                 app.modal(210,170,750,470)
@@ -254,6 +267,57 @@ class Lobby:
                     art.text(line,480,382-i*32,17,INK,True)
                 app.button('취소',(290,205,425,247),('lobby','cancel'),not bool(app.store.pending))
                 app.button('저장 재시도' if app.store.pending else '확인',(535,205,670,247),('lobby','confirm'),primary=True)
+
+    def draw_shop(self,app):
+        art=app.art
+        profile=app.store.profile
+        gold=profile['gold']
+        app.shade()
+        app.panel(28,34,212,608)
+        app.panel(228,538,932,608)
+        app.button('‹  로비로',(44,552,196,592),('lobby','close'))
+        art.text('상점',252,573,27,INK)
+        REWARD_ART['gold'].draw(art,731,573,app.ui_clock,scale=1.3)
+        art.text(f'{gold:,} GOLD',753,573,19,ACCENT)
+        for i,(category,label) in enumerate(SHOP_CATEGORIES.items()):
+            y=474-i*56
+            app.button(label,(44,y,196,y+44),('lobby','shop_category',category),
+                       primary=self.shop_category==category,wayfinding=True)
+
+        price=GEAR['gacha_price']
+        offers=(
+            ('character','흑냥이','근접 캐릭터',BLACK_PRICE,('lobby','buy_black')),
+            ('equipment','장비 뽑기 ×1','장비 1개',price,('lobby','gacha')),
+            ('equipment','장비 뽑기 ×10','장비 10개',price*10,('lobby','gacha',10)),
+        )
+        visible=[offer for offer in offers if self.shop_category in ('all',offer[0])]
+        for i,(category,label,description,cost,action) in enumerate(visible):
+            left=228+i*240
+            x=left+112
+            rect=(left,207,left+224,513)
+            owned=category=='character' and 'black' in profile['characters']
+            enabled=not owned and gold>=cost
+            hovered=enabled and contains(rect,*app.mouse)
+            app.panel(*rect)
+            p.draw_rectangle(left+10,330,left+214,503,*(SELECTED if hovered else ROW),filled=True)
+            if category=='character':
+                app.cat(x,356,'idle',app.ui_clock,skin=CHARACTERS['black']['skin'],scale=3.)
+            else:
+                art.draw('ui/equipment_chest.png',x,417,118,106,alpha=1. if enabled else .7)
+            art.text(label,x,305,20,INK,True)
+            art.text(description,x,275,14,SECONDARY,True)
+            p.draw_rectangle(left+8,215,left+216,250,*(PRIMARY if hovered else FRAME),filled=True)
+            status='보유 완료' if owned else f'{cost:,} GOLD'
+            if not enabled and not owned:
+                status+=' · 부족'
+            art.text(status,x,233,15,FRAME if hovered else INK if enabled else SECONDARY,True)
+            app.buttons.append((rect,action,enabled))
+
+        if self.shop_category!='character':
+            app.panel(228,120,932,177)
+            odds='   /   '.join(f'{tier["name"]} {tier["weight"]}%' for tier in GEAR['rarities'].values())
+            art.text('장비 등급 확률',250,148,15,INK)
+            art.text(odds,650,148,14,SECONDARY,True)
 
     def draw_panel(self,app):
         art=app.art
@@ -295,23 +359,6 @@ class Lobby:
             art.text('스킬 구성이 정해지면 이곳에서 포인트를 사용할 수 있습니다.',480,255,17,INK,True)
         elif self.panel=='equipment':
             self.draw_equipment(app)
-        elif self.panel=='shop':
-            REWARD_ART['gold'].draw(art,113,454,app.ui_clock,scale=1.1)
-            art.text(f'보유 GOLD   {profile["gold"]:,}',132,454,18,INK)
-            if 'black' not in profile['characters']:
-                art.text('흑냥이',310,423,24,INK,True)
-                art.text('근접 캐릭터',310,397,17,INK,True)
-                app.cat(310,284,'idle',app.ui_clock,skin=CHARACTERS['black']['skin'],scale=3.)
-                art.text('500 GOLD',310,257,21,INK,True)
-                app.button('구매하기',(168,193,453,235),('lobby','buy_black'),profile['gold']>=500)
-            else:
-                art.text('모든 캐릭터 보유',310,355,21,INK,True)
-            art.text('장비 뽑기',650,423,24,INK,True)
-            art.draw('ui/equipment_chest.png',650,340,160,144)
-            art.text('150 GOLD',650,257,21,INK,True)
-            app.button('1회 뽑기',(508,193,793,235),('lobby','gacha'),profile['gold']>=150)
-            app.button('10연뽑 · 1,500 G',(508,139,793,181),('lobby','gacha',10),profile['gold']>=GEAR['gacha_price']*10)
-            art.text('Common 70% · Rare 23% · Unique 6% · Legendary 1%',480,480,14,INK,True)
         elif self.panel=='achievements':
             self.page=min(self.page,(len(ACHIEVEMENTS)-1)//5)
             for i,achievement in enumerate(ACHIEVEMENTS[self.page*5:self.page*5+5]):

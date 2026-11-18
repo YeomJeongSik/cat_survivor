@@ -2,6 +2,7 @@
 from .rewards import initial_character, grow_character
 from .achievements import ACHIEVEMENTS, progress
 from .equipment import apply_equipment
+from .characters import BLACK_PRICE
 
 
 def apply_operation(profile,operation,args,rng,request_id,gacha_pool=None):
@@ -10,9 +11,9 @@ def apply_operation(profile,operation,args,rng,request_id,gacha_pool=None):
             raise ValueError('Unknown character')
         if 'black' in profile['characters']:
             raise ValueError('Already owned')
-        if profile['gold']<500:
+        if profile['gold']<BLACK_PRICE:
             raise ValueError('GOLD가 부족합니다.')
-        profile['gold']-=500
+        profile['gold']-=BLACK_PRICE
         profile['characters']['black']=initial_character()
         return {'message':'흑냥이를 구매했습니다.'}
     if operation=='claim_achievement':

@@ -1,4 +1,6 @@
 """Playable character definitions shared by model, storage and lobby."""
+BLACK_PRICE = 500
+
 CHARACTERS = {
     'nabi': {
         'name': '나비',

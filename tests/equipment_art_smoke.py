@@ -73,7 +73,7 @@ def main():
                 with patch.object(app.art,'sprite',wraps=app.art.sprite) as sprites:
                     draw('ten_equipment_results')
                     calls=[c.args[0] for c in sprites.call_args_list]
-                    assert sum('/equipment_fx/' in name for name in calls)==13  # Three equipped slots plus ten results.
+                    assert sum('/equipment_fx/' in name for name in calls)==10  # One effect per result.
                     for i,name in enumerate(calls):
                         if '/equipment/' in name:
                             assert i and '/equipment_fx/' in calls[i-1]

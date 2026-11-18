@@ -39,7 +39,7 @@ class LobbyTest(unittest.TestCase):
             self.assertEqual(app.lobby.panel,name)
             app.action('start',0)
             self.assertEqual(app.scene,'LOBBY')
-            app.click(50,50)
+            app.click(15,15)
             self.assertIsNone(app.lobby.panel)
             self.assertEqual(app.scene,'LOBBY')
 

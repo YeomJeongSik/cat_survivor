@@ -46,10 +46,11 @@ def main():
             app.store.profile['gold']=100000
             app.store.save_profile()
             draw();click(480,205)
-            click(775,317);click(310,214);draw('buy_black_confirmation');confirm()
+            click(775,317);click(340,417);draw('buy_black_confirmation');confirm()
             assert 'black' in app.store.profile['characters']
             assert app.store.profile['selected_character_id']=='nabi'
-            click(766,509);click(775,503);click(200,316)
+            assert any(action==('lobby','buy_black') and not enabled for _,action,enabled in app.buttons)
+            click(120,573);click(775,503);click(200,316)
             assert app.store.profile['selected_character_id']=='nabi'
             draw('black_character');click(670,154)
             assert app.store.profile['selected_character_id']=='black'
@@ -72,14 +73,14 @@ def main():
             click(775,317)
             before=app.store.profile['gold']
             for _ in range(3):
-                click(650,214);confirm()
+                click(580,417);confirm()
             assert app.store.profile['gold']==before-450 and len(app.store.profile['items'])==3
             draw('gacha_result')
             def fixture(key,definition):
                 return dict(id=key,definition=definition,enhancement=0,stacks=0,locked=False)
             app.store.profile['items'] += [fixture('target','bell_common'),fixture('material','bell_common'),fixture('sale','bell_legendary')]
             app.store.save_profile()
-            click(766,509);click(775,379)
+            click(120,573);click(775,379)
             click(200,266)
             assert app.lobby.item_id=='target'
             click(607,336);confirm()
@@ -119,7 +120,7 @@ def main():
             click(757,438);draw('achievement_claim');confirm()
             assert app.store.profile['gold']==before+30
             draw('achievements')
-            click(766,509);click(775,317);click(650,214)
+            click(766,509);click(775,317);click(580,417)
             write=app.store.write
             def fail_profile(name,value):
                 if name=='profile.json':raise OSError('test: disk full')

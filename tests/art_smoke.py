@@ -45,7 +45,7 @@ def main():
                     assert 'ui/equipment_chest.png' in names
                     assert 'backgrounds/campus_field.png' in names
                     assert 'backgrounds/campus_title_duel.png' not in names
-                assert any(rect==(508,193,793,235) and action==('lobby','gacha') for rect,action,_ in app.buttons)
+                assert any(action==('lobby','gacha') for _,action,_ in app.buttons)
                 capture(OUTPUT/'shop_chest.png')
                 p.clear_canvas()
                 app.panel(0,0,960,640)
