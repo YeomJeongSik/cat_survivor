@@ -290,7 +290,7 @@ class App:
             p.draw_rectangle(right-25,y-5,right-23,y+5,*marker,filled=True)
             p.draw_rectangle(right-22,y-3,right-20,y+3,*marker,filled=True)
             p.draw_rectangle(right-19,y-1,right-17,y+1,*marker,filled=True)
-        else:
+        elif label:
             self.art.text(label,(left+right)/2,y,18,ink,True)
         self.buttons.append((rect,action,enabled))
 

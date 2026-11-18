@@ -13,3 +13,8 @@ ACHIEVEMENTS=(
 
 def progress(profile,achievement):
     return min(achievement['target'],profile['stats'][achievement['metric']])
+
+
+def can_claim(profile,achievement):
+    return (achievement['id'] not in profile['claimed_achievements']
+            and progress(profile,achievement)>=achievement['target'])

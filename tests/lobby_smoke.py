@@ -87,25 +87,32 @@ def main():
                     assert app.lobby.shop_category=='equipment'
                     app.lobby.close(app)
             app.draw()
-            app.click(95,105)
+            assert 'title' not in [action for _,action,_ in app.buttons]
+            app.click(907,591)
             assert app.lobby.panel=='settings'
             app.draw()
             capture(OUTPUT/'lobby_settings.png')
-            app.action(('volume','bgm_volume',352),360)
+            app.click(480,365)
+            assert app.lobby.panel=='sound'
+            app.draw()
+            capture(OUTPUT/'lobby_sound.png')
+            app.click(360,365)
             assert app.store.profile['bgm_volume']==0
             if app.audio.available:assert p.Mix_VolumeMusic(-1)==0
             app.change_volume(600)
             assert app.store.profile['bgm_volume']==100
             app.click(50,50)
-            assert app.dragging is None and app.lobby.panel is None
+            assert app.dragging is None and app.lobby.panel=='settings'
             app.draw()
-            app.click(250,105)
+            app.click(480,282)
             assert app.lobby.panel=='controls'
             app.draw()
             capture(OUTPUT/'lobby_controls.png')
             # Outside click closes the panel without activating the launch behind it.
             app.click(775,104)
-            assert app.lobby.panel is None and app.scene=='LOBBY' and app.world is None
+            assert app.lobby.panel=='settings' and app.scene=='LOBBY' and app.world is None
+            key(p.SDLK_ESCAPE)
+            assert app.lobby.panel is None
             app.draw()
             key(p.SDLK_RETURN)
             assert app.scene=='PLAY'
@@ -122,6 +129,22 @@ def main():
             app.draw()
             assert 'GOLD   401' in records and 'Lv. 5' in records and 'EXP  102 / 200' in records
             capture(OUTPUT/'lobby_after_settlement.png')
+            assert '0' not in records
+            app.store.profile['stats'].update(kills=100,bee=30)
+            records.clear()
+            app.draw()
+            assert '3' in records
+            capture(OUTPUT/'lobby_claimable.png')
+            app.click(775,255)
+            app.draw()
+            app.click(757,438)
+            app.draw()
+            app.click(602,226)
+            app.draw()
+            app.click(766,509)
+            records.clear()
+            app.draw()
+            assert '2' in records and '3' not in records
             # Every panel is also rendered at both supported representative sizes.
             for width,height in ((720,480),(1280,720)):
                 p.SDL_SetWindowSize(native.window,width,height)
@@ -131,7 +154,7 @@ def main():
                     p.update_canvas()
                 app.draw()
                 capture(OUTPUT/f'lobby_{width}x{height}.png')
-                for name in (*MENU,'settings','controls'):
+                for name in (*MENU,'settings','sound','controls'):
                     app.lobby.open(app,name)
                     app.draw()
                     capture(OUTPUT/f'lobby_{name}_{width}x{height}.png')
@@ -143,7 +166,7 @@ def main():
             app.draw()
             key(p.SDLK_RETURN)
             assert app.scene=='LOBBY'
-            print('LOBBY SDL PASS: title/lobby/play/result/lobby; live saved totals; all 7 panels; modal Enter/ESC; purchase confirmations; volume')
+            print('LOBBY SDL PASS: lobby panels, sound and keys navigation, live claimable count, purchase confirmations and volume')
             print('LOBBY BOUNDS PASS: all rendered text fits 960x640; 720x480 and 1280x720 panels and logical centers')
         finally:
             app.close()

@@ -1,10 +1,11 @@
 """Lobby layout and panel state; economic actions belong to later features."""
+from math import isqrt
 from uuid import uuid4
 import pico2d as p
 from .characters import BLACK_PRICE, CHARACTERS
 from .visuals import REWARD_ART, NEW_BADGE, EQUIPMENT_ART
 from .gacha import GachaReveal
-from .achievements import ACHIEVEMENTS, progress
+from .achievements import ACHIEVEMENTS, can_claim, progress
 from .equipment import RULES as GEAR, item_name, definition, stat_value, enhancement_offer, material_allowed, bonuses
 from .rewards import level_cost
 from .ui import ACCENT, ERROR, FRAME, INK, LINE, PRIMARY, ROW, SECONDARY, SELECTED
@@ -14,6 +15,9 @@ CLOSE=(696,492,836,526)
 CONTROLS=(275,190,685,490)
 SHOP=(28,34,932,608)
 SHOP_CATEGORIES={'equipment':'장비','character':'캐릭터'}
+SETTINGS_BUTTON=(882,566,932,616)
+SETTINGS_PAGES=('sound','controls')
+SETTINGS_BACK=(568,443,660,475)
 MENU={
     'character':('캐릭터 선택',(630,480,920,526)),
     'skills':('스킬 트리',(630,418,920,464)),
@@ -51,12 +55,12 @@ class Lobby:
             return (210,170,750,470)
         if self.panel=='shop':
             return SHOP
-        return CONTROLS if self.panel=='controls' else (40,70,920,552) if self.panel=='equipment' else PANEL
+        return CONTROLS if self.panel in ('settings','controls') else (40,70,920,552) if self.panel=='equipment' else PANEL
 
     def open(self,app,name):
         if app.store.pending:
             return
-        if name not in (*MENU,'settings','controls'):
+        if name not in (*MENU,'settings',*SETTINGS_PAGES):
             return
         self.close(app)
         self.panel=name
@@ -82,7 +86,7 @@ class Lobby:
         if app.dragging:
             app.dragging=None
             app.save()
-        self.panel=None
+        self.panel='settings' if self.panel in SETTINGS_PAGES else None
         self.error=''
         app.buttons=[]
         app.keys.clear()
@@ -194,9 +198,14 @@ class Lobby:
         character=profile['characters'][selected]
         app.panel(28,566,227,616)
         art.text('산책 준비',48,592,24,INK)
-        app.panel(664,566,932,616)
-        REWARD_ART['gold'].draw(art,694,592,app.ui_clock,scale=1.4)
-        art.text(f'GOLD   {profile["gold"]:,}',720,592,20,ACCENT)
+        app.panel(602,566,870,616)
+        REWARD_ART['gold'].draw(art,632,592,app.ui_clock,scale=1.4)
+        art.text(f'GOLD   {profile["gold"]:,}',658,592,20,ACCENT)
+        app.button('',SETTINGS_BUTTON,('lobby','open','settings'))
+        for dx,dy in ((0,12),(8,8),(12,0),(8,-8),(0,-12),(-8,-8),(-12,0),(-8,8)):
+            p.draw_rectangle(904+dx,588+dy,910+dx,594+dy,*INK,filled=True)
+        p.draw_circle(907,591,11,*INK,filled=True)
+        p.draw_circle(907,591,5,*(SELECTED if contains(SETTINGS_BUTTON,*app.mouse) else ROW),filled=True)
         app.panel(28,238,352,536)
         art.text(info['name'],52,489,28,INK)
         art.text(f'Lv. {character["level"]}',263,489,18,INK)
@@ -230,12 +239,15 @@ class Lobby:
         p.draw_rectangle(875,182,884,526,107,88,63,filled=True)
         for name,(label,rect) in MENU.items():
             app.button(label,rect,('lobby','open',name),wayfinding=True)
+        claimable=sum(can_claim(profile,achievement) for achievement in ACHIEVEMENTS)
+        if claimable:
+            p.draw_circle(895,255,16,104,29,40,filled=True)
+            for dy in range(-14,15):
+                span=isqrt(14*14-dy*dy)
+                p.draw_line(895-span,255+dy,895+span,255+dy,173+3*(dy+14)//2,39+dy+14,55+dy+14)
+            art.text(str(claimable),895,255,16,(255,255,255),True)
         app.button('출전하기',(630,80,920,128),'start',primary=True)
-        app.button('설정',(30,84,165,126),('lobby','open','settings'))
-        app.button('키 설명',(185,84,320,126),('lobby','open','controls'))
-        app.button('타이틀',(30,28,165,70),'title')
         art.outlined_text('Enter',775,54,14)
-
     def draw(self,app):
         art=app.art
         if app.store.pending:
@@ -250,6 +262,7 @@ class Lobby:
                 return
             if self.panel=='controls':
                 app.controls_panel()
+                app.button('뒤로',SETTINGS_BACK,('lobby','close'))
                 return
             if self.panel=='shop':
                 self.draw_shop(app)
@@ -320,11 +333,25 @@ class Lobby:
 
     def draw_panel(self,app):
         art=app.art
+        if self.panel=='settings':
+            app.modal(*CONTROLS)
+            art.text('설정',480,454,25,ACCENT,True)
+            app.button('닫기',(568,438,660,470),('lobby','close'))
+            app.button('사운드',(317,333,643,394),('lobby','open','sound'),wayfinding=True)
+            app.button('키',(317,253,643,314),('lobby','open','controls'),wayfinding=True)
+            return
+        if self.panel=='sound':
+            app.modal(*self.bounds)
+            art.text('사운드',124,520,24,ACCENT)
+            app.button('뒤로',CLOSE,('lobby','close'))
+            app.volume('bgm_volume',352,365)
+            app.volume('sfx_volume',352,260)
+            return
         profile=app.store.profile
         selected=profile['selected_character_id']
         info=CHARACTERS[selected]
         character=profile['characters'][selected]
-        title=MENU[self.panel][0] if self.panel in MENU else '설정'
+        title=MENU[self.panel][0]
         app.modal(*((40,70,920,552) if self.panel=='equipment' else PANEL))
         art.text(title,124,520,24,ACCENT)
         app.button('닫기',CLOSE,('lobby','close'))
@@ -369,12 +396,9 @@ class Lobby:
                 art.text(f'{achievement["description"]}  {current:g}/{achievement["target"]}',132,y-23,14,INK)
                 reward=f'EXP +{achievement["exp"]}' if achievement['exp'] else f'GOLD +{achievement["gold"]}'
                 art.text(reward,540,y-8,15,INK)
-                app.button('수령 완료' if claimed else '수령',(690,y-25,825,y+17),('lobby','claim',achievement['id']),not claimed and current>=achievement['target'])
+                app.button('수령 완료' if claimed else '수령',(690,y-25,825,y+17),('lobby','claim',achievement['id']),can_claim(profile,achievement))
             app.button('이전',(170,140,305,182),('lobby','page',-1),self.page>0)
             app.button('다음',(655,140,790,182),('lobby','page',1),(self.page+1)*5<len(ACHIEVEMENTS))
-        elif self.panel=='settings':
-            app.volume('bgm_volume',352,365)
-            app.volume('sfx_volume',352,260)
 
 
     def gear_action(self,app,operation):

@@ -34,7 +34,7 @@ class LobbyTest(unittest.TestCase):
         app.enter_lobby()
         app.update(20)
         self.assertEqual(world.time,0)
-        for name in (*MENU,'settings','controls'):
+        for name in (*MENU,'settings'):
             app.action(('lobby','open',name),0)
             self.assertEqual(app.lobby.panel,name)
             app.action('start',0)
@@ -88,11 +88,12 @@ class LobbyTest(unittest.TestCase):
     def test_closing_settings_finishes_drag_saves_and_clears_inputs(self):
         app=headless_app(self.store,World())
         app.enter_lobby()
-        app.lobby.open(app,'settings')
+        app.lobby.open(app,'sound')
         app.dragging=('bgm_volume',352)
         app.keys.add('shoot')
         app.store.profile['bgm_volume']=30
         app.lobby.close(app)
+        self.assertEqual(app.lobby.panel,'settings')
         self.assertIsNone(app.dragging)
         self.assertFalse(app.keys)
         self.assertEqual(Store(self.folder.name).profile['bgm_volume'],30)
